@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://involving-ict-formed-step.trycloudflare.com/:path*" }
+  ]
+}
