@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Wasky App</title>
+    <style>
+        :root {
+            /* Identidad Wasky Obligatoria */
+            --wasky-primary: #0A525F;
+            --wasky-accent: #A5CF53;
+            
+            /* Paleta de apoyo */
+            --wasky-bg: #F8F9FA;
+            --wasky-white: #FFFFFF;
+            --wasky-text-dark: #2D3436;
+            --wasky-text-muted: #636E72;
+            --wasky-border: #E9ECEF;
+            --wasky-error: #FF7675;
+            --wasky-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            
+            /* Dimensiones */
+            --header-height: 60px;
+            --nav-height: 70px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #2d3436;
+            display: flex;
+            justify-content: center;
+            color: var(--wasky-text-dark);
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            background-color: var(--wasky-bg);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: fadeIn 0.3s ease-out;
+            background-color: var(--wasky-bg);
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            height: var(--header-height);
+            background-color: var(--wasky-white);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid var(--wasky-border);
+            z-index: 10;
+        }
+
+        /* Nav Global */
+        nav#main-nav {
+            display: none; /* Se activa mediante JS solo en ciertas pantallas */
+            height: var(--nav-height);
+            background-color: var(--wasky-white);
+            border-top: 1px solid var(--wasky-border);
+            justify-content: space-around;
+            align-items: center;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            z-index: 20;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.03);
+        }
+
+        main {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px;
+            /* Espaciado dinámico dependiendo de si hay header o nav */
+            padding-bottom: calc(var(--nav-height) + 40px);
+        }
+        
+        .header-padding { padding-top: calc(var(--header-height) + 20px); }
+
+        .btn {
+            padding: 14px 24px;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background-color: var(--wasky-primary); color: white; }
+        .btn-accent { background-color: var(--wasky-accent); color: var(--wasky-primary); }
+
+        .card {
+            background: var(--wasky-white);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--wasky-shadow);
+        }
+
+        .input-group { margin-bottom: 16px; }
+        .input-group label { display: block; font-size: 14px; color: var(--wasky-text-muted); margin-bottom: 6px; }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--wasky-border);
+            font-size: 16px;
+            outline: none;
+        }
+        .input-group input:focus { border-color: var(--wasky-primary); }
+
+        /* Splash & Login */
+        #splash-screen { justify-content: center; align-items: center; background-color: var(--wasky-primary); }
+        .logo-big { width: 120px; height: 120px; background-color: var(--wasky-accent); border-radius: 24px; display: flex; justify-content: center; align-items: center; }
+        .login-container { display: flex; flex-direction: column; justify-content: center; height: 100%; padding: 30px; }
+        .login-container h1 { font-size: 28px; margin-bottom: 8px; color: var(--wasky-primary); }
+        .login-container p { color: var(--wasky-text-muted); margin-bottom: 32px; }
+
+        /* Onboarding */
+        .onboarding-list { list-style: none; margin: 24px 0; }
+        .onboarding-item { display: flex; align-items: center; margin-bottom: 16px; font-size: 16px; }
+        .onboarding-icon { width: 24px; height: 24px; margin-right: 12px; color: var(--wasky-accent); }
+
+        /* Scanning */
+        .scanning-content { height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .loader {
+            width: 60px; height: 60px; border: 5px solid var(--wasky-border);
+            border-top: 5px solid var(--wasky-accent); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Dashboard */
+        .summary-card { background: linear-gradient(135deg, var(--wasky-primary), #063641); color: white; padding: 24px; border-radius: 20px; }
+        .summary-value { font-size: 32px; font-weight: 700; margin: 8px 0; }
+        .filter-tabs { display: flex; gap: 10px; margin: 20px 0; }
+        .tab { flex: 1; padding: 10px; text-align: center; border-radius: 10px; background: var(--wasky-border); font-size: 14px; font-weight: 600; cursor: pointer; }
+        .tab.active { background: var(--wasky-accent); color: var(--wasky-primary); }
+        .search-bar { width: 100%; padding: 12px; background: var(--wasky-white); border: 1px solid var(--wasky-border); border-radius: 10px; margin-bottom: 20px; display: flex; align-items: center; }
+        .search-bar svg { margin-right: 10px; color: var(--wasky-text-muted); }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--wasky-border); }
+        .list-item:last-child { border-bottom: none; }
+        .item-info h4 { font-size: 16px; }
+        .item-info p { font-size: 13px; color: var(--wasky-text-muted); }
+        .item-amount { font-weight: 700; text-align: right; }
+
+        /* FAB */
+        .fab {
+            position: absolute; bottom: 90px; right: 20px; width: 56px; height: 56px;
+            background-color: var(--wasky-accent); border-radius: 28px; display: flex;
+            justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(165, 207, 83, 0.4);
+            cursor: pointer; z-index: 15; transition: transform 0.2s; color: var(--wasky-primary);
+        }
+        .fab:active { transform: scale(0.9); }
+
+        /* Invoice Details */
+        .detail-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--wasky-border); }
+        .detail-label { color: var(--wasky-text-muted); }
+        .detail-value { font-weight: 600; }
+
+        /* General Screens (Favoritos, Docs) */
+        .empty-state { text-align: center; color: var(--wasky-text-muted); margin-top: 50px; }
+
+        /* Nav Icons */
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--wasky-text-muted); font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .nav-item.active { color: var(--wasky-primary); font-weight: 700; }
+        .nav-item svg { width: 24px; height: 24px; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        
+        <!-- Input nativo de cámara oculto -->
+        <input type="file" id="camera-input" accept="image/*" capture="environment" style="display: none;" onchange="processImageSelection()">
+
+        <!-- SPLASH SCREEN -->
+        <section id="splash-screen" class="screen">
+            <div class="logo-big">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#0A525F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            </div>
+        </section>
+
+        <!-- LOGIN SCREEN -->
+        <section id="login-screen" class="screen active">
+            <div class="login-container">
+                <h1>Bienvenido a Wasky</h1>
+                <p>Gestiona tus facturas de forma inteligente.</p>
+                <div class="input-group">
+                    <label>Correo electrónico</label>
+                    <input type="email" placeholder="ejemplo@gmail.com">
+                </div>
+                <div class="input-group">
+                    <label>Contraseña</label>
+                    <input type="password" placeholder="••••••••">
+                </div>
+                <button class="btn btn-primary" onclick="navigateTo('onboarding-screen')">Aceptar</button>
+            </div>
+        </section>
+
+        <!-- ONBOARDING SCREEN -->
+        <section id="onboarding-screen" class="screen">
+            <header>
+                <h1>¡Hora de la foto!</h1>
+            </header>
+            <main class="header-padding">
+                <div class="card">
+                    <h3>Sigue estos pasos:</h3>
+                    <ul class="onboarding-list">
+                        <li class="onboarding-item">
+                            <svg class="onboarding-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Evita sombras sobre el papel.
+                        </li>
+                        <li class="onboarding-item">
+                            <svg class="onboarding-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Coloca la factura en una superficie plana.
+                        </li>
+                    </ul>
+                    <!-- Abre la cámara real -->
+                    <button class="btn btn-accent" style="width: 100%;" onclick="openCamera()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                        Abrir Cámara
+                    </button>
+                </div>
+            </main>
+        </section>
+
+        <!-- SCANNING SCREEN -->
+        <section id="scanning-screen" class="screen">
+            <div class="scanning-content">
+                <div class="loader"></div>
+                <h2 style="color: var(--wasky-primary);">Analizando factura...</h2>
+                <p style="color: var(--wasky-text-muted);">Extrayendo datos con IA</p>
+            </div>
+        </section>
+
+        <!-- INVOICE DETAILS SCREEN -->
+        <section id="invoice-details-screen" class="screen">
+            <header>
+                <button class="btn" onclick="navigateTo('dashboard-screen')" style="padding: 8px; background: transparent;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--wasky-primary)" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                </button>
+                <h1 style="font-size: 18px; margin-left: 10px;">Detalles Extraídos</h1>
+            </header>
+            <main class="header-padding">
+                <div class="card">
+                    <div class="detail-row">
+                        <span class="detail-label">RUC</span>
+                        <span class="detail-value" id="ext-ruc">20123456789</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Fecha</span>
+                        <span class="detail-value" id="ext-fecha">01/08/2026</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Proveedor</span>
+                        <span class="detail-value" id="ext-prov">Bodega Central</span>
+                    </div>
+                    <div class="detail-row" style="border:none; margin-top: 10px; padding-top: 20px;">
+                        <span class="detail-label" style="font-weight: bold;">Monto Total</span>
+                        <span class="detail-value" id="ext-monto" style="font-size: 20px; color: var(--wasky-primary);">S/ 150.50</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="saveInvoiceToState()">Guardar en Wasky</button>
+            </main>
+        </section>
+
+        <!-- DASHBOARD SCREEN -->
+        <section id="dashboard-screen" class="screen">
+            <header style="position: absolute; width: 100%;">
+                <h1 style="font-size: 18px;">Wasky Dashboard</h1>
+            </header>
+            <main class="header-padding">
+                <div class="summary-card">
+                    <p style="font-size: 14px; opacity: 0.8;">Total Invertido</p>
+                    <div class="summary-value" id="dash-total">S/ 0.00</div>
+                    <p style="font-size: 12px; opacity: 0.7;" id="dash-count">0 Facturas registradas</p>
+                </div>
+
+                <div class="search-bar">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" placeholder="Buscar proveedor..." style="border:none; outline:none; width:100%;">
+                </div>
+
+                <div class="card" style="padding: 10px 20px;" id="invoice-list-container">
+                    <!-- Las facturas se inyectarán aquí con JavaScript -->
+                    <div class="empty-state" style="margin: 20px 0;">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--wasky-border)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                        <p style="margin-top: 10px;">Aún no hay datos.<br>¡Escanea tu primera factura!</p>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Botón Flotante para abrir cámara desde el Dashboard -->
+            <div class="fab" onclick="openCamera()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+            </div>
+        </section>
+
+        <!-- FAVORITOS SCREEN (Faltante añadida) -->
+        <section id="favoritos-screen" class="screen">
+            <header style="position: absolute; width: 100%;"><h1 style="font-size: 18px;">Favoritos</h1></header>
+            <main class="header-padding">
+                <div class="empty-state">
+                    <p>No tienes proveedores favoritos aún.</p>
+                </div>
+            </main>
+        </section>
+
+        <!-- DOCS SCREEN (Faltante añadida) -->
+        <section id="docs-screen" class="screen">
+            <header style="position: absolute; width: 100%;"><h1 style="font-size: 18px;">Documentos</h1></header>
+            <main class="header-padding">
+                <div class="empty-state">
+                    <p>Historial de reportes SUNAT vacío.</p>
+                </div>
+            </main>
+        </section>
+
+        <!-- PROFILE SCREEN -->
+        <section id="profile-screen" class="screen">
+            <header style="position: absolute; width: 100%;"><h1 style="font-size: 18px;">Mi Perfil</h1></header>
+            <main class="header-padding">
+                <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 30px;">
+                    <div style="width: 100px; height: 100px; background: var(--wasky-border); border-radius: 50%; margin-bottom: 12px;"></div>
+                    <h2 style="font-size: 20px;">Usuario Bodega</h2>
+                    <p style="color: var(--wasky-text-muted);">bodega@gmail.com</p>
+                </div>
+                <div class="card">
+                    <div style="padding: 16px; border-bottom: 1px solid var(--wasky-border);">Configuración</div>
+                    <div style="padding: 16px; color: var(--wasky-error); cursor: pointer;" onclick="navigateTo('login-screen')">Cerrar sesión</div>
+                </div>
+            </main>
+        </section>
+
+        <!-- NAV GLOBAL (Sacada de las pantallas para que no se duplique) -->
+        <nav id="main-nav">
+            <div class="nav-item active" data-target="dashboard-screen" onclick="navigateTo('dashboard-screen')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+                <span>Inicio</span>
+            </div>
+            <div class="nav-item" data-target="favoritos-screen" onclick="navigateTo('favoritos-screen')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                <span>Favoritos</span>
+            </div>
+            <div class="nav-item" data-target="docs-screen" onclick="navigateTo('docs-screen')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <span>Docs</span>
+            </div>
+            <div class="nav-item" data-target="profile-screen" onclick="navigateTo('profile-screen')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <span>Perfil</span>
+            </div>
+        </nav>
+
+    </div>
+
+    <script>
+        // Memoria de la aplicación (Estado Global)
+        let baseDeDatosFacturas = [];
+        
+        /**
+         * 1. Sistema de Navegación SPA Mejorado
+         */
+        function navigateTo(screenId) {
+            // Ocultar todas las pantallas
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            
+            // Mostrar la pantalla objetivo
+            const target = document.getElementById(screenId);
+            if (target) target.classList.add('active');
+
+            // Lógica para mostrar/ocultar el menú inferior y actualizar ícono activo
+            const nav = document.getElementById('main-nav');
+            const pantallasConMenu = ['dashboard-screen', 'favoritos-screen', 'docs-screen', 'profile-screen'];
+            
+            if (pantallasConMenu.includes(screenId)) {
+                nav.style.display = 'flex';
+                // Actualizar color del ícono
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                    if(item.getAttribute('data-target') === screenId) {
+                        item.classList.add('active');
+                    }
+                });
+            } else {
+                nav.style.display = 'none';
+            }
+        }
+
+        /**
+         * 2. Integración de Cámara Nativa
+         */
+        function openCamera() {
+            // Hace clic por código en el input oculto tipo file
+            document.getElementById('camera-input').click();
+        }
+
+        // Se ejecuta cuando el usuario selecciona una foto o toma una con la cámara
+        function processImageSelection() {
+            const input = document.getElementById('camera-input');
+            if (input.files && input.files[0]) {
+                // Hay archivo, iniciamos simulación de procesamiento
+                navigateTo('scanning-screen');
+                
+                setTimeout(() => {
+                    navigateTo('invoice-details-screen');
+                    // Limpiamos el input para permitir tomar otra foto luego
+                    input.value = ""; 
+                }, 2500);
+            }
+        }
+
+        /**
+         * 3. Gestión de Datos Reales en el Dashboard
+         */
+        function saveInvoiceToState() {
+            // Simular datos extraídos (Más adelante esto vendrá de tu Backend en Node.js)
+            const nuevaFactura = {
+                proveedor: document.getElementById('ext-prov').innerText,
+                fecha: document.getElementById('ext-fecha').innerText,
+                monto: 150.50,
+                estado: "Contado"
+            };
+            
+            // Guardar en la memoria
+            baseDeDatosFacturas.push(nuevaFactura);
+            
+            // Actualizar la interfaz
+            renderDashboard();
+            navigateTo('dashboard-screen');
+        }
+
+        function renderDashboard() {
+            const container = document.getElementById('invoice-list-container');
+            const txtTotal = document.getElementById('dash-total');
+            const txtCount = document.getElementById('dash-count');
+            
+            container.innerHTML = ''; // Limpiar lista
+            let sumaTotal = 0;
+
+            baseDeDatosFacturas.forEach(factura => {
+                sumaTotal += factura.monto;
+                container.innerHTML += `
+                    <div class="list-item">
+                        <div class="item-info">
+                            <h4>${factura.proveedor}</h4>
+                            <p>${factura.fecha}</p>
+                        </div>
+                        <div class="item-amount">
+                            <div>S/ ${factura.monto.toFixed(2)}</div>
+                            <div style="font-size: 12px; color: var(--wasky-accent);">${factura.estado}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Actualizar resumen numérico
+            txtTotal.innerText = `S/ ${sumaTotal.toFixed(2)}`;
+            txtCount.innerText = `${baseDeDatosFacturas.length} Facturas registradas`;
+        }
+
+    </script>
+</body>
+</html>
