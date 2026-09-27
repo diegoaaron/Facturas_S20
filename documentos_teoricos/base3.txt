@@ -1,0 +1,14 @@
+Descripcion del proyect: Una AppMovil que facilita al bodeguero en el registro de sus facturas de compras para su negocio.
+
+Problema que resuelve: La declaración mensual del Nuevo RUS ante la SUNAT representa un desafío para los bodegueros, quienes deben clasificar y calcular manualmente el valor de sus facturas del mes, lo que genera una pérdida de tiempo e incumplimiento tributario. Para resolverlo, creamos WASYK, una solución movil basada en IA Multimodal (Gemma 4). Los usuarios simplemente fotografían sus facturas recibir sus pedidos; la inteligencia aritificial extrae los datos clave en segundos ycalcula el total del mes de manera automática, facilitando una declaración tribrutaria rápida, exacta y sin complicaciones.
+
+Arquitectura de la solución: Se realiza el fine-tunning sobre facturas del cliente a tratar para que Gemma 4 pueda reconocer con mayor precesion este tipo específico de comprobantes, a su vez usamos gemma 4 par poder tambien desarrollar la app web que se podra instalar en el movil del usuario y directamente desde ahi poder hacer el escaneo
+
+Uso de Gemma 4: fine-tunning para entender las factura de las bodegas y poder procesarlas a través de fotos, desarrollo de la app con el framework vite
+
+Principios retos y decisiones tecnicas: poder ajustar el entrenamiento para que pueda entender las facturas en diferentes formatos y con fotos de diferente calidad. poder crear una app sencilla de instalar en el celurar sin requerir muchos recursos.
+
+Seleccionar el Track correspondiente:
+
+Aplicaciones de IA Multimodal
+IA Local e Inteligencia Edge
