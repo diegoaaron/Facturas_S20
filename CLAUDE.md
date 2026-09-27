@@ -89,8 +89,18 @@ No hay linter, formateador ni tests configurados. Verifica cambios con `npm run 
 - `sergio/` es una copia casi idéntica del proyecto (con su propio `dist/`); solo difiere `src/pages/ScanCamera.tsx` (allí se usa `getUserMedia` + `<video>`/`<canvas>`). La app activa es la de la raíz; no edites `sergio/` salvo que se pida.
 - `Angie/Index.html` es un prototipo HTML estático independiente (“Wasky App”, otra paleta). No forma parte de la app React.
 - `design_factu/*.pdf` — diseños de referencia de la UI (iteraciones 1 a 8; “Diseño 8 Final” es la versión final).
-- Archivos de prueba sin uso: `Test`, `mitest.txt`, `prueba.txt`, `diseno_app/test.txt`.
+- Archivos de prueba sin uso: `Test`, `mitest.txt`, `prueba.txt`.
 - `node_modules` se llegó a commitear y luego se eliminó; está en `.gitignore`, no volver a añadirlo.
+
+## Documentos teóricos (`documentos_teoricos/`)
+
+Entregables del curso (UTP, Curso Integrador I), con la convención `entregable<N>_<tipo>.<ext>`:
+
+- `entregable<N>_baseX.*` — material base que entrega el curso/usuario (enunciado, rúbrica, descripción del proyecto).
+- `entregable<N>_documento.docx` — informe generado para ese entregable.
+- `entregable<N>_presentacion.pptx` — sustentación generada para ese entregable.
+
+El entregable 1 corresponde al APF1. Al añadir nuevos entregables, sigue la misma convención y referencia los archivos por esta ruta.
 
 ## Notebooks de fine-tuning (`tunning_gemma4/`)
 
