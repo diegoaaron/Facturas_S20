@@ -1,5 +1,5 @@
 ---
-name: proyecto-index-html-build
+name: 003_26_09_26_proyecto_index_html_build
 description: El index.html de la raíz es un build viejo que carga assets/index-D-068JsU.js en vez de src/main.tsx; pendiente de corregir
 metadata:
   type: project
