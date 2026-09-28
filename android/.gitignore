@@ -11,6 +11,7 @@ local.properties
 *.iml
 .navigation/
 captures/
+.mcp.json
 
 # Firma de la app y secretos: nunca al repo
 *.jks
