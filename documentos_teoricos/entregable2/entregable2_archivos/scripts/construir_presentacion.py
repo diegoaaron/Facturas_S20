@@ -12,6 +12,8 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.util import Inches, Pt
 
+from contenido_documento import TITULO
+
 AQUI = os.path.dirname(os.path.abspath(__file__))
 IMG = os.path.dirname(AQUI)
 SALIDA = os.path.join(os.path.dirname(IMG), "entregable2_presentacion.pptx")
@@ -177,8 +179,7 @@ def portada():
     rect(s, 4.45, 0.55, 4.43, 1.28, BLANCO)
     s.shapes.add_picture(LOGO, Inches(4.95), Inches(0.8), Inches(3.43), Inches(0.913))
     caja_texto(s, 0.8, 2.0, 11.73, 0.6, "Facturas S20", size=34, color=BLANCO, bold=True, align=PP_ALIGN.CENTER)
-    caja_texto(s, 1.2, 2.65, 10.93, 0.9, "Diseño de la solución: aplicación móvil con IA multimodal (Gemma 4) embebida en el teléfono "
-               "para la declaración mensual del NRUS en bodegas de San Juan de Lurigancho", size=20, color=BLANCO, align=PP_ALIGN.CENTER)
+    caja_texto(s, 1.2, 2.65, 10.93, 0.9, TITULO, size=20, color=BLANCO, align=PP_ALIGN.CENTER)
     rect(s, 6.07, 3.7, 1.2, 0.05, BLANCO)
     caja_texto(s, 1.0, 3.9, 11.33, 0.35, "Avance de Proyecto Final 2  ·  Curso Integrador I: Sistemas Software", size=15, color=BLANCO, align=PP_ALIGN.CENTER)
     caja_texto(s, 1.0, 4.3, 11.33, 0.3, "Sección 48935  ·  Docente: Ing. Carlos Alberto Effio Gonzáles", size=12, color=BLANCO, align=PP_ALIGN.CENTER)

@@ -134,7 +134,7 @@ Plan de trabajo del desarrollo. Todo lo que sea roadmap, cronograma, pendientes 
 
 Entregables del curso (UTP, Curso Integrador I). Cada entregable tiene su subcarpeta `documentos_teoricos/entregable<N>/`, y dentro los archivos siguen la convención `entregable<N>_<tipo>.<ext>`:
 
-- `entregable<N>_baseX.*` — material base que entrega el curso/usuario (enunciado, rúbrica, descripción del proyecto). En el entregable 2 los de apoyo tienen nombre descriptivo: `entregable2_puntos_evaluacion.pdf` (consigna y rúbrica, el principal), `entregable2_diferencias_con_entregable1.pdf` (estructura oficial del informe y anexos A–S) y `entregable2_consideraciones.docx` (notas del docente).
+- `entregable<N>_baseX.*` — material base que entrega el curso/usuario (enunciado, rúbrica, descripción del proyecto). En el entregable 2 los de apoyo tienen nombre descriptivo con el prefijo `base_`, para distinguirlos de los generados: `base_entregable2_puntos_evaluacion.pdf` (consigna y rúbrica, el principal), `base_entregable2_diferencias_con_entregable1.pdf` (estructura oficial del informe y anexos A–S) y `base_entregable2_consideraciones.docx` (notas del docente).
 - `entregable<N>_documento.docx` — informe generado para ese entregable.
 - `entregable<N>_presentacion.pptx` — sustentación generada para ese entregable.
 - `entregable<N>_documentacion_tecnica.md` — (desde el 2) referencia para desarrolladores; el usuario la mueve a `roadmap/` para la conversación de código.

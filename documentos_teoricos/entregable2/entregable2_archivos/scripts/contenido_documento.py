@@ -9,6 +9,14 @@ from docx_xml import h1, h2, h3, p, subtitulo, vinetas, codigo, nota
 
 IA = "IA"
 
+# Título oficial del proyecto (portada del Word, Project Charter y portada del PPT).
+TITULO = ("Aplicación móvil con IA multimodal (Gemma 4) para mejorar la exactitud de la declaración mensual del NRUS "
+          "en bodegas de S.J.L.")
+# Títulos del entregable 1 que se reemplazan por TITULO.
+TITULO_E1_PORTADA = ("Facturas S20: aplicación móvil con IA multimodal (Gemma 4) embebida en el teléfono para mejorar la "
+                     "exactitud de la declaración mensual del NRUS en bodegas de San Juan de Lurigancho")
+TITULO_E1_CHARTER = "Facturas S20: aplicación móvil con Gemma 4 embebido para la declaración del NRUS"
+
 
 def escribir(d):
     portada_e_introduccion(d)
@@ -23,7 +31,7 @@ def escribir(d):
 
 # ======================================================================
 def portada_e_introduccion(d):
-    d.e1(0, 3)
+    d.e1(0, 3, reemplazos=[(TITULO_E1_PORTADA, TITULO)])
     d.e1(4, reemplazos=[("Avance de Proyecto Final 1 (APF1)", "Avance de Proyecto Final 2 (APF2)")])
     d.e1(5, 21)
     d.add(p("Este informe corresponde al segundo avance del proyecto final del curso. El segundo avance no reemplaza al "
@@ -971,7 +979,8 @@ def anexos(d):
                                ("Desarrollo y mantenimiento de la app Android y del servicio de respaldo;", "Desarrollo y mantenimiento de la app Android;")])
     # B
     d.add(h2("Anexo B: Project Charter", salto=True))
-    d.e1(462, 464, reemplazos=[("(detalle en A3.4)", "(detalle en el Anexo D)"),
+    d.e1(462, 464, reemplazos=[(TITULO_E1_CHARTER, TITULO),
+                               ("(detalle en A3.4)", "(detalle en el Anexo D)"),
                                ("instalación del modelo y respaldo opcional.", "instalación del modelo y exportación de datos.")])
     # C
     d.add(h2("Anexo C: Estructura de Descomposición del Trabajo (WBS)", salto=True))
