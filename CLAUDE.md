@@ -94,17 +94,17 @@ No hay linter, formateador ni tests configurados. Verifica cambios con `npm run 
 
 ## Documentos teóricos (`documentos_teoricos/`)
 
-Entregables del curso (UTP, Curso Integrador I), con la convención `entregable<N>_<tipo>.<ext>`:
+Entregables del curso (UTP, Curso Integrador I). Cada entregable tiene su subcarpeta `documentos_teoricos/entregable<N>/`, y dentro los archivos siguen la convención `entregable<N>_<tipo>.<ext>`:
 
 - `entregable<N>_baseX.*` — material base que entrega el curso/usuario (enunciado, rúbrica, descripción del proyecto). En el entregable 2 los de apoyo tienen nombre descriptivo: `entregable2_puntos_evaluacion.pdf` (consigna y rúbrica, el principal), `entregable2_diferencias_con_entregable1.pdf` (estructura oficial del informe y anexos A–S) y `entregable2_consideraciones.docx` (notas del docente).
 - `entregable<N>_documento.docx` — informe generado para ese entregable.
 - `entregable<N>_presentacion.pptx` — sustentación generada para ese entregable.
 - `entregable<N>_documentacion_tecnica.md` — (desde el 2) referencia para desarrolladores; el usuario la mueve a otra ruta para la conversación de código.
-- `entregable<N>_imagenes/` — (desde el 2) figuras PNG, fuentes SVG editables y `scripts/` que regeneran figuras, Word y PPT (ver su `README.md`).
+- `entregable<N>_archivos/` — (desde el 2) figuras PNG, fuentes SVG editables y `scripts/` que regeneran figuras, Word y PPT (ver su `README.md`).
 
-El entregable 1 corresponde al APF1 y el 2 al APF2. Al añadir nuevos entregables, sigue la misma convención y referencia los archivos por esta ruta.
+El entregable 1 corresponde al APF1 y el 2 al APF2. Al añadir nuevos entregables, crea su subcarpeta, sigue la misma convención y referencia los archivos por esa ruta.
 
-**Entregable 2:** el Word **no se edita a mano**: `entregable2_imagenes/scripts/construir_documento.py` lo arma sobre `entregable1_documento.docx` (reutiliza sus bloques por índice de elemento del cuerpo y añade el contenido de `contenido_documento.py`), y `actualizar_indice.ps1` regenera el índice con Word. Requiere Python de Windows (`C:\Users\diego\AppData\Local\Python\bin\python.exe`, con `lxml`, `Pillow`, `python-pptx`, `pymupdf`), Chrome (SVG → PNG) y Word/PowerPoint (COM) para revisar en PDF; LibreOffice y pandoc no están instalados.
+**Entregable 2:** el Word **no se edita a mano**: `entregable2/entregable2_archivos/scripts/construir_documento.py` lo arma sobre `entregable1/entregable1_documento.docx` (reutiliza sus bloques por índice de elemento del cuerpo y añade el contenido de `contenido_documento.py`), y `actualizar_indice.ps1` regenera el índice con Word (`-Docx` elige el archivo). `construir_documento_solo.py` genera `solo_entregable2_documento.docx` (solo los apartados del APF2) a partir del informe completo; `generar_todo.py` corre todo. Requiere Python de Windows (`C:\Users\diego\AppData\Local\Python\bin\python.exe`, con `lxml`, `Pillow`, `python-pptx`, `pymupdf`), Chrome (SVG → PNG) y Word/PowerPoint (COM) para revisar en PDF; LibreOffice y pandoc no están instalados.
 
 ## Notebooks de fine-tuning (`tunning_gemma4/`)
 
