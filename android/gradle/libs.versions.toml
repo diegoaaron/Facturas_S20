@@ -1,0 +1,34 @@
+# Catálogo de versiones del proyecto. Todas las dependencias se declaran aquí y
+# los build.gradle.kts las usan con libs.<alias>. Al actualizar una versión,
+# sincroniza y compila antes de hacer commit.
+
+[versions]
+# AGP: no subir de 9.1.x — es lo máximo que soporta el plugin Android de IntelliJ 2026.2
+# (con 9.4.1 IntelliJ dice "incompatible version... Latest supported version is AGP 9.1.0").
+agp = "9.1.1"
+appcompat = "1.8.0"
+material = "1.14.0"
+activity = "1.13.0"
+constraintlayout = "2.2.2"
+junit4 = "4.13.2"
+junitJupiter = "6.1.3"
+androidxJunit = "1.3.0"
+espresso = "3.7.0"
+
+[libraries]
+# UI
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
+androidx-activity = { module = "androidx.activity:activity", version.ref = "activity" }
+androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
+
+# Pruebas
+junit4 = { module = "junit:junit", version.ref = "junit4" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junitJupiter" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
+androidx-test-espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }

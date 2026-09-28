@@ -35,7 +35,22 @@ Claves de la arquitectura (el detalle está en `roadmap/entregable2_documentacio
 - **Java en al menos el 50 % del código** (exigencia del curso; se apunta a ~85 %). Lo único en Kotlin es el puente con LiteRT-LM, porque su API es Kotlin.
 - **Un solo usuario y sin servidor.** Toda la data vive en el teléfono, en SQLite con Room + SQLCipher. El usuario exporta sus datos (ZIP con CSV, imágenes y PDF) para analizarlos en una PC. No hay cuentas, sincronización, nube ni consola de administración.
 - **Funciona sin conexión.** La única conexión de red es la descarga única del modelo desde Hugging Face. En teléfonos sin RAM suficiente hay un modo de registro manual.
-- Se desarrolla con **IntelliJ IDEA** (plugin de Android + Gradle). El proyecto Android todavía no está creado en el repo.
+- Se desarrolla con **IntelliJ IDEA** (plugin de Android + Gradle). La configuración del equipo está en `roadmap/configuracion_equipo.md`.
+
+### App Android (`android/`)
+
+Proyecto Gradle propio; en IntelliJ se abre la carpeta `android/`, no la raíz del repo.
+
+- Módulos: `:app` (Android; paquete `pe.facturass20`, `viewBinding`) y `:dominio` (`java-library`, Java puro sin Android, JUnit 5). Regla de dependencias: `ui → dominio ← inferencia, datos, exportacion`.
+- Versiones: Gradle 9.8.0 (wrapper), AGP 9.1.1 (máximo que soporta IntelliJ 2026.2; no subir), Java 17, `compileSdk` 36.1, `minSdk` 26. **Todas las dependencias van en `android/gradle/libs.versions.toml`**; no escribas versiones sueltas en los `build.gradle.kts`.
+- Los paquetes siguen la documentación técnica §3.3 y cada uno tiene su `package-info.java`. `MainActivity` está en `ui.comun`.
+
+```bash
+cd android
+export JAVA_HOME=/c/Users/<usuario>/.jdks/temurin-17.0.20.1
+./gradlew :app:assembleDebug :dominio:test   # verifica cambios con esto
+./gradlew :app:installDebug                  # instala en el teléfono conectado
+```
 
 ### Prototipo previo (lo que hay hoy en el repo)
 
@@ -112,6 +127,7 @@ No hay linter, formateador ni tests configurados. Verifica cambios con `npm run 
 Plan de trabajo del desarrollo. Todo lo que sea roadmap, cronograma, pendientes o requerimientos por avanzar va aquí:
 
 - `entregable2_documentacion_tecnica.md` — referencia técnica para construir la app Android: arquitectura, contratos, esquema SQLite, pantallas, RF/RNF (§11) y plan por iteraciones (§13). Si el código la contradice, gana el documento, salvo que se decida cambiarlo.
+- `configuracion_equipo.md` — pasos probados para dejar IntelliJ + Android SDK + JDK 17 listos, abrir `android/` y correr la app en el teléfono (para la otra computadora). Actualízalo si cambia algo del entorno.
 - `roadmap_cronograma_y_pendientes.md` — entregas del curso, iteraciones I1–I6, responsables, estado del Gantt y mediciones comprometidas por entrega. Si se cambia el plan, conviene reflejarlo también en los scripts del entregable correspondiente.
 
 ## Documentos teóricos (`documentos_teoricos/`)

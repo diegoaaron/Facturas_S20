@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Primer plano del ícono: una factura con líneas y un check (zona segura 66 dp al centro) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="108dp"
+        android:height="108dp"
+        android:viewportWidth="108"
+        android:viewportHeight="108">
+    <!-- Hoja de la factura -->
+    <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M36,30h28l8,8v40h-36z"/>
+    <!-- Esquina doblada -->
+    <path
+            android:fillColor="#C8D8D5"
+            android:pathData="M64,30v8h8z"/>
+    <!-- Líneas de texto -->
+    <path
+            android:fillColor="#1B4D45"
+            android:pathData="M42,44h16v3h-16zM42,51h24v3h-24zM42,58h20v3h-20z"/>
+    <!-- Check de lectura correcta -->
+    <path
+            android:fillColor="#8BC34A"
+            android:pathData="M60,64m-9,0a9,9 0,1 1,18 0a9,9 0,1 1,-18 0"/>
+    <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M56,64.2l2.1,-2.1 1.9,1.9 4.1,-4.1 2.1,2.1 -6.2,6.2z"/>
+</vector>

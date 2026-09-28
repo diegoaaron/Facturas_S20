@@ -1,0 +1,28 @@
+# Gradle
+.gradle/
+build/
+.kotlin/
+
+# Configuración local de cada computadora (ruta del SDK, JDK)
+local.properties
+
+# IntelliJ / Android Studio (configuración personal del IDE)
+.idea/
+*.iml
+.navigation/
+captures/
+
+# Firma de la app y secretos: nunca al repo
+*.jks
+*.keystore
+keystore.properties
+
+# Modelo Gemma (~2,6 GB): se descarga aparte, nunca al repo
+*.litertlm
+*.task
+*.tflite
+
+# Varios
+*.log
+.externalNativeBuild/
+.cxx/
