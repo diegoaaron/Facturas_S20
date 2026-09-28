@@ -1,9 +1,12 @@
-node_modules
-dist
-dist-ssr
+# Secretos y configuración local
 .env
 .env.local
 *.local
-*.tsbuildinfo
+
+# Claude Code (configuración local de cada computadora)
 .claude
+
+# Python (scripts de documentos_teoricos)
 __pycache__/
+
+# El proyecto Android tiene su propio android/.gitignore

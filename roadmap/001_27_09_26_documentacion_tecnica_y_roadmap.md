@@ -1,12 +1,12 @@
-# Facturas S20 — Documentación técnica para desarrolladores
+# Facturas S20 — Documentación técnica y roadmap del proyecto
 
-> **Qué es este documento.** Es la referencia para construir el código de Facturas S20: la app Android nativa en Java, de un solo usuario, con Gemma 4 E2B ejecutado en el teléfono y toda la información guardada en el propio celular (SQLite cifrada). Resume, en forma de contratos que se pueden implementar y probar, el diseño aprobado en el segundo avance (APF2) del curso Integrador I (UTP).
+> **Qué es este documento.** Es la base de todo lo que hay que hacer para completar el proyecto. Es la referencia para construir el código de Facturas S20: la app Android nativa en Java, de un solo usuario, con Gemma 4 E2B ejecutado en el teléfono y toda la información guardada en el propio celular (SQLite cifrada). Resume, en forma de contratos que se pueden implementar y probar, el diseño aprobado en el segundo avance (APF2) del curso Integrador I (UTP), y el roadmap para terminarlo (sección 13): entregas, iteraciones, responsables y mediciones comprometidas. Une la antigua `entregable2_documentacion_tecnica.md` con el antiguo `roadmap_cronograma_y_pendientes.md`.
 >
 > **Ajuste de alcance.** Respecto del primer avance se retiró el servidor de respaldo opcional: toda la información permanece en el teléfono y el usuario la exporta cuando la necesita (sección 9).
 >
-> **Cómo usarlo en una conversación nueva.** Este archivo es autocontenido. Si trabajas con un asistente de código, pégalo o referencia su ruta al inicio y pide trabajar por iteraciones (sección 13). Cuando el código contradiga este documento, gana el documento, salvo que se decida cambiarlo: en ese caso, actualízalo en el mismo commit.
+> **Cómo usarlo en una conversación nueva.** Este archivo es autocontenido. Si trabajas con un asistente de código, pégalo o referencia su ruta al inicio y pide trabajar por iteraciones (sección 13). La configuración del equipo de desarrollo (paso 0, ya hecho) está en `002_27_09_26_configuracion_equipo.md`. Cuando el código contradiga este documento, gana el documento, salvo que se decida cambiarlo: en ese caso, actualízalo en el mismo commit.
 >
-> **Versión:** 1.1 · 2026-09-27 · corte de la semana 8 del ciclo 2026-03.
+> **Versión:** 1.2 · 2026-09-28 · corte de la semana 8 del ciclo 2026-03, con el paso 0 completado.
 
 ---
 
@@ -24,7 +24,7 @@
 10. [Seguridad](#10-seguridad)
 11. [Requerimientos y criterios de aceptación](#11-requerimientos-y-criterios-de-aceptación)
 12. [Pruebas](#12-pruebas)
-13. [Plan de construcción por iteraciones](#13-plan-de-construcción-por-iteraciones)
+13. [Roadmap: plan de construcción por iteraciones](#13-roadmap-plan-de-construcción-por-iteraciones)
 14. [Convenciones](#14-convenciones)
 15. [Artefactos de referencia](#15-artefactos-de-referencia)
 
@@ -57,17 +57,18 @@
 
 **Pérdida del teléfono.** El sustento son los reportes PDF y los archivos exportados que el usuario guardó fuera del teléfono; por eso la app sugiere exportar al cerrar cada mes (P17).
 
-**Estado del repositorio `Facturas_S20`.** La raíz contiene un **prototipo previo** (PWA React + servidor FastAPI en Colab con túnel) usado en la competencia Build with Gemma. **No es la base del producto final.** Lo reutilizable es:
+**Estado del repositorio `Facturas_S20`** (2026-09-28). El prototipo previo (PWA React + servidor FastAPI en Colab con túnel, usado en la competencia Build with Gemma) se retiró del repo; su último estado está en el tag `prototipo-pwa`. La raíz queda así:
+
+```
+android/              proyecto Gradle de la app (módulos :app y :dominio) — paso 0 hecho
+tunning_gemma4/       tunning_model_gemma4_6.ipynb: entrenamiento y conversión del modelo
+roadmap/              este documento (001) y la configuración del equipo (002)
+documentos_teoricos/  entregables del curso (informes, sustentaciones y figuras)
+memorias/             memoria de Claude Code compartida entre computadoras
+```
 
 - `tunning_gemma4/tunning_model_gemma4_6.ipynb`: cuaderno de ajuste fino (Unsloth + TRL, 896 px, 80/20). Hoy extrae 4 campos (`ruc`, `fecha_emision`, `numero_factura`, `monto_total`); debe pasar a los **7 campos** de la sección 6.2 y agregar la exportación a `.litertlm`.
-- `design_factu/*.pdf` (diseño 8 final) y el prototipo de APF2 (sección 15) como referencia visual.
-
-Se recomienda crear el producto en carpetas nuevas del mismo repositorio (o en un repositorio aparte):
-
-```
-facturas-s20-android/     proyecto Gradle de la app (módulos :app y :dominio)
-tunning_gemma4/           (existente) entrenamiento y conversión del modelo
-```
+- La referencia visual es el prototipo P01–P20 del APF2 (sección 15).
 
 ---
 
@@ -178,7 +179,7 @@ pe.facturass20
 
 ## 4. Stack tecnológico
 
-> Usa la **última versión estable** de cada biblioteca al iniciar y fija las versiones en `libs.versions.toml`. Las versiones de abajo son la base de diseño; verifica compatibilidad antes de fijarlas.
+> Usa la **última versión estable** de cada biblioteca al iniciar y fija las versiones en `libs.versions.toml`. Las versiones de abajo son la base de diseño; verifica compatibilidad antes de fijarlas. Las versiones ya fijadas en el paso 0 (Gradle, AGP, SDK, Java) están en `002_27_09_26_configuracion_equipo.md` §1.5; **AGP no puede pasar de 9.1.x** mientras IntelliJ 2026.2 no lo soporte.
 
 | Capa | Tecnología |
 |---|---|
@@ -776,12 +777,53 @@ Usa un **`ExtractorFacturas` falso** (devuelve el JSON de la sección 6.2) para 
 
 ---
 
-## 13. Plan de construcción por iteraciones
+## 13. Roadmap: plan de construcción por iteraciones
 
-> Nota del curso: para el avance siguiente el docente pidió mostrar **alrededor de 20 % del back-end y 60–80 % del front-end** (interfaces construidas a partir del prototipo y la base de datos). Por eso la iteración I3 prioriza las pantallas navegables con datos locales.
+Plan del proyecto para el ciclo 2026-03 (18 semanas). Estado al **corte de la semana 8** (APF2, 27–29/09/2026), más el paso 0, que se completó el 27–28/09/2026. Las tablas de entregas, responsables, Gantt y mediciones vienen del informe y la sustentación del APF2 (`documentos_teoricos/entregable2/entregable2_archivos/scripts/`). Si el plan cambia y el informe del siguiente avance debe reflejarlo, actualiza también esos scripts.
+
+### 13.1 Entregas del curso
+
+| Semana | Entrega |
+|---|---|
+| 4 | APF1 — entregado |
+| 8 | APF2 — entrega hasta el 29/09/2026 18:00 |
+| 12 | APF3 |
+| 18 | Informe final y sustentación |
+
+> Nota del curso: para el avance siguiente el docente pidió mostrar **alrededor de 20 % del back-end y 60–80 % del front-end** (interfaces construidas a partir del prototipo y la base de datos). Sin servidor, el "back-end" son las capas Java del teléfono: dominio, motor NRUS, Room/SQLite y exportación. Por eso la iteración I3 prioriza las pantallas navegables con datos locales.
+
+### 13.2 Iteraciones
+
+Son iteraciones de dos semanas, alineadas con las entregas del curso.
+
+| Iteración | Semanas | Objetivo | Entregable | Estado |
+|---|---|---|---|---|
+| I1 | 1–4 | Análisis del contexto, alternativas y SRS | APF1 | ✅ completo |
+| I2 | 5–8 | Diseño de procesos, datos, clases, prototipo y documentación técnica | APF2 | ✅ completo |
+| Paso 0 | 8 | Configuración del equipo y proyecto Android base | App "Hello World!" en el teléfono | ✅ completo (ver 13.3) |
+| I3 | 9–10 | Front-end navegable (P01–P20) y dominio con motor de reglas probado | Incremento 1 | ⏳ siguiente |
+| I4 | 11–12 | Persistencia cifrada (Room + SQLCipher) e inferencia local con el modelo convertido | APF3 | pendiente |
+| I5 | 13–14 | Reporte PDF, exportación de datos e historial | Incremento 3 | pendiente |
+| I6 | 15–18 | Pruebas, validación en mes simulado y sustentación | Informe final | pendiente |
+
+### 13.3 Paso 0 · Configuración del equipo ✅ (hecho)
+
+La primera parte del trabajo ya está hecha y documentada en **`002_27_09_26_configuracion_equipo.md`**. Su Parte 1 cuenta lo que se hizo en la primera computadora; su Parte 2, cómo levantar el proyecto en otra.
+
+Quedó listo:
+- IntelliJ IDEA 2026.2 con el plugin de Android, Android SDK (API 36.1) y JDK 17.
+- El proyecto Gradle en `android/` con los módulos `:app` (Android, `viewBinding`) y `:dominio` (`java-library`, JUnit 5).
+- Versiones en `gradle/libs.versions.toml`, Gradle Wrapper 9.8.0 y AGP 9.1.1 (máximo que soporta IntelliJ 2026.2).
+- La estructura de paquetes de la sección 3.3, con un `package-info.java` por paquete. `MainActivity` está en `ui.comun`.
+- Íconos provisionales, `.gitignore` y `.gitattributes`.
+- La app instalada en el teléfono de pruebas (Android 15), mostrando "Hello World!".
+
+Con esto, la tarea 1 de I3 queda **parcialmente cubierta**. Falta el tema y los tokens, y `MainActivity` con NavHost y barra inferior.
+
+### 13.4 Tareas por iteración
 
 **I3 · semanas 9–10 — Front-end navegable y dominio**
-1. Crear el proyecto Android (`:app`, `:dominio`), `libs.versions.toml`, tema y tokens (8.3), `MainActivity` con NavHost y barra inferior.
+1. ~~Crear el proyecto Android (`:app`, `:dominio`), `libs.versions.toml`~~ (✅ paso 0). Falta: tema y tokens (8.3), `MainActivity` con NavHost y barra inferior.
 2. `:dominio` completo con pruebas: modelo, `ValidadorRuc`, `MotorReglasNRUS`, `DetectorDuplicados`, `ParserRespuesta`.
 3. Pantallas P01–P20 con ViewModels y **repositorios en memoria** + `ExtractorFacturas` falso.
 4. CameraX en P06 con evaluación de nitidez y luz.
@@ -790,7 +832,7 @@ Usa un **`ExtractorFacturas` falso** (devuelve el JSON de la sección 6.2) para 
 5. Room + SQLCipher (13 tablas, migraciones), `AlmacenImagenes`, repositorios reales, guardado transaccional, carga de `assets/parametros_nrus.json`.
 6. `LiteRtLmPuente.kt`, `GestorModeloLocal` (comprobación, `assets/modelo.json`, descarga desde Hugging Face, SHA-256, prueba), P03.
 7. Medir tiempo y memoria en el teléfono de referencia con el modelo convertido.
-8. Prueba de usabilidad con 3 titulares (protocolo del informe, Anexo S).
+8. Prueba de usabilidad con 3 titulares (protocolo del informe, Anexo S). **Decidido (2026-09-27): semanas 11–12.** El informe del APF2 también la menciona en I3 (§3.7.6 y conclusión cuarta); se corrige en el informe del APF3.
 
 **I5 · semanas 13–14 — Reportes, exportación de datos e historial**
 9. Reporte PDF (8.5) y compartir; cierre de mes e historial (P17) con la sugerencia de exportar.
@@ -801,6 +843,55 @@ Usa un **`ExtractorFacturas` falso** (devuelve el JSON de la sección 6.2) para 
 **I6 · semanas 15–18 — Pruebas y validación**
 13. Pruebas de integración y de seguridad (lista 10), modo avión, cierre forzado.
 14. Validación en mes simulado y métricas finales; informe y sustentación.
+
+### 13.5 Actividades de las semanas 9 a 18 y responsables
+
+| Semanas | Actividad | Responsable | Entregable |
+|---|---|---|---|
+| 9–10 | Front-end navegable (P01–P20) y dominio con pruebas unitarias del motor NRUS | Coronel Obregón | Incremento 1 |
+| 9–12 | Ajuste fino, evaluación, conversión a `.litertlm` y pruebas en el teléfono | Damián Valdivia | Modelo v1 convertido |
+| 11–12 | Room con SQLCipher, repositorios e integración del puente LiteRT-LM | Coronel Obregón | APF3 |
+| 11–12 | Prueba de usabilidad del prototipo con tres titulares | Gonzales Maco | Informe de usabilidad |
+| 13–14 | Reporte PDF, exportación de datos e historial | Coronel Obregón, Mateo Velásquez | Incremento 3 |
+| 12–16 | Pruebas de integración y validación en mes simulado | Gonzales Maco | Resultados de validación |
+| 17–18 | Informe final y sustentación | Mateo Velásquez | Informe final |
+
+### 13.6 Estado del Gantt al corte de la semana 8
+
+| Paquete | Semanas | Estado |
+|---|---|---|
+| 1. Gestión del proyecto (acta, WBS, cronograma y riesgos: S1–3; seguimiento: S4–18) | 1–18 | en curso |
+| 2. Análisis (contexto, canvas, entrevistas, SRS) | 1–4 | completo |
+| 3. Diseño (BPMN, clases, DER, prototipo UX/UI, documentación técnica) | 3–8 | completo |
+| 4. Modelo Gemma 4 ajustado — recopilación y etiquetado | 5–9 | en curso |
+| 4. Modelo Gemma 4 ajustado — ajuste fino, conversión y pruebas | 9–12 | pendiente |
+| 5. Construcción de la app — front-end (pantallas y navegación) | 7–12 | en curso |
+| 5. Construcción de la app — back-end (dominio, Room y exportación) | 8–14 | en curso |
+| 6. Pruebas y validación | 12–16 | pendiente |
+| 7. Documentación y sustentación | 4–18 | en curso |
+
+No hay desviaciones respecto de la línea base (Anexo D del informe). La construcción de la app se adelantó una semana para empezar el front-end mientras se cerraba el diseño.
+
+### 13.7 Mediciones comprometidas (qué hay que demostrar y cuándo)
+
+| RNF | Medición prevista | Cuándo |
+|---|---|---|
+| RNF-01, RNF-02 | Exactitud ≥ 90 % por campo (conjunto de prueba separado, comparado con el modelo base) | APF3 |
+| RNF-03 | Diferencia < 2 % en el mes simulado | Final |
+| RNF-04, RNF-05 | ≤ 20 s y ≤ 2 GB en el equipo de referencia (imagen a 896 px, GPU si existe) | APF3 |
+| RNF-06, RNF-07 | APK ≤ 60 MB (modelo como descarga separada); pruebas en Android 8 y 13 (minSdk 26) | APF3 |
+| RNF-09 a RNF-11 | Prueba de usabilidad con 3 titulares (Anexo S) | Semanas 11–12, I4 (resultados en APF3) |
+| RNF-12, RNF-14 | Prueba en modo avión e inspección de tráfico | APF3 |
+| RNF-13 | Prueba de cierre forzado durante el guardado | APF3 |
+| RNF-15, RNF-16 | Revisión con OWASP MASVS e inspección de tráfico | Final |
+| RNF-17 a RNF-19 | Cobertura de pruebas del motor ≥ 80 % | APF3 |
+
+### 13.8 Próximos pasos hacia el APF3 (presentados en la sustentación)
+
+1. Construir el front-end y el dominio a partir de este documento (I3).
+2. Hacer el ajuste fino y la conversión a `.litertlm`.
+3. Medir la exactitud y el tiempo de lectura en el teléfono de referencia.
+4. Hacer la prueba de usabilidad con tres titulares. Los resultados se reportan en el APF3 y **no se inventan cifras**.
 
 ---
 

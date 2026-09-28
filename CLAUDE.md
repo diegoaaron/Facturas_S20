@@ -31,11 +31,11 @@ El usuario trabaja este proyecto desde **dos computadoras**, así que la memoria
 
 **Facturas S20** es una **app Android nativa en Java** (en español, orientada a Perú) para escanear facturas y boletas con la cámara del teléfono. Sus datos se extraen con un modelo **Gemma 4 E2B afinado (LoRA)** que corre **dentro del teléfono** (formato `.litertlm` con LiteRT-LM), y la app ayuda al titular a controlar su categoría y a hacer su declaración mensual del NRUS.
 
-Claves de la arquitectura (el detalle está en `roadmap/entregable2_documentacion_tecnica.md`):
+Claves de la arquitectura (el detalle está en `roadmap/001_27_09_26_documentacion_tecnica_y_roadmap.md`):
 - **Java en al menos el 50 % del código** (exigencia del curso; se apunta a ~85 %). Lo único en Kotlin es el puente con LiteRT-LM, porque su API es Kotlin.
 - **Un solo usuario y sin servidor.** Toda la data vive en el teléfono, en SQLite con Room + SQLCipher. El usuario exporta sus datos (ZIP con CSV, imágenes y PDF) para analizarlos en una PC. No hay cuentas, sincronización, nube ni consola de administración.
 - **Funciona sin conexión.** La única conexión de red es la descarga única del modelo desde Hugging Face. En teléfonos sin RAM suficiente hay un modo de registro manual.
-- Se desarrolla con **IntelliJ IDEA** (plugin de Android + Gradle). La configuración del equipo está en `roadmap/configuracion_equipo.md`.
+- Se desarrolla con **IntelliJ IDEA** (plugin de Android + Gradle). La configuración del equipo está en `roadmap/002_27_09_26_configuracion_equipo.md`.
 
 ### App Android (`android/`)
 
@@ -52,83 +52,24 @@ export JAVA_HOME=/c/Users/<usuario>/.jdks/temurin-17.0.20.1
 ./gradlew :app:installDebug                  # instala en el teléfono conectado
 ```
 
-### Prototipo previo (lo que hay hoy en el repo)
+### Prototipo previo (retirado del repo)
 
-Antes de pasar a Android se hizo una PWA, que queda como prototipo de referencia (competencia Build with Gemma). **No es el producto final.** Tiene dos partes:
-
-1. **Frontend** (raíz del repo): React 19 + TypeScript + Vite 8 + Tailwind CSS 4 + React Router 7. Se despliega en Vercel.
-2. **Modelo / backend de inferencia** (`tunning_gemma4/`): notebooks de Google Colab que afinan `unsloth/gemma-4-E2B-it` con Unsloth + TRL y luego exponen un servidor FastAPI (`POST /extraer`) publicado mediante un túnel de Cloudflare (`*.trycloudflare.com`). No hay backend persistente: el túnel vive mientras corre el Colab. Los notebooks siguen sirviendo para el ajuste fino del modelo de la app Android.
-
-Las secciones siguientes (comandos, configuración, arquitectura del frontend y trampas) describen **este prototipo**.
-
-## Comandos
-
-```bash
-npm install
-npm run dev       # servidor de desarrollo Vite (usa el proxy /api -> túnel)
-npm run build     # tsc -b && vite build  (el type-check forma parte del build)
-npm run preview   # sirve el build con el mismo proxy
-```
-
-No hay linter, formateador ni tests configurados. Verifica cambios con `npm run build`.
-
-## Configuración y conexión con Gemma
-
-- Copia `.env.example` a `.env`:
-  - `GEMMA_TUNNEL_ORIGIN` — URL del túnel Cloudflare actual (sin ruta). Solo la lee `vite.config.ts` para el proxy.
-  - `VITE_GEMMA_ENDPOINT_URL=/api/extraer` — ruta fija que llama el frontend.
-- **Dev/preview:** `vite.config.ts` reenvía `/api/*` a `GEMMA_TUNNEL_ORIGIN` quitando el prefijo `/api` (evita CORS).
-- **Producción (Vercel):** `vercel.json` hace el mismo rewrite `/api/:path*` → URL del túnel, **hardcodeada**. Cada vez que se reinicia el Colab la URL de `trycloudflare.com` cambia y hay que actualizar `vercel.json` (y `.env` en local).
-
-### Contrato del endpoint (`src/services/api.ts`)
-
-- Petición: `POST /api/extraer`, `multipart/form-data` con el campo `imagen` (JPEG). Timeout de 30 s.
-- Respuesta esperada:
-  ```json
-  { "ok": true,
-    "campos": { "ruc": "...", "fecha_emision": "YYYY-MM-DD", "numero_factura": "...", "monto_total": "123.45" },
-    "revisar": ["campo_con_baja_confianza"],
-    "confiable": true,
-    "error": "solo si ok=false" }
-  ```
-- `extractInvoice()` lo mapea a `InvoiceData` (`src/types/Invoice.ts`): convierte la fecha a `DD/MM/YYYY`, fija `tipoDocumento: "Factura"` y `moneda: "PEN"`; `proveedor`, `formaPago` y `diasCredito` los completa el usuario. Los errores se lanzan como `ExtractInvoiceError` con `code` (`timeout | network | server | config | parse`) y mensajes para el usuario en español.
-- Si se cambian los campos que devuelve el modelo, hay que actualizar a la vez el prompt `INSTRUCCION` del notebook, el servidor FastAPI y `GemmaResponse` en `api.ts`.
-
-## Arquitectura del frontend (`src/`)
-
-- `App.tsx` — `AuthProvider` > `InvoiceProvider` > `BrowserRouter`. Layout de ancho móvil (`max-w-md`). Todo excepto `/`, `/login` y `/register` va envuelto en `ProtectedRoute`.
-- **Flujo de escaneo** (los datos pasan entre pantallas por `navigate(..., { state })`, no por contexto):
-  `/scan/intro` → `/scan/camera` (input de archivo con `capture="environment"` o galería → data URL base64) → `/scan/processing` (llama a `extractInvoice`, permite reintentar) → `/scan/complete` → `/invoice/nueva` (borrador editable; al guardar llama `addInvoice`) → `/summary`.
-  `/invoice/:id` muestra una factura guardada. Si se entra a una pantalla sin su `state`, se muestra un mensaje y se redirige.
-- `context/AuthContext.tsx` — autenticación **simulada** en `localStorage` (`facturas-s20:users`, `facturas-s20:session`). Contraseñas en texto plano; usuarios demo `demo@facturas.com / demo1234` y `user / user`; “login con Google” es un mock. Solo para prototipo.
-- `context/InvoiceContext.tsx` — facturas persistidas en `localStorage` (`facturas-s20:invoices`), incluida la imagen en base64 (ojo con el límite de ~5 MB de localStorage).
-- `lib/format.ts` — moneda (`S/` o `$`), fechas relativas (`Hoy, 26SEP`), color/inicial de avatar.
-- `components/` — `Button`, `Card`, `BottomNav`, `StatusBadge`, `ProtectedRoute`.
-- Estilos: Tailwind 4 con tokens en `@theme` de `src/index.css` (`primary #1b4d45`, `accent #8bc34a`, `warning`, `success`, `surface`, `text-primary`, `text-secondary`). Usa estas clases (`bg-primary`, `text-text-secondary`…) en lugar de colores sueltos. Iconos con `lucide-react`.
+Antes de pasar a Android se hizo una PWA (React 19 + Vite + Tailwind, desplegada en Vercel) que llamaba a Gemma por un servidor FastAPI en Colab, expuesto con un túnel de Cloudflare. Se usó en la competencia Build with Gemma. El 2026-09-28 se borró del repo, junto con la copia `sergio/`, los diseños `design_factu/` y los notebooks viejos. **Su último estado está en el tag `prototipo-pwa`** (`git checkout prototipo-pwa` para verlo). No se debe retomar ni proponer: el producto es la app Android.
 
 ## Convenciones
 
-- Todo el texto de la UI, mensajes de error y comentarios van en **español**.
-- Componentes funcionales con `export default function`, hooks de contexto `useAuth()` / `useInvoices()`.
-- TypeScript estricto (`noUnusedLocals`, `noUnusedParameters`): el build falla con variables sin usar.
-- Dominio peruano: RUC de 11 dígitos (el notebook valida prefijo 10/15/17/20 y dígito verificador módulo 11), moneda por defecto PEN.
-
-## Trampas conocidas del repo
-
-- **`index.html` de la raíz es un build, no el fuente.** Carga `/assets/index-D-068JsU.js` (bundle compilado y commiteado en `assets/`) en lugar de `/src/main.tsx`. Ese bundle es antiguo (usa `getUserMedia`, la versión anterior de la cámara), así que los cambios en `src/` **no se reflejan** en `npm run dev` ni en `npm run build` mientras sea así. La versión correcta del fuente está en `sergio/index.html` (`<script type="module" src="/src/main.tsx">`). Confirma con el usuario antes de corregirlo, porque puede afectar al despliegue en Vercel.
-- `icon.svg` y `manifest.json` están duplicados en la raíz y en `public/` (los de `public/` son los que usa Vite).
-- `sergio/` es una copia casi idéntica del proyecto (con su propio `dist/` y una carpeta `diseno_app/` que solo tiene un `test.txt`); en el código solo difiere `src/pages/ScanCamera.tsx` (allí se usa `getUserMedia` + `<video>`/`<canvas>`). La app activa es la de la raíz; no edites `sergio/` salvo que se pida.
-- `design_factu/*.pdf` — diseños de referencia de la UI (iteraciones 1 a 8; “Diseño 8 Final” es la versión final).
-- Archivos de prueba sin uso: `Test`, `mitest.txt`, `prueba.txt`.
-- `node_modules` se llegó a commitear y luego se eliminó; está en `.gitignore`, no volver a añadirlo.
+- Todo el texto de la UI, mensajes de error y comentarios van en **español**. Los identificadores del dominio también, sin tildes (`FacturaCompra`, `importeTotal`); los sufijos técnicos van en inglés (`ViewModel`, `Dao`, `Fragment`). El resto de convenciones está en la documentación técnica §14.
+- Dominio peruano: RUC de 11 dígitos (prefijo 10/15/17/20 y dígito verificador módulo 11), moneda PEN, dinero con `BigDecimal` de escala 2.
+- Commits en español y en imperativo («Agrega validación de RUC»).
 
 ## Roadmap (`roadmap/`)
 
-Plan de trabajo del desarrollo. Todo lo que sea roadmap, cronograma, pendientes o requerimientos por avanzar va aquí:
+Plan de trabajo del desarrollo. Todo lo que sea roadmap, cronograma, pendientes o requerimientos por avanzar va aquí.
 
-- `entregable2_documentacion_tecnica.md` — referencia técnica para construir la app Android: arquitectura, contratos, esquema SQLite, pantallas, RF/RNF (§11) y plan por iteraciones (§13). Si el código la contradice, gana el documento, salvo que se decida cambiarlo.
-- `configuracion_equipo.md` — pasos probados para dejar IntelliJ + Android SDK + JDK 17 listos, abrir `android/` y correr la app en el teléfono (para la otra computadora). Actualízalo si cambia algo del entorno.
-- `roadmap_cronograma_y_pendientes.md` — entregas del curso, iteraciones I1–I6, responsables, estado del Gantt y mediciones comprometidas por entrega. Si se cambia el plan, conviene reflejarlo también en los scripts del entregable correspondiente.
+Los archivos siguen la misma convención que las memorias: `<NNN>_<dd>_<mm>_<yy>_<nombre_descriptivo>.md`. El número es correlativo (el siguiente toma el más alto + 1) y la fecha es la de creación.
+
+- `001_27_09_26_documentacion_tecnica_y_roadmap.md` — **la base de todo lo que hay que hacer para completar el proyecto.** Referencia técnica de la app Android (arquitectura, contratos, esquema SQLite, pantallas, RF/RNF en §11) y roadmap en §13: entregas, iteraciones I1–I6, tareas, responsables, Gantt y mediciones comprometidas. El paso 0 (configuración del equipo) ya está hecho y remite a `002`. Si el código lo contradice, gana el documento, salvo que se decida cambiarlo. Si cambia el plan, conviene reflejarlo también en los scripts del entregable correspondiente.
+- `002_27_09_26_configuracion_equipo.md` — paso 0 del roadmap. La Parte 1 es lo que se hizo en la primera computadora (errores incluidos); la Parte 2, los pasos para levantar el proyecto en otra computadora con IntelliJ recién instalado. Actualízalo si cambia algo del entorno.
 
 ## Documentos teóricos (`documentos_teoricos/`)
 
@@ -146,4 +87,6 @@ El entregable 1 corresponde al APF1 y el 2 al APF2. Al añadir nuevos entregable
 
 ## Notebooks de fine-tuning (`tunning_gemma4/`)
 
-Son iteraciones incrementales (`_1` … `_6`); **`tunning_model_gemma4_6.ipynb` es la más completa**. Pasos: instalar Unsloth/TRL/transformers 5.5 → montar Google Drive (`/MyDrive/dataset_facturas/` con `data.json` + `imagenes/`) → cargar el LoRA existente o crear uno nuevo sobre el modelo base en 4 bits → entrenar con `SFTTrainer` (resolución 896, 3 épocas, 80/20 train/val) → guardar el LoRA en Drive → evaluar por campo con validación de RUC/fecha → levantar FastAPI en el puerto 8000 → exponerlo con `cloudflared tunnel`. Requieren GPU de Colab; no se pueden ejecutar localmente.
+Solo queda **`tunning_model_gemma4_6.ipynb`** (las iteraciones `_1` a `_5` se borraron el 2026-09-28; están en el historial de git). Pasos: instalar Unsloth/TRL/transformers 5.5 → montar Google Drive (`/MyDrive/dataset_facturas/` con `data.json` + `imagenes/`) → cargar el LoRA existente o crear uno nuevo sobre el modelo base en 4 bits → entrenar con `SFTTrainer` (resolución 896, 3 épocas, 80/20 train/val) → guardar el LoRA en Drive → evaluar por campo con validación de RUC/fecha → levantar FastAPI en el puerto 8000 → exponerlo con `cloudflared tunnel`. Requiere GPU de Colab; no se puede ejecutar localmente.
+
+La parte final (FastAPI + túnel) era para la PWA y **ya no se usa**. Para la app Android, el notebook debe terminar fusionando el LoRA y convirtiendo el modelo a `.litertlm` (documentación técnica §6.7, iteración I4).

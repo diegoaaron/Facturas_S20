@@ -57,7 +57,7 @@ Con eso la app se instaló en el teléfono y mostró **"Hello World!"**.
 | SDK | `compileSdk` 36.1 · `targetSdk` 36 · `minSdk` 26 |
 | Versiones | todas en `android/gradle/libs.versions.toml` (se usan con `libs.<alias>`) |
 | Módulos | `:app` (Android, `viewBinding`) y `:dominio` (`java-library`, Java puro, JUnit 5) |
-| Paquetes | estructura de `entregable2_documentacion_tecnica.md` §3.3, con un `package-info.java` por paquete; `MainActivity` en `pe.facturass20.ui.comun` |
+| Paquetes | estructura de `001_27_09_26_documentacion_tecnica_y_roadmap.md` §3.3, con un `package-info.java` por paquete; `MainActivity` en `pe.facturass20.ui.comun` |
 | `android/.gitignore` | excluye `.gradle/`, `build/`, `local.properties`, `.idea/`, `*.iml`, llaves de firma y `*.litertlm` |
 | `android/.gitattributes` | `gradlew` con finales LF |
 
@@ -145,4 +145,4 @@ En PowerShell o cmd se usa `gradlew.bat` en lugar de `./gradlew`.
 | El teléfono no aparece en *Devices* | Revisa el cable (algunos solo cargan), el aviso de depuración en el teléfono o el driver USB del fabricante |
 | El menú *File* no aparece | En la bienvenida no existe; con el proyecto abierto está dentro de **☰** |
 
-Con la app mostrando "Hello World!", el equipo está listo para empezar el desarrollo: la iteración **I3** de `roadmap_cronograma_y_pendientes.md`.
+Con la app mostrando "Hello World!", el equipo está listo para empezar el desarrollo: la iteración **I3** de `001_27_09_26_documentacion_tecnica_y_roadmap.md` §13 (este documento es su paso 0).
