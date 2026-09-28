@@ -137,6 +137,7 @@ En PowerShell o cmd se usa `gradlew.bat` en lugar de `./gradlew`.
 
 | Síntoma | Qué hacer |
 |---|---|
+| Franja azul *"Plugins supporting Android files found"* al abrir un archivo | Falta el plugin de Android o está desactivado: pulsa **Install Android plugin** → **Restart IDE** → Sync (equivale al paso 2) |
 | En *Open* no se reconoce como proyecto Gradle | Abriste la raíz del repo; abre la carpeta `android/` |
 | `Invalid Gradle JDK configuration found` | Paso 5 |
 | `incompatible version (AGP …)` | Alguien subió AGP; en `android/gradle/libs.versions.toml` debe decir `agp = "9.1.1"` |
