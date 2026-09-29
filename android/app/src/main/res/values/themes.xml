@@ -21,9 +21,17 @@
         <item name="shapeAppearanceCornerMedium">@style/Forma.FacturasS20.Tarjeta</item>
         <item name="materialButtonStyle">@style/Widget.FacturasS20.Boton</item>
         <item name="materialCardViewStyle">@style/Widget.FacturasS20.Tarjeta</item>
+        <item name="textInputStyle">@style/Widget.FacturasS20.Campo</item>
     </style>
 
     <style name="Theme.FacturasS20" parent="Base.Theme.FacturasS20"/>
+
+    <!-- Pantalla de arranque: se ve mientras se consulta si la app ya está configurada (ui.acceso.Sesion). -->
+    <style name="Theme.FacturasS20.Arranque" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/color_primario</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.FacturasS20</item>
+    </style>
 
     <!-- Formas -->
     <style name="Forma.FacturasS20.Tarjeta" parent="">
@@ -48,6 +56,59 @@
         <item name="shapeAppearance">@style/Forma.FacturasS20.Boton</item>
     </style>
 
+    <!-- Botón principal alto y en negrita: «Continuar» de P01. -->
+    <style name="Widget.FacturasS20.Boton.Grande">
+        <item name="android:minHeight">@dimen/boton_grande_alto</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Widget.FacturasS20.Boton.Texto" parent="Widget.Material3.Button.TextButton">
+        <item name="android:minHeight">@dimen/boton_alto</item>
+        <item name="android:textSize">@dimen/texto_dato</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/color_primario</item>
+    </style>
+
+    <!-- Botón con borde de acento sobre el color primario: «Ingresar con huella» de P02. -->
+    <style name="Widget.FacturasS20.Boton.ContornoClaro" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:minHeight">@dimen/boton_grande_alto</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/color_acento</item>
+        <item name="iconTint">@color/color_acento</item>
+        <item name="iconGravity">textStart</item>
+        <item name="strokeColor">@color/color_acento</item>
+        <item name="strokeWidth">2dp</item>
+        <item name="rippleColor">@color/color_tecla_oscura_pulsada</item>
+        <item name="shapeAppearance">@style/Forma.FacturasS20.Boton</item>
+    </style>
+
+    <!-- Campo de texto con borde y esquinas de tarjeta (P01, P08, P19). -->
+    <style name="Widget.FacturasS20.Campo" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">@dimen/radio_tarjeta</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/radio_tarjeta</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/radio_tarjeta</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/radio_tarjeta</item>
+        <item name="boxStrokeColor">@color/campo_borde</item>
+        <item name="boxStrokeWidth">1.5dp</item>
+        <item name="boxStrokeWidthFocused">2dp</item>
+        <item name="hintTextColor">@color/color_primario</item>
+        <item name="helperTextTextColor">@color/color_ok</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.FacturasS20.Campo</item>
+    </style>
+
+    <style name="ThemeOverlay.FacturasS20.Campo" parent="">
+        <item name="editTextStyle">@style/Widget.FacturasS20.Campo.Texto</item>
+    </style>
+
+    <style name="Widget.FacturasS20.Campo.Texto" parent="Widget.Material3.TextInputEditText.OutlinedBox">
+        <item name="android:minHeight">@dimen/campo_alto</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/color_texto</item>
+    </style>
+
     <style name="Widget.FacturasS20.Tarjeta" parent="Widget.Material3.CardView.Outlined">
         <item name="cardBackgroundColor">@color/color_superficie</item>
         <item name="strokeColor">@color/color_borde</item>
@@ -69,6 +130,13 @@
         <item name="android:textColor">@color/color_texto</item>
     </style>
 
+    <!-- Títulos principales: «Configure su negocio», «Septiembre 2026». -->
+    <style name="Texto.FacturasS20.TituloGrande" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:textSize">@dimen/texto_titulo_grande</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/color_primario</item>
+    </style>
+
     <style name="Texto.FacturasS20.Monto" parent="TextAppearance.Material3.HeadlineLarge">
         <item name="android:textSize">@dimen/texto_monto</item>
         <item name="android:textStyle">bold</item>
@@ -78,6 +146,17 @@
     <style name="Texto.FacturasS20.Dato" parent="TextAppearance.Material3.BodyLarge">
         <item name="android:textSize">@dimen/texto_dato</item>
         <item name="android:textColor">@color/color_texto</item>
+    </style>
+
+    <!-- Etiquetas y líneas de apoyo de las tarjetas: «Compras del mes», «F001-004821 · 22/09». -->
+    <style name="Texto.FacturasS20.Secundario" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textSize">@dimen/texto_dato</item>
+        <item name="android:textColor">@color/color_texto2</item>
+    </style>
+
+    <style name="Texto.FacturasS20.Etiqueta" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textSize">@dimen/texto_secundario</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="Texto.FacturasS20.Ayuda" parent="TextAppearance.Material3.BodySmall">

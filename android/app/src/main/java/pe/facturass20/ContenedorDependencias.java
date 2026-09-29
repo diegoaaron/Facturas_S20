@@ -1,6 +1,7 @@
 package pe.facturass20;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,24 +26,32 @@ import pe.facturass20.dominio.puertos.FacturaRepositorio;
 import pe.facturass20.dominio.puertos.ParametrosRepositorio;
 import pe.facturass20.dominio.puertos.PeriodoRepositorio;
 import pe.facturass20.dominio.puertos.Reloj;
+import pe.facturass20.ui.acceso.PreferenciasAcceso;
+import pe.facturass20.ui.acceso.Sesion;
 
 /**
  * Inyección de dependencias manual (documentación técnica §3.1): crea una sola vez los adaptadores
  * que implementan los puertos del dominio y los entrega a los ViewModels.
  *
  * <p>La base de datos y sus repositorios se crean la primera vez que se piden (la clave sale del
- * Keystore), siempre desde un hilo de fondo. Faltan por agregar el extractor de facturas (falso primero,
- * Gemma después) y el exportador de datos.</p>
+ * Keystore), siempre desde un hilo de fondo; en ese momento también se cargan los parámetros del NRUS,
+ * así ninguna pantalla los lee antes de tiempo. La primera en pedirlos es {@link Sesion#comprobar()}, al
+ * abrir la app. Faltan por agregar el extractor de facturas (falso primero, Gemma después) y el
+ * exportador de datos.</p>
  */
 public final class ContenedorDependencias {
 
     private final Context contexto;
     private final ExecutorService ejecutor = Executors.newFixedThreadPool(2);
     private final Reloj reloj = Reloj.sistema();
+    private final PreferenciasAcceso preferenciasAcceso;
+    private final Sesion sesion;
     private Adaptadores adaptadores;
 
     ContenedorDependencias(Context contexto) {
         this.contexto = contexto.getApplicationContext();
+        preferenciasAcceso = new PreferenciasAcceso(this.contexto);
+        sesion = new Sesion(ejecutor, () -> gestorPin().tienePin());
     }
 
     /** Hilos de fondo para la base de datos, la inferencia, el PDF y la exportación; nunca el hilo de UI. */
@@ -52,6 +61,15 @@ public final class ContenedorDependencias {
 
     public Reloj reloj() {
         return reloj;
+    }
+
+    /** Si la app está configurada y desbloqueada; dura lo que dura el proceso. */
+    public Sesion sesion() {
+        return sesion;
+    }
+
+    public PreferenciasAcceso preferenciasAcceso() {
+        return preferenciasAcceso;
     }
 
     public BaseDatosFacturas baseDatos() {
@@ -124,6 +142,8 @@ public final class ContenedorDependencias {
     /** Todo lo que depende de la base, creado junto. */
     private static final class Adaptadores {
 
+        private static final String ETIQUETA = "FacturasS20";
+
         final BaseDatosFacturas base;
         final ContribuyenteRepositorioRoom contribuyentes;
         final PeriodoRepositorioRoom periodos;
@@ -144,6 +164,19 @@ public final class ContenedorDependencias {
             pin = new GestorPin(base.contribuyenteDao());
             cargador = new CargadorParametrosNrus(contexto, base);
             determinarCategoria = new DeterminarCategoria(periodos, contribuyentes, parametros);
+            cargarParametrosNrus();
+        }
+
+        /** Carga los parámetros del NRUS si la versión de la app trae una nueva. */
+        private void cargarParametrosNrus() {
+            try {
+                if (cargador.cargarSiHaceFalta()) {
+                    Log.i(ETIQUETA, "Parámetros del NRUS actualizados");
+                }
+            } catch (RuntimeException e) {
+                // La app abre igual; las pantallas que los necesitan muestran un mensaje.
+                Log.e(ETIQUETA, "No se pudieron cargar los parámetros del NRUS", e);
+            }
         }
     }
 }

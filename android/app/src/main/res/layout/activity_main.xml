@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Contenedor de la app: NavHost con los destinos de nav_graph y la barra inferior con el botón central «Escanear».
+     El grafo no se declara aquí: MainActivity lo pone con el destino inicial que corresponde a la sesión.
      El fondo primario queda detrás de la barra de estado (el encabezado de las pantallas es de ese color). -->
 <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -18,7 +19,6 @@
             android:layout_height="0dp"
             android:background="@color/color_fondo"
             app:defaultNavHost="true"
-            app:navGraph="@navigation/nav_graph"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/barra_inferior"
             app:layout_constraintStart_toStartOf="parent"

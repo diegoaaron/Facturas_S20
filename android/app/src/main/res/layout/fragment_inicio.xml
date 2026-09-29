@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- P04 Inicio (prototipo pantalla_04_inicio_resumen_del.png). El encabezado primario queda detrás de la
+     mitad superior de la tarjeta de compras. -->
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_fondo">
+
+    <androidx.core.widget.NestedScrollView
+            android:id="@+id/desplazamiento"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="40dp"
+            android:visibility="invisible"
+            tools:visibility="visible">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <View
+                    android:id="@+id/fondo_encabezado"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:background="@color/color_primario"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@id/mitad_tarjeta_compras"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                    android:id="@+id/texto_saludo"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margen_amplio"
+                    android:layout_marginTop="20dp"
+                    android:textAppearance="@style/Texto.FacturasS20.Dato"
+                    android:textColor="@color/color_texto_sobre_primario"
+                    android:textSize="18sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/boton_avisos"
+                    tools:text="Hola, Rosa"/>
+
+            <TextView
+                    android:id="@+id/texto_periodo"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margen_amplio"
+                    android:accessibilityHeading="true"
+                    android:textAppearance="@style/Texto.FacturasS20.TituloGrande"
+                    android:textColor="@color/color_superficie"
+                    app:layout_constraintTop_toBottomOf="@id/texto_saludo"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/boton_avisos"
+                    tools:text="Septiembre 2026"/>
+
+            <FrameLayout
+                    android:id="@+id/boton_avisos"
+                    android:layout_width="@dimen/boton_alto"
+                    android:layout_height="@dimen/boton_alto"
+                    android:layout_marginEnd="16dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/p04_avisos"
+                    app:layout_constraintTop_toTopOf="@id/texto_saludo"
+                    app:layout_constraintBottom_toBottomOf="@id/texto_periodo"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_campana"
+                        app:tint="@color/color_superficie"/>
+
+                <View
+                        android:id="@+id/punto_avisos"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginBottom="14dp"
+                        android:background="@drawable/punto_aviso"
+                        android:visibility="gone"/>
+            </FrameLayout>
+
+            <!-- Compras del mes -->
+            <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tarjeta_compras"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margen"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="@dimen/margen"
+                    app:layout_constraintTop_toBottomOf="@id/texto_periodo"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/relleno_tarjeta">
+
+                    <TextView
+                            android:id="@+id/etiqueta_compras"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/p04_compras"
+                            android:textAppearance="@style/Texto.FacturasS20.Secundario"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/texto_numero_facturas"/>
+
+                    <TextView
+                            android:id="@+id/texto_numero_facturas"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/fondo_etiqueta_ok"
+                            android:paddingStart="12dp"
+                            android:paddingTop="4dp"
+                            android:paddingEnd="12dp"
+                            android:paddingBottom="4dp"
+                            android:textAppearance="@style/Texto.FacturasS20.Etiqueta"
+                            android:textColor="@color/color_ok"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            tools:text="12 facturas"/>
+
+                    <TextView
+                            android:id="@+id/texto_compras"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textAppearance="@style/Texto.FacturasS20.Monto"
+                            android:textSize="36sp"
+                            app:layout_constraintTop_toBottomOf="@id/texto_numero_facturas"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            tools:text="S/ 4 120,50"/>
+
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/barra_limite"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:max="100"
+                            app:indicatorColor="@color/color_acento"
+                            app:trackColor="@color/color_pista_barra"
+                            app:trackCornerRadius="7dp"
+                            app:trackThickness="14dp"
+                            app:trackStopIndicatorSize="0dp"
+                            app:indicatorTrackGapSize="0dp"
+                            app:layout_constraintTop_toBottomOf="@id/texto_compras"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            tools:progress="82"/>
+
+                    <!-- Marca del umbral de aviso (80 %); su posición se fija desde el código. -->
+                    <androidx.constraintlayout.widget.Guideline
+                            android:id="@+id/guia_umbral"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            app:layout_constraintGuide_percent="0.8"/>
+
+                    <View
+                            android:id="@+id/marca_umbral"
+                            android:layout_width="2dp"
+                            android:layout_height="26dp"
+                            android:background="@color/color_texto"
+                            android:importantForAccessibility="no"
+                            app:layout_constraintTop_toTopOf="@id/barra_limite"
+                            app:layout_constraintBottom_toBottomOf="@id/barra_limite"
+                            app:layout_constraintStart_toStartOf="@id/guia_umbral"
+                            app:layout_constraintEnd_toEndOf="@id/guia_umbral"/>
+
+                    <TextView
+                            android:id="@+id/texto_limite"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:textAppearance="@style/Texto.FacturasS20.Dato"
+                            android:textStyle="bold"
+                            app:layout_constraintTop_toBottomOf="@id/barra_limite"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            tools:text="82 % del límite de la categoría 1 (S/ 5 000)"/>
+
+                    <TextView
+                            android:id="@+id/texto_restante"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:textAppearance="@style/Texto.FacturasS20.Secundario"
+                            app:layout_constraintTop_toBottomOf="@id/texto_limite"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            tools:text="Le quedan S/ 879,50 antes de pasar a la categoría 2"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <Space
+                    android:id="@+id/mitad_tarjeta_compras"
+                    android:layout_width="1dp"
+                    android:layout_height="1dp"
+                    app:layout_constraintTop_toTopOf="@id/tarjeta_compras"
+                    app:layout_constraintBottom_toBottomOf="@id/tarjeta_compras"
+                    app:layout_constraintVertical_bias="0.4"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+            <!-- Ventas y categoría -->
+            <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tarjeta_ventas"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="@dimen/margen"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="6dp"
+                    android:contentDescription="@string/p04_ventas_editar"
+                    app:layout_constraintTop_toBottomOf="@id/tarjeta_compras"
+                    app:layout_constraintBottom_toBottomOf="@id/tarjeta_categoria"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/tarjeta_categoria">
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:padding="@dimen/relleno_tarjeta">
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/p04_ventas"
+                            android:textAppearance="@style/Texto.FacturasS20.Secundario"/>
+
+                    <TextView
+                            android:id="@+id/texto_ventas"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:textAppearance="@style/Texto.FacturasS20.Titulo"
+                            tools:text="S/ 3 900,00"/>
+
+                    <Space
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"/>
+
+                    <TextView
+                            android:id="@+id/texto_ventas_accion"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:drawablePadding="6dp"
+                            android:gravity="center_vertical"
+                            android:text="@string/p04_editar"
+                            android:textAppearance="@style/Texto.FacturasS20.Dato"
+                            android:textColor="@color/color_primario"
+                            android:textStyle="bold"
+                            app:drawableStartCompat="@drawable/ic_editar"
+                            app:drawableTint="@color/color_primario"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tarjeta_categoria"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="@dimen/margen"
+                    app:cardBackgroundColor="@color/color_ok_claro"
+                    app:strokeColor="@color/color_acento_borde"
+                    app:layout_constraintTop_toBottomOf="@id/tarjeta_compras"
+                    app:layout_constraintStart_toEndOf="@id/tarjeta_ventas"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/relleno_tarjeta">
+
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/p04_le_corresponde"
+                            android:textAppearance="@style/Texto.FacturasS20.Secundario"/>
+
+                    <TextView
+                            android:id="@+id/texto_categoria"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:textAppearance="@style/Texto.FacturasS20.Titulo"
+                            android:textColor="@color/color_primario"
+                            tools:text="Categoría 1"/>
+
+                    <TextView
+                            android:id="@+id/texto_cuota"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:textAppearance="@style/Texto.FacturasS20.Dato"
+                            android:textColor="@color/color_acento_oscuro"
+                            android:textStyle="bold"
+                            tools:text="Cuota S/ 20"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Aviso del tope anual (RF-12) -->
+            <TextView
+                    android:id="@+id/texto_tope_anual"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margen"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="@dimen/margen"
+                    android:background="@drawable/fondo_aviso"
+                    android:drawablePadding="12dp"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/relleno_tarjeta"
+                    android:textAppearance="@style/Texto.FacturasS20.Dato"
+                    android:visibility="gone"
+                    app:drawableStartCompat="@drawable/ic_alerta"
+                    app:drawableTint="@color/color_alerta_oscuro"
+                    app:layout_constraintTop_toBottomOf="@id/tarjeta_categoria"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="Sus compras o ventas del año se acercan al tope de S/ 96 000"
+                    tools:visibility="visible"/>
+
+            <!-- Vencimiento -->
+            <LinearLayout
+                    android:id="@+id/tarjeta_vencimiento"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margen"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="@dimen/margen"
+                    android:background="@drawable/fondo_aviso"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="@dimen/boton_alto"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/relleno_tarjeta"
+                    app:layout_constraintTop_toBottomOf="@id/texto_tope_anual"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_calendario"
+                        app:tint="@color/color_alerta_oscuro"/>
+
+                <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                    <TextView
+                            android:id="@+id/texto_vencimiento"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/Texto.FacturasS20.Dato"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            tools:text="Declare hasta el jueves 15 de octubre"/>
+
+                    <TextView
+                            android:id="@+id/texto_dias"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textAppearance="@style/Texto.FacturasS20.Secundario"
+                            tools:text="Faltan 18 días"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Últimas facturas -->
+            <TextView
+                    android:id="@+id/titulo_ultimas"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margen"
+                    android:layout_marginTop="16dp"
+                    android:accessibilityHeading="true"
+                    android:text="@string/p04_ultimas"
+                    android:textAppearance="@style/Texto.FacturasS20.Titulo"
+                    android:textSize="18sp"
+                    app:layout_constraintTop_toBottomOf="@id/tarjeta_vencimiento"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/boton_ver_todas"/>
+
+            <com.google.android.material.button.MaterialButton
+                    android:id="@+id/boton_ver_todas"
+                    style="@style/Widget.FacturasS20.Boton.Texto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:text="@string/p04_ver_todas"
+                    app:layout_constraintTop_toTopOf="@id/titulo_ultimas"
+                    app:layout_constraintBottom_toBottomOf="@id/titulo_ultimas"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+            <LinearLayout
+                    android:id="@+id/lista_ultimas"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margen"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="@dimen/margen"
+                    android:orientation="vertical"
+                    app:layout_constraintTop_toBottomOf="@id/titulo_ultimas"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+            <LinearLayout
+                    android:id="@+id/vacio_ultimas"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margen"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="@dimen/margen"
+                    android:background="@drawable/fondo_tarjeta_borde"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:padding="24dp"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/titulo_ultimas"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/p04_sin_facturas"
+                        android:textAppearance="@style/Texto.FacturasS20.Dato"
+                        android:textStyle="bold"/>
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center"
+                        android:text="@string/p04_sin_facturas_ayuda"
+                        android:textAppearance="@style/Texto.FacturasS20.Secundario"/>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progreso"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            app:indicatorColor="@color/color_primario"/>
+</FrameLayout>

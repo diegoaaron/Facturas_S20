@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- P01 Configuración inicial (prototipo pantalla_01_configuracion_inicial.png).
+     Paso 1: datos del negocio (grupo_negocio). Pasos 2 y 3: crear y repetir el PIN (grupo_pin). -->
+<ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_superficie"
+        android:fillViewport="true">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/margen_amplio"
+            android:paddingTop="40dp"
+            android:paddingEnd="@dimen/margen_amplio"
+            android:paddingBottom="24dp">
+
+        <FrameLayout
+                android:layout_width="@dimen/marca_diametro"
+                android:layout_height="@dimen/marca_diametro"
+                android:background="@drawable/fondo_circulo_primario">
+
+            <ImageView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_marca"/>
+        </FrameLayout>
+
+        <TextView
+                android:id="@+id/texto_titulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:text="@string/p01_titulo_negocio"
+                android:textAppearance="@style/Texto.FacturasS20.TituloGrande"
+                android:accessibilityHeading="true"/>
+
+        <TextView
+                android:id="@+id/texto_paso"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:textAppearance="@style/Texto.FacturasS20.Secundario"/>
+
+        <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:importantForAccessibility="noHideDescendants"
+                android:orientation="horizontal">
+
+            <View
+                    android:id="@+id/indicador_paso1"
+                    android:layout_width="28dp"
+                    android:layout_height="6dp"
+                    android:background="@drawable/indicador_paso"/>
+
+            <View
+                    android:id="@+id/indicador_paso2"
+                    android:layout_width="28dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/indicador_paso"/>
+
+            <View
+                    android:id="@+id/indicador_paso3"
+                    android:layout_width="28dp"
+                    android:layout_height="6dp"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/indicador_paso"/>
+        </LinearLayout>
+
+        <!-- Paso 1 -->
+        <LinearLayout
+                android:id="@+id/grupo_negocio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical">
+
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/campo_ruc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/p01_ruc"
+                    app:endIconDrawable="@drawable/ic_check"
+                    app:endIconMode="custom"
+                    app:endIconTint="@color/color_ok">
+
+                <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/entrada_ruc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:digits="0123456789"
+                        android:imeOptions="actionNext"
+                        android:inputType="number"
+                        android:maxLength="11"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/campo_nombre"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="@string/p01_nombre">
+
+                <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/entrada_nombre"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionNext"
+                        android:inputType="textCapWords"
+                        android:maxLength="100"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/campo_titular"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="@string/p01_titular">
+
+                <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/entrada_titular"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionDone"
+                        android:inputType="textPersonName|textCapWords"
+                        android:maxLength="100"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/fondo_nota"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_candado"
+                        app:tint="@color/color_primario"/>
+
+                <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_weight="1"
+                        android:text="@string/p01_privacidad"
+                        android:textAppearance="@style/Texto.FacturasS20.Dato"/>
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                    android:id="@+id/boton_continuar"
+                    style="@style/Widget.FacturasS20.Boton.Grande"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    android:text="@string/p01_continuar"/>
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
+                    android:text="@string/p01_aviso_legal"
+                    android:textAppearance="@style/Texto.FacturasS20.Ayuda"/>
+        </LinearLayout>
+
+        <!-- Pasos 2 y 3 -->
+        <LinearLayout
+                android:id="@+id/grupo_pin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+            <TextView
+                    android:id="@+id/texto_aviso_pin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:accessibilityLiveRegion="polite"
+                    android:gravity="center"
+                    android:textAppearance="@style/Texto.FacturasS20.Dato"
+                    android:textColor="@color/color_error"
+                    android:visibility="gone"/>
+
+            <pe.facturass20.ui.acceso.TecladoPin
+                    android:id="@+id/teclado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            <com.google.android.material.button.MaterialButton
+                    android:id="@+id/boton_volver"
+                    style="@style/Widget.FacturasS20.Boton.Texto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/p01_volver"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ui.acceso.TecladoPin: true para dibujarlo en blanco sobre el color primario (P02). -->
+    <declare-styleable name="TecladoPin">
+        <attr name="sobreOscuro" format="boolean"/>
+    </declare-styleable>
+</resources>

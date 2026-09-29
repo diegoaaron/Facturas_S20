@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Diálogo de P02 «¿Olvidó su PIN?»: pide el RUC del negocio para crear un PIN nuevo. -->
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="24dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="24dp">
+
+    <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/campo_ruc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/p01_ruc">
+
+        <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/entrada_ruc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:digits="0123456789"
+                android:inputType="number"
+                android:maxLength="11"/>
+    </com.google.android.material.textfield.TextInputLayout>
+</FrameLayout>

@@ -17,4 +17,20 @@
     <color name="color_borde">#DFE5E3</color>
     <!-- Ícono inactivo de la barra inferior. -->
     <color name="color_inactivo">#8A9894</color>
+
+    <!-- Derivados del prototipo (P01, P02, P04); no son tokens de §8.3. -->
+    <!-- Texto secundario y avisos sobre el color primario (contraste ≥ 4,5:1). -->
+    <color name="color_texto_sobre_primario">#CFE3DD</color>
+    <color name="color_alerta_sobre_primario">#FFCB52</color>
+    <!-- Texto e íconos ámbar sobre fondo claro (color_alerta no llega a 4,5:1 sobre blanco). -->
+    <color name="color_alerta_oscuro">#8A5A00</color>
+    <color name="color_alerta_borde">#F3DDA5</color>
+    <color name="color_acento_borde">#CFE5B4</color>
+    <color name="color_pista_barra">#E6EBE9</color>
+    <color name="color_fondo_nota">#F1F5F4</color>
+    <color name="color_fondo_inicial">#E3EEEA</color>
+    <!-- Teclado del PIN: sobre el color primario (P02) y sobre fondo claro (P01). -->
+    <color name="color_tecla_oscura">#265F58</color>
+    <color name="color_tecla_oscura_pulsada">#3A7A71</color>
+    <color name="color_tecla_clara">#EEF2F1</color>
 </resources>

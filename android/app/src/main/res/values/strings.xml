@@ -32,6 +32,111 @@
     <string name="pendiente_codigo">Pantalla %1$s</string>
     <string name="pendiente_detalle">Esta pantalla todavía está en construcción.</string>
 
+    <!-- Comunes -->
+    <string name="cancelar">Cancelar</string>
+    <string name="error_generico">Ocurrió un problema. Intente de nuevo.</string>
+    <string name="error_parametros_nrus">No se pudieron leer los límites y cuotas del NRUS. Actualice la app.</string>
+    <string name="error_sin_configurar">Primero configure los datos de su negocio.</string>
+
+    <!-- Teclado del PIN (P01, P02) -->
+    <string name="pin_borrar">Borrar</string>
+    <string name="pin_puntos">%1$d de 4 dígitos escritos</string>
+    <string name="pin_no_coincide">Los PIN no coinciden. Créelo otra vez.</string>
+
+    <!-- P01 Configuración inicial -->
+    <string name="p01_titulo_negocio">Configure su negocio</string>
+    <string name="p01_titulo_pin">Cree su PIN</string>
+    <string name="p01_titulo_repetir_pin">Repita su PIN</string>
+    <string name="p01_paso1">Paso 1 de 3 · solo la primera vez</string>
+    <string name="p01_paso2">Paso 2 de 3 · 4 dígitos para abrir la app</string>
+    <string name="p01_paso3">Paso 3 de 3 · escríbalo otra vez</string>
+    <string name="p01_ruc">RUC del negocio</string>
+    <string name="p01_nombre">Nombre del negocio</string>
+    <string name="p01_titular">Nombre del titular</string>
+    <string name="p01_ruc_valido">RUC válido (11 dígitos y dígito verificador)</string>
+    <string name="p01_error_ruc">El RUC no es válido. Revise los 11 dígitos.</string>
+    <string name="p01_error_ruc_largo">El RUC tiene 11 dígitos.</string>
+    <string name="p01_error_nombre">Escriba el nombre del negocio.</string>
+    <string name="p01_error_titular">Escriba el nombre del titular.</string>
+    <string name="p01_privacidad">Sus datos se guardan cifrados en este teléfono. No necesita crear una cuenta ni tener internet para usar la app.</string>
+    <string name="p01_continuar">Continuar</string>
+    <string name="p01_aviso_legal">Al continuar acepta el tratamiento local de sus datos</string>
+    <string name="p01_volver">Volver</string>
+    <string name="p01_huella_titulo">¿Ingresar también con su huella?</string>
+    <string name="p01_huella_mensaje">Así abre la app más rápido. Su PIN sigue sirviendo, y puede cambiar esto en Ajustes.</string>
+    <string name="p01_huella_si">Sí, usar huella</string>
+    <string name="p01_huella_no">Ahora no</string>
+
+    <!-- P02 Acceso -->
+    <string name="p02_saludo">Hola, %1$s</string>
+    <string name="p02_instruccion">Ingrese su PIN de 4 dígitos</string>
+    <string name="p02_nuevo_pin">Escriba su PIN nuevo de 4 dígitos</string>
+    <string name="p02_repetir_pin">Repita su PIN nuevo</string>
+    <string name="p02_huella">Ingresar con huella</string>
+    <string name="p02_usar_pin">Usar PIN</string>
+    <string name="p02_olvido">¿Olvidó su PIN? Restablecer con su RUC</string>
+    <string name="p02_cancelar_restablecer">Volver a ingresar mi PIN</string>
+    <string name="p02_espera">Demasiados intentos. Espere un momento.</string>
+    <string name="p02_ruc_no_coincide">Ese RUC no es el de este negocio.</string>
+    <string name="p02_restablecer_titulo">Restablecer su PIN</string>
+    <string name="p02_restablecer_mensaje">Escriba el RUC de su negocio para crear un PIN nuevo.</string>
+    <string name="p02_restablecer_continuar">Continuar</string>
+    <plurals name="p02_pin_incorrecto">
+        <item quantity="one">PIN incorrecto. Le queda %d intento.</item>
+        <item quantity="many">PIN incorrecto. Le quedan %d intentos.</item>
+        <item quantity="other">PIN incorrecto. Le quedan %d intentos.</item>
+    </plurals>
+    <plurals name="p02_espera_segundos">
+        <item quantity="one">Demasiados intentos. Espere %d segundo.</item>
+        <item quantity="many">Demasiados intentos. Espere %d segundos.</item>
+        <item quantity="other">Demasiados intentos. Espere %d segundos.</item>
+    </plurals>
+
+    <!-- P04 Inicio -->
+    <string name="p04_saludo">Hola, %1$s</string>
+    <string name="p04_avisos">Avisos del mes</string>
+    <string name="p04_compras">Compras del mes</string>
+    <plurals name="p04_facturas">
+        <item quantity="one">%d factura</item>
+        <item quantity="many">%d facturas</item>
+        <item quantity="other">%d facturas</item>
+    </plurals>
+    <string name="p04_porcentaje_limite">%1$s del límite de la categoría %2$d (%3$s)</string>
+    <string name="p04_restante_categoria">Le quedan %1$s antes de pasar a la categoría %2$d</string>
+    <string name="p04_restante_nrus">Le quedan %1$s antes de salir del NRUS</string>
+    <string name="p04_en_limite_nrus">Llegó al límite del NRUS</string>
+    <string name="p04_fuera_limite">Superó el límite del NRUS (%1$s)</string>
+    <string name="p04_fuera_ayuda">Este mes ya no le corresponde el NRUS. Consulte con su contador.</string>
+    <string name="p04_determinan_ventas">Se toma el monto de sus ventas, que es mayor que el de sus compras.</string>
+    <string name="p04_ventas">Ventas del mes</string>
+    <string name="p04_ventas_editar">Editar las ventas del mes</string>
+    <string name="p04_ventas_sin_registrar">Sin registrar</string>
+    <string name="p04_editar">Editar</string>
+    <string name="p04_registrar">Registrar</string>
+    <string name="p04_le_corresponde">Le corresponde</string>
+    <string name="p04_categoria">Categoría %1$d</string>
+    <string name="p04_cuota">Cuota %1$s</string>
+    <string name="p04_fuera_nrus">Fuera del NRUS</string>
+    <string name="p04_sin_cuota">Sin cuota</string>
+    <string name="p04_tope_anual">Sus compras o ventas del año se acercan al tope de %1$s</string>
+    <string name="p04_declare_hasta">Declare hasta el %1$s</string>
+    <plurals name="p04_faltan_dias">
+        <item quantity="one">Falta %d día</item>
+        <item quantity="many">Faltan %d días</item>
+        <item quantity="other">Faltan %d días</item>
+    </plurals>
+    <string name="p04_vence_hoy">Vence hoy</string>
+    <plurals name="p04_vencio_hace">
+        <item quantity="one">Venció hace %d día</item>
+        <item quantity="many">Venció hace %d días</item>
+        <item quantity="other">Venció hace %d días</item>
+    </plurals>
+    <string name="p04_ultimas">Últimas facturas</string>
+    <string name="p04_ver_todas">Ver todas</string>
+    <string name="p04_sin_facturas">Aún no registra facturas este mes</string>
+    <string name="p04_sin_facturas_ayuda">Toque Escanear para registrar la primera.</string>
+    <string name="p04_documento">%1$s-%2$s · %3$s</string>
+
     <!-- Notificaciones -->
     <string name="canal_avisos_nombre">Avisos del NRUS</string>
     <string name="canal_avisos_descripcion">Límite de la categoría y fecha de vencimiento de la declaración</string>

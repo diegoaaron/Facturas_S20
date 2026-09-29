@@ -127,7 +127,7 @@ No hay otros proyectos de producción: el único código fuera de la app es el c
 ```
 pe.facturass20
 ├── ui/
-│   ├── acceso/         P01 ConfiguracionFragment · P02 AccesoFragment
+│   ├── acceso/         P01 ConfiguracionFragment · P02 AccesoFragment · Sesion · TecladoPin · ControlIntentos
 │   ├── inicio/         P04 InicioFragment · InicioViewModel
 │   ├── captura/        P05 GuiaCapturaFragment · P06 CapturaActivity · EvaluadorNitidez
 │   ├── verificacion/   P07 LecturaFragment · P08 VerificacionFragment · P09 DuplicadoDialog · P10 GuardadaFragment
@@ -136,7 +136,7 @@ pe.facturass20
 │   ├── reportes/       P16 ReporteFragment · P17 HistorialFragment
 │   ├── ajustes/        P18 AjustesFragment · P03 PreparacionModeloFragment · P19 RegistroManualFragment
 │   ├── exportacion/    P20 ExportarDatosFragment · ExportarDatosViewModel
-│   └── comun/          MainActivity (NavHost + barra inferior), componentes y formateadores
+│   └── comun/          MainActivity (NavHost + barra inferior), BaseViewModel, Evento, componentes y formateadores
 ├── inferencia/         ExtractorGemmaLocal · ParserRespuesta · GestorModeloLocal · Imagenes
 │   └── litert/         LiteRtLmPuente.kt
 ├── datos/
@@ -506,8 +506,8 @@ Las 20 pantallas (P01–P20) son móviles; además está el reporte PDF (8.5).
 ### 8.2 Grafo de navegación (resumen)
 
 ```
-configuracion → acceso → (sin modelo) preparacionModelo → inicio
-acceso → inicio
+configuracion → inicio            (MainActivity elige la raíz según la Sesion: configuracion, acceso o inicio)
+acceso → inicio                   (desde I4: → preparacionModelo si no hay modelo instalado)
 inicio → guiaCaptura → CapturaActivity → lectura → verificacion → guardada → inicio
 verificacion → DuplicadoDialog (si existe) · CapturaActivity (otra foto)
 CapturaActivity → registroManual (sin IA / memoria insuficiente) → guardada
@@ -700,7 +700,7 @@ No hay servidor, cuentas ni sincronización: la superficie de ataque es el telé
 
 - [x] SQLCipher con clave aleatoria de 32 bytes envuelta por una clave AES del Android Keystore (`GestorClaves`).
 - [x] Imágenes cifradas con AES-GCM en almacenamiento interno (`AlmacenImagenes`); `android:allowBackup="false"` y reglas de extracción de datos (`dataExtractionRules`) que excluyan base e imágenes de las copias automáticas de Android.
-- [ ] PIN con hash (PBKDF2 + sal) y bloqueo temporal; huella con `BiometricPrompt` (`BIOMETRIC_STRONG`). El hash ya está (`GestorPin`, PBKDF2-HMAC-SHA256, 120 000 iteraciones); faltan el bloqueo y la huella (P02).
+- [ ] PIN con hash (PBKDF2 + sal) y bloqueo temporal; huella con `BiometricPrompt` (`BIOMETRIC_STRONG`). Hecho en P02 salvo probarlo en el teléfono: hash en `GestorPin` (PBKDF2-HMAC-SHA256, 120 000 iteraciones), espera en `ControlIntentos` (guardada fuera del proceso) y huella con `BiometricPrompt`. La sesión se vuelve a bloquear al reabrir la app o tras 5 min fuera de ella.
 - [ ] **Permisos mínimos de Android:** `CAMERA`, `INTERNET` y `ACCESS_NETWORK_STATE` (solo para la descarga del modelo por Wi-Fi), `POST_NOTIFICATIONS` (Android 13+, recordatorios), `FOREGROUND_SERVICE` + `FOREGROUND_SERVICE_DATA_SYNC` (descarga larga con WorkManager). **Sin** permisos de almacenamiento (la galería usa el Photo Picker y la exportación usa SAF/`FileProvider`), ubicación ni contactos.
 - [ ] `INTERNET` solo lo usa `DescargaModeloWorker`; ningún otro flujo abre conexiones (verificar en modo avión y con un proxy que no salga ningún dato del usuario).
 - [ ] TLS 1.2+, sin tráfico en claro (`usesCleartextTraffic="false"`, `network_security_config` que solo permita el dominio del repositorio del modelo).
@@ -804,7 +804,7 @@ Son iteraciones de dos semanas, alineadas con las entregas del curso.
 | I1 | 1–4 | Análisis del contexto, alternativas y SRS | APF1 | ✅ completo |
 | I2 | 5–8 | Diseño de procesos, datos, clases, prototipo y documentación técnica | APF2 | ✅ completo |
 | Paso 0 | 8 | Configuración del equipo y proyecto Android base | App "Hello World!" en el teléfono | ✅ completo (ver 13.3) |
-| I3 | 9–10 | Front-end navegable (P01–P20) sobre la base de datos cifrada, y dominio con motor de reglas probado | Incremento 1 | ⏳ en curso (pasos 1 a 3 hechos, ver 13.4) |
+| I3 | 9–10 | Front-end navegable (P01–P20) sobre la base de datos cifrada, y dominio con motor de reglas probado | Incremento 1 | ⏳ en curso (pasos 1 a 3 hechos; paso 4 en curso, ver 13.4) |
 | I4 | 11–12 | Inferencia local con el modelo convertido, medición en el teléfono y prueba de usabilidad | APF3 | pendiente |
 | I5 | 13–14 | Reporte PDF, exportación de datos e historial | Incremento 3 | pendiente |
 | I6 | 15–18 | Pruebas, validación en mes simulado y sustentación | Informe final | pendiente |
@@ -850,16 +850,24 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
    - `datos.dao`: `ContribuyenteDao`, `PeriodoDao` (+ determinación), `FacturaDao` (+ emisor, imagen y campos), `ParametrosDao`, y `ModeloDao`, `AvisoDao` y `ReporteDao` mínimos para I4–I5.
    - `BaseDatosFacturas.abrir(contexto, clave, nombre)` con `SupportOpenHelperFactory`, y `enMemoria` para pruebas.
    - `datos.cifrado`: `GestorClaves` (clave de 32 bytes envuelta con AES-GCM del Keystore, en preferencias privadas; otra clave del Keystore para imágenes), `AlmacenImagenes` (`filesDir/imagenes/<uuid>.jpg.enc`) y `GestorPin` (PBKDF2-HMAC-SHA256, 120 000 iteraciones, sal de 16 bytes; P01/P02 lo usarán).
-   - `datos.parametros.CargadorParametrosNrus` y `assets/parametros_nrus.json` **provisional** (ver nota de 5.2). `App` lo corre en segundo plano al iniciar.
+   - `datos.parametros.CargadorParametrosNrus` y `assets/parametros_nrus.json` **provisional** (ver nota de 5.2). Lo corre `ContenedorDependencias` al abrir la base (en el paso 4; antes, `App` en segundo plano).
    - `datos.repositorios`: los 4 repositorios `…Room`. Cada escritura del puerto es un `runInTransaction`. La determinación se enlaza con la categoría de la versión activa de parámetros.
    - `ContenedorDependencias` crea la base y los repositorios la primera vez que se piden, y entrega los casos de uso.
    - Manifiesto: `allowBackup="false"` y reglas de copia y transferencia que excluyen todo.
    - El dominio se limitó a la biblioteca de Java 8 + `java.time` (`Stream.toList()`, `List.of`, `isBlank()`… no existen en Android 8 y lint no revisa `:dominio`; ver comentario en `dominio/build.gradle.kts`).
    - Pruebas instrumentadas (`app/src/androidTest/.../datos/`): `RepositoriosRoomTest` (flujo real con los casos de uso, montos exactos, duplicados, reregistro de anulada, ventas NULL vs 0, cierre y **rollback de la transacción**), `CargadorParametrosNrusTest` y `CifradoTest` (Keystore, imágenes, PIN, y que el archivo `.db` no se abre sin la clave). **Compilan, pero no se han corrido:** no había teléfono conectado. Correr con `./gradlew :app:connectedDebugAndroidTest` con el teléfono por USB.
-   - Pendiente para el paso 4: el destino inicial sigue siendo `inicio`; cambiará a `configuracion`/`acceso` cuando existan P01 y P02 (hoy son pantallas provisionales y la app quedaría trabada en P01).
+   - ~~Pendiente para el paso 4: destino inicial~~ — resuelto en el paso 4 (primer bloque).
 4. **Pantallas en el orden del flujo (FE, el 80 %)**, cada una con su Fragment, layout y ViewModel sobre los repositorios reales:
-   - Acceso: P01 Configuración, P02 Acceso (PIN, huella, 3 fallos → 30 s).
-   - Principal: P04 Inicio.
+   - ✅ **Primer bloque (2026-09-28): P01, P02 y P04**, compilado y con pruebas unitarias; **falta probarlo en el teléfono** (no había uno conectado).
+     - Dependencias nuevas: `lifecycle-viewmodel`/`livedata` 2.11.0, `biometric` 1.1.0 (última estable) y `core-splashscreen` 1.2.0.
+     - `ui.comun.BaseViewModel` (`AndroidViewModel`): da el `ContenedorDependencias`, corre las tareas con `enFondo(tarea, alTerminar[, alFallar])` en el ejecutor y entrega en el hilo de UI; `ocupado()` y `mensaje()` (`Evento<String>` para un Snackbar). Los errores llegan en español: el mensaje de la `ReglaNegocioException`, uno para `ConfiguracionNrusException` o uno genérico; en Logcat solo va la clase de la excepción. Los Fragments usan `new ViewModelProvider(this).get(...)`.
+     - `ui.acceso.Sesion` (en el contenedor, dura lo que el proceso): `SIN_CONFIGURAR`, `BLOQUEADA`, `DESBLOQUEADA`. `MainActivity` muestra la pantalla de arranque hasta saberlo y pone el grafo con raíz `configuracion`, `acceso` o `inicio`; P01 y P02 no navegan, desbloquean la sesión. Si el sistema cerró el proceso no restaura las pantallas (no se salta el PIN). Por eso se quitaron las acciones `configuracion_a_acceso` y `acceso_*` del grafo (§8.2).
+     - P01 en tres pasos (el prototipo dice «Paso 1 de 3»): negocio (RUC con check y validación módulo 11 al escribir), crear PIN y repetirlo. Guarda contribuyente y PIN en una transacción y, si el teléfono tiene huella, pregunta si activarla.
+     - P02: teclado propio (`TecladoPin`, también en P01), 3 fallos → 30 s con cuenta atrás (`ControlIntentos` en `PreferenciasAcceso`, sobrevive a cerrar la app y no se alarga si se atrasa la hora), huella (se pide sola al abrir si está activada) y «¿Olvidó su PIN?»: si el RUC escrito es el del negocio, crea un PIN nuevo en la misma pantalla.
+     - P04 (`InicioViewModel` + `ResumenInicio`, Java puro con `ResumenInicioTest`): recalcula la determinación del mes al volver a la pantalla (crea el mes si no existe). Barra verde / ámbar (`AVISO_80`) / roja (`LIMITE_100` o fuera), marca en el umbral de los parámetros, «Le quedan…», nota si las ventas deciden la categoría, ventas (o «Sin registrar»), categoría y cuota, aviso de tope anual, vencimiento con días que faltan y las 3 últimas facturas vigentes. «recordatorio activado» del prototipo queda para I5 (WorkManager). Nuevas acciones: `inicio_a_detalleFactura` (con `idFactura`), `inicio_a_categoria` (tarjeta de categoría y campana) e `inicio_a_vencimiento`.
+     - Los parámetros del NRUS se cargan al abrir la base en `ContenedorDependencias` (antes, en paralelo desde `App`, y P04 podía leerlos antes de tiempo).
+   - Acceso: P01 Configuración, P02 Acceso (PIN, huella, 3 fallos → 30 s). ✅
+   - Principal: P04 Inicio. ✅
    - Registro: P05 Guía → P06 Cámara (CameraX + `EvaluadorNitidez`) → P07 Lectura → P08 Verificación → P09 Duplicado → P10 Guardada · P19 Registro manual. P07 usa un `ExtractorFacturas` **falso** que devuelve una factura de ejemplo.
    - Control: P11 Facturas del mes (filtros), P12 Detalle + anulación.
    - NRUS: P13 Ventas, P14 Categoría y cuota, P15 Vencimiento.
