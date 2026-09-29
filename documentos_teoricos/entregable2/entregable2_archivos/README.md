@@ -1,6 +1,6 @@
 # Archivos del entregable 2 (APF2)
 
-Figuras usadas en `../entregable2_documento.docx` (informe completo), `../solo_entregable2_documento.docx` (solo el APF2) y `../entregable2_presentacion.pptx`.
+Figuras usadas en `../entregable2_documento.docx` (informe completo), `../solo_entregable2_documento.docx` (solo el APF2) `../entregable2_presentacion.pptx` y `../solo_entregable2_presentacion.pptx` (sustentación alineada con el Word solo APF2).
 
 Diseño vigente: app Android de un solo usuario, **sin servidor**. Toda la data vive en una base SQLite cifrada en el teléfono y el usuario la exporta a CSV/PDF para analizarla en una PC (pantalla P20). Respecto del primer avance se retiraron el servidor de respaldo, su base Oracle/SQL Server, el actor Administrador y la consola web.
 
@@ -35,11 +35,12 @@ Requisitos (Windows): Python 3 con `lxml`, `Pillow` y `python-pptx` (`pip instal
 
 ```bash
 cd scripts
-python generar_todo.py            # figuras + Word completo + Word solo APF2 (con sus índices) + PPT
+python generar_todo.py            # figuras + Word completo + Word solo APF2 (con sus índices) + las dos PPT
 python generar_todo.py figuras    # solo figuras
 python construir_documento.py     # solo el Word completo (luego: powershell -File actualizar_indice.ps1)
 python construir_documento_solo.py  # Word solo APF2 (luego: powershell -File actualizar_indice.ps1 -Docx solo_entregable2_documento.docx)
 python construir_presentacion.py  # solo la PPT
+python construir_presentacion_solo.py  # PPT solo APF2
 ```
 
 | Script | Genera |
@@ -52,6 +53,7 @@ python construir_presentacion.py  # solo la PPT
 | `docx_xml.py` + `contenido_documento.py` + `construir_documento.py` | `../entregable2_documento.docx`, construido sobre `../../entregable1/entregable1_documento.docx` |
 | `construir_documento_solo.py` | `../solo_entregable2_documento.docx`: solo los apartados del APF2, elegidos por título a partir del informe completo |
 | `construir_presentacion.py` | `../entregable2_presentacion.pptx` |
+| `construir_presentacion_solo.py` | `../solo_entregable2_presentacion.pptx`: la PPT anterior más objetivos y alcance, actores y casos de uso, resultados y conclusiones del Word solo APF2 |
 | `actualizar_indice.ps1` | Abre el Word (`-Docx` para elegir cuál), regenera el índice y lo guarda |
 
 > Si editas un SVG a mano, el PNG no se actualiza solo: expórtalo desde tu editor con el mismo nombre, o vuelve a correr el script (que sobrescribe el SVG). Si modificas `entregable2_documento.docx` directamente en Word, esos cambios se pierden al regenerarlo desde el script.

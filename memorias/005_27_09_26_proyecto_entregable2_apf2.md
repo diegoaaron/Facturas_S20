@@ -9,6 +9,7 @@ El 2026-09-27 se generaron, en `documentos_teoricos/entregable2/`:
 - `entregable2_documento.docx`: informe completo y acumulativo (APF1 + APF2), 106 págs., estructura oficial con cap. 3.1–3.7, cap. 4 y anexos A–T.
 - `solo_entregable2_documento.docx`: 85 págs., solo los apartados del APF2 más lo mínimo del APF1. Conserva la numeración y las letras oficiales (con saltos: 3.2 → 3.4, anexos A, B, D, F, H, I, K–T).
 - `entregable2_presentacion.pptx`: 15 diapositivas, ≈ 10 min.
+- `solo_entregable2_presentacion.pptx` (2026-09-28): 19 diapositivas; la PPT anterior más objetivos/alcance, actores y casos de uso, resultados y conclusiones del Word solo APF2 (`construir_presentacion_solo.py`).
 - `entregable2_documentacion_tecnica.md` (el 2026-09-27 el usuario la movió a `roadmap/`; desde el 2026-09-28 es `roadmap/001_27_09_26_documentacion_tecnica_y_roadmap.md`).
 
 Ese mismo día se quitó el servidor de todo el diseño (ver [[004_26_09_26_proyecto_arquitectura_on_device]]). Según `base_entregable2_consideraciones.docx`, la entrega es del 27 al 29/09/2026 hasta las 18:00 (el docx dice 2025, es error de año) y el orden de exposición se sortea.

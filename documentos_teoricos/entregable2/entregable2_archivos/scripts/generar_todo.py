@@ -1,7 +1,7 @@
 """Regenera todas las figuras del entregable 2, el informe Word y la presentación.
 
 Uso (desde esta carpeta):
-    python generar_todo.py            # figuras + Word completo + Word solo APF2 + PPT
+    python generar_todo.py            # figuras + Word completo + Word solo APF2 + PPT completa + PPT solo APF2
     python generar_todo.py figuras    # solo figuras
 Después de regenerar el Word, ejecutar actualizar_indice.ps1 para que Word recalcule el índice.
 """
@@ -29,6 +29,7 @@ def main():
     subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "actualizar_indice.ps1",
                     "-Docx", "solo_entregable2_documento.docx"], check=True)
     print("Presentación"); subprocess.run([sys.executable, "construir_presentacion.py"], check=True)
+    print("Presentación solo del APF2"); subprocess.run([sys.executable, "construir_presentacion_solo.py"], check=True)
 
 
 if __name__ == "__main__":
