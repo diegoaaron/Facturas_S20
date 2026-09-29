@@ -122,7 +122,8 @@ Comprueba que exista la carpeta `android/`, con `gradlew`, `settings.gradle.kts`
 ### Paso 8 · Ejecutar
 1. En la barra superior, donde dice *No Devices*, elige tu teléfono. Al lado debe decir **app**.
 2. Pulsa **Run ▶** (`Shift+F10`).
-3. ✅ Se instala **Facturas S20** (ícono verde con una factura) y abre con **"Hello World!"**.
+3. ✅ Se instala **Facturas S20** (ícono verde con una factura) y abre en la configuración inicial: **"Configure su negocio · Paso 1 de 3"**. Antes del commit `7584731` mostraba "Hello World!".
+4. Si el teléfono aparece **dos veces** (pasa con *Depuración inalámbrica*: son dos conexiones del mismo aparato), elige solo una.
 
 ### Paso 9 · (Opcional) Comprobar desde la terminal
 Desde Git Bash, ajustando el nombre de la carpeta del JDK que se descargó:
@@ -130,8 +131,13 @@ Desde Git Bash, ajustando el nombre de la carpeta del JDK que se descargó:
 cd /c/reposPersonal/Facturas_S20/android
 export JAVA_HOME=/c/Users/<usuario>/.jdks/temurin-17.<version>
 ./gradlew :app:assembleDebug :dominio:build    # debe terminar en BUILD SUCCESSFUL
+./gradlew :app:connectedDebugAndroidTest       # pruebas instrumentadas en el teléfono conectado
 ```
 En PowerShell o cmd se usa `gradlew.bat` en lugar de `./gradlew`.
+
+- Si todavía no abriste el proyecto en IntelliJ, no existe `local.properties` y Gradle no encuentra el SDK. Créalo en `android/` con la ruta usando **barras normales**: `sdk.dir=C:/Users/<usuario>/AppData/Local/Android/Sdk`. Si usas `\`, en un `.properties` tienen que ir dobles (`C\:\\Users\\...`), y al escribirlas desde Git Bash se pierden fácilmente. Con una ruta mal escrita falla con *"El nombre de archivo, el nombre de directorio o la sintaxis de la etiqueta del volumen no son correctos"*.
+- La primera compilación descarga sola **Build-Tools 36.0.0** si falta.
+- Si `adb devices` muestra el teléfono dos veces (depuración inalámbrica), `installDebug` y `connectedDebugAndroidTest` lo usarían dos veces. Limítalo a uno con `export ANDROID_SERIAL=<serial>` (el serial es la primera columna de `adb devices`), o instala directamente con `adb -s <serial> install -r app/build/outputs/apk/debug/app-debug.apk`. No uses `adb -t <id>`: el `transport_id` cambia cada vez que se reconecta. `adb` está en `<SDK>/platform-tools/adb.exe`.
 
 ### Si algo falla
 
@@ -143,6 +149,8 @@ En PowerShell o cmd se usa `gradlew.bat` en lugar de `./gradlew`.
 | `incompatible version (AGP …)` | Alguien subió AGP; en `android/gradle/libs.versions.toml` debe decir `agp = "9.1.1"` |
 | `mipmap/ic_launcher ... not found` | Falta hacer `git pull`; los íconos están en el repo |
 | El teléfono no aparece en *Devices* | Revisa el cable (algunos solo cargan), el aviso de depuración en el teléfono o el driver USB del fabricante |
+| `IOException: El nombre de archivo… sintaxis de la etiqueta del volumen no son correctos` al compilar | Ruta del SDK mal escrita en `android/local.properties`; ver el paso 9 |
+| El teléfono aparece dos veces | Depuración inalámbrica; elige uno (en terminal, `ANDROID_SERIAL`, ver el paso 9) |
 | El menú *File* no aparece | En la bienvenida no existe; con el proyecto abierto está dentro de **☰** |
 
-Con la app mostrando "Hello World!", el equipo está listo para empezar el desarrollo: la iteración **I3** de `001_27_09_26_documentacion_tecnica_y_roadmap.md` §13 (este documento es su paso 0).
+Con la app abierta en el teléfono, el equipo está listo para empezar el desarrollo: la iteración **I3** de `001_27_09_26_documentacion_tecnica_y_roadmap.md` §13 (este documento es su paso 0).
