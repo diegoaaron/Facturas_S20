@@ -2,6 +2,7 @@
 // Contiene el modelo, los casos de uso, las reglas del NRUS y los puertos.
 plugins {
     `java-library`
+    jacoco
 }
 
 java {
@@ -17,4 +18,28 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+// Informe de cobertura en build/reports/jacoco/test/html/index.html.
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+}
+
+// RNF-18: cobertura de pruebas del paquete de reglas (motor NRUS y validadores) ≥ 80 %. Corre con `check`.
+tasks.jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            element = "PACKAGE"
+            includes = listOf("pe.facturass20.dominio.reglas")
+            limit {
+                counter = "LINE"
+                minimum = "0.80".toBigDecimal()
+            }
+        }
+    }
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
 }

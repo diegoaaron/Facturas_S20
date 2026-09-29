@@ -801,7 +801,7 @@ Son iteraciones de dos semanas, alineadas con las entregas del curso.
 | I1 | 1–4 | Análisis del contexto, alternativas y SRS | APF1 | ✅ completo |
 | I2 | 5–8 | Diseño de procesos, datos, clases, prototipo y documentación técnica | APF2 | ✅ completo |
 | Paso 0 | 8 | Configuración del equipo y proyecto Android base | App "Hello World!" en el teléfono | ✅ completo (ver 13.3) |
-| I3 | 9–10 | Front-end navegable (P01–P20) sobre la base de datos cifrada, y dominio con motor de reglas probado | Incremento 1 | ⏳ en curso (paso 1 hecho, ver 13.4) |
+| I3 | 9–10 | Front-end navegable (P01–P20) sobre la base de datos cifrada, y dominio con motor de reglas probado | Incremento 1 | ⏳ en curso (pasos 1 y 2 hechos, ver 13.4) |
 | I4 | 11–12 | Inferencia local con el modelo convertido, medición en el teléfono y prueba de usabilidad | APF3 | pendiente |
 | I5 | 13–14 | Reporte PDF, exportación de datos e historial | Incremento 3 | pendiente |
 | I6 | 15–18 | Pruebas, validación en mes simulado y sustentación | Informe final | pendiente |
@@ -818,7 +818,7 @@ Quedó listo:
 - Íconos provisionales, `.gitignore` y `.gitattributes`.
 - La app instalada en el teléfono de pruebas (Android 15), mostrando "Hello World!".
 
-El 2026-09-28 se completó además el paso 1 de I3 (base de la app); ver 13.4.
+El 2026-09-28 se completaron además los pasos 1 (base de la app) y 2 (dominio) de I3; ver 13.4.
 
 ### 13.4 Tareas por iteración
 
@@ -834,8 +834,15 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
    - `MainActivity` con NavHost, `nav_graph.xml` con los destinos y acciones de §8.2 y la barra inferior con el botón central Escanear (visible solo en P04, P11, P14, P17 y P18).
    - **Todos los destinos usan `PantallaPendienteFragment`** (muestra código y título); cada pantalla la reemplaza en su `android:name` al construirse. Faltan en el grafo `CapturaActivity` (P06) y `DuplicadoDialog` (P09). El destino inicial es `inicio` hasta que exista la base; entonces será `configuracion` o `acceso`.
    - CameraX no se agregó todavía: va con P06 (paso 4).
-2. **Dominio mínimo (BE)**: modelo y enumeraciones de 5.1; puertos (`FacturaRepositorio`, `PeriodoRepositorio`, `ContribuyenteRepositorio`, `ParametrosRepositorio`, `ExtractorFacturas`); `ValidadorRuc`, `Montos`, `MotorReglasNRUS` (7 casos de 5.4) y `DetectorDuplicados` con JUnit 5; casos de uso `RegistrarFactura`, `VerificarFactura`, `RegistrarVentas`, `DeterminarCategoria`, `AnularFactura` y `CerrarPeriodo`.
-3. **Base de datos (BE, el 20 %)**: Room (`annotationProcessor`) y SQLCipher en `libs.versions.toml`; las 13 entidades de 7.1 con UNIQUE, índices y FK; `TypeConverter`s (montos en céntimos `INTEGER` ↔ `BigDecimal`, fechas ISO-8601); DAO por agregado; `BaseDatosFacturas` versión 1 con `exportSchema = true`; `GestorClaves` (Keystore) y apertura cifrada; `assets/parametros_nrus.json` + `CargadorParametrosNrus`; repositorios que implementan los puertos con guardado `@Transaction`; `AlmacenImagenes` (AES-256-GCM); PIN con hash y sal; `allowBackup="false"` y reglas de extracción (lista de §10); pruebas instrumentadas de DAO y de la transacción.
+2. ✅ **Dominio mínimo (BE)** — hecho el 2026-09-28. `./gradlew :dominio:check` corre 118 pruebas y JaCoCo exige ≥ 80 % de líneas en `reglas` (RNF-18; hoy 99 %). Informe en `dominio/build/reports/jacoco/test/html/`.
+   - `modelo`: entidades y enumeraciones de 5.1. `FacturaCompra` y `PeriodoMensual` son clases con invariantes; el resto, `record`s. `PeriodoMensual` es el agregado: `agregarFactura`, `anularFactura(id, motivo)` (la anulación pasa por el mes, que es quien sabe si está abierto), `registrarVentas` y `cerrar`. `totalVentas` nulo = «sin registrar» (el motor lo toma como 0; `cerrar()` lo rechaza). Además: `CampoFactura` (con la clave JSON de 6.2), `ReglaNegocioException` (mensaje en español para mostrar al usuario) y `ConfiguracionNrusException` (faltan categorías o fechas en los parámetros).
+   - `reglas`: `ValidadorRuc`, `Montos` (incluye `interpretar("1 450,00")`, que reutilizará `ParserRespuesta`, y céntimos para Room), `ValidadorFecha` (acepta `2026-09-22` y `22/09/2026`; regla de 5.5), `ValidadorCampos` (mensaje por campo, igual en P08 y P19; USD se rechaza con «Por ahora solo se registran compras en soles (S/).»), `DetectorDuplicados` y `MotorReglasNRUS`.
+   - Interpretación del motor (5.4, paso 5): `LIMITE_100` si la categoría ya no es la 1 o el monto está justo en el límite de la última. El aviso de tope anual es `Determinacion.avisoTopeAnual` (compras o ventas del año ≥ tope × umbral). Fuera de régimen: `categoria` y `cuota` nulas.
+   - `puertos`: `ExtractorFacturas` (+ `ExtraccionException`), `FacturaRepositorio`, `PeriodoRepositorio`, `ContribuyenteRepositorio`, `ParametrosRepositorio` y `Reloj` (hora de Lima). **Cada escritura es una sola llamada que el repositorio hace en una transacción:** `FacturaRepositorio.registrar(periodo, factura, imagen, extraccion, determinacion)`, `FacturaRepositorio.anular(factura, determinacion)` y `PeriodoRepositorio.guardar(periodo, determinacion)`. `AvisoProgramador` y `ExportadorArchivos` quedan para I5.
+   - `casosuso`: `VerificarFactura` (no guarda; devuelve errores por campo, si hay que confirmar el mes y el duplicado), `RegistrarFactura` (lanza `FacturaDuplicadaException` con la existente), `RegistrarVentas`, `DeterminarCategoria` (`calcular` no guarda y lo usan los demás; `ejecutar` devuelve la determinación congelada si el mes está cerrado, RF-22), `AnularFactura` y `CerrarPeriodo` (el PDF y la sugerencia de exportar, en I5).
+   - Las pruebas de casos de uso usan `BaseEnMemoria`, que solo existe en `src/test` (la app no tendrá repositorios en memoria).
+3. **Base de datos (BE, el 20 %)** — ojo con dos puntos que dejó el paso 2: (a) el duplicado compara el número **sin ceros de relleno** y **solo contra facturas VIGENTE**, así que el UQ(id_emisor, serie, numero) de 7.1 tal cual chocaría al volver a registrar una factura anulada o al escribir `4821` en vez de `004821`; conviene una columna `numero_normalizado` y quitar o cambiar ese UQ (decidirlo al hacer la entidad). (b) `total_ventas` debe admitir NULL.
+   Contenido: Room (`annotationProcessor`) y SQLCipher en `libs.versions.toml`; las 13 entidades de 7.1 con UNIQUE, índices y FK; `TypeConverter`s (montos en céntimos `INTEGER` ↔ `BigDecimal`, fechas ISO-8601); DAO por agregado; `BaseDatosFacturas` versión 1 con `exportSchema = true`; `GestorClaves` (Keystore) y apertura cifrada; `assets/parametros_nrus.json` + `CargadorParametrosNrus`; repositorios que implementan los puertos con guardado `@Transaction`; `AlmacenImagenes` (AES-256-GCM); PIN con hash y sal; `allowBackup="false"` y reglas de extracción (lista de §10); pruebas instrumentadas de DAO y de la transacción.
 4. **Pantallas en el orden del flujo (FE, el 80 %)**, cada una con su Fragment, layout y ViewModel sobre los repositorios reales:
    - Acceso: P01 Configuración, P02 Acceso (PIN, huella, 3 fallos → 30 s).
    - Principal: P04 Inicio.
