@@ -1,5 +1,9 @@
 // Módulo de dominio: Java puro, sin dependencias de Android.
 // Contiene el modelo, los casos de uso, las reglas del NRUS y los puertos.
+//
+// OJO: este código corre en Android 8 (minSdk 26) y lint no lo revisa. Usa solo la biblioteca de Java 8
+// más java.time: nada de Stream.toList(), List.of/copyOf, String.isBlank(), Optional.isEmpty() ni
+// InputStream.readAllBytes() (existen en la JVM de las pruebas, pero no en los teléfonos antiguos).
 plugins {
     `java-library`
     jacoco

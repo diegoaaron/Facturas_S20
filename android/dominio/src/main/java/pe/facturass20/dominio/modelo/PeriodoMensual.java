@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import pe.facturass20.dominio.reglas.Montos;
 
@@ -36,7 +37,7 @@ public final class PeriodoMensual {
 
     /** Mes nuevo: abierto, sin facturas y sin ventas registradas. */
     public static PeriodoMensual nuevo(YearMonth periodo) {
-        return new PeriodoMensual(periodo, null, EstadoPeriodo.ABIERTO, List.of());
+        return new PeriodoMensual(periodo, null, EstadoPeriodo.ABIERTO, Collections.emptyList());
     }
 
     /** Suma de las facturas VIGENTE del mes. */
@@ -141,6 +142,7 @@ public final class PeriodoMensual {
     }
 
     public List<FacturaCompra> facturasVigentes() {
-        return facturas.stream().filter(FacturaCompra::esVigente).toList();
+        return Collections.unmodifiableList(
+                facturas.stream().filter(FacturaCompra::esVigente).collect(Collectors.toList()));
     }
 }

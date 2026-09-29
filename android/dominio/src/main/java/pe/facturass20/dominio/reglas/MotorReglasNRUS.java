@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,7 +30,7 @@ public final class MotorReglasNRUS {
 
     /** Determina el mes sin tomar en cuenta los demás meses del año para el tope anual. */
     public Determinacion determinar(PeriodoMensual periodo, int ultimoDigitoRuc) {
-        return determinar(periodo, ultimoDigitoRuc, List.of());
+        return determinar(periodo, ultimoDigitoRuc, Collections.emptyList());
     }
 
     /**

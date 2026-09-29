@@ -41,7 +41,7 @@ public final class ValidadorFecha {
 
     /** Acepta {@code 2026-09-22} (como la devuelve el modelo) y {@code 22/09/2026} (como la escribe el usuario). */
     public static Optional<LocalDate> interpretar(String texto) {
-        if (texto == null || texto.isBlank()) {
+        if (texto == null || texto.trim().isEmpty()) {
             return Optional.empty();
         }
         String t = texto.trim();

@@ -16,6 +16,11 @@ junit4 = "4.13.2"
 junitJupiter = "6.1.3"
 androidxJunit = "1.3.0"
 espresso = "3.7.0"
+androidxTest = "1.7.0"
+room = "2.8.5"
+sqlite = "2.7.1"
+# SQLCipher: no subir de 4.17.x mientras compileSdk sea 36 (desde 4.18.0 exige compileSdk 37).
+sqlcipher = "4.17.0"
 
 [libraries]
 # UI
@@ -27,6 +32,12 @@ androidx-fragment = { module = "androidx.fragment:fragment", version.ref = "frag
 androidx-navigation-fragment = { module = "androidx.navigation:navigation-fragment", version.ref = "navigation" }
 androidx-navigation-ui = { module = "androidx.navigation:navigation-ui", version.ref = "navigation" }
 
+# Base de datos: Room sobre SQLite cifrada con SQLCipher (documentación técnica §7)
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-sqlite = { module = "androidx.sqlite:sqlite", version.ref = "sqlite" }
+sqlcipher-android = { module = "net.zetetic:sqlcipher-android", version.ref = "sqlcipher" }
+
 # Pruebas
 junit4 = { module = "junit:junit", version.ref = "junit4" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junitJupiter" }
@@ -34,6 +45,8 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
 androidx-test-espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTest" }
+androidx-test-core = { module = "androidx.test:core", version.ref = "androidxTest" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

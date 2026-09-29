@@ -50,6 +50,7 @@ cd android
 export JAVA_HOME=/c/Users/<usuario>/.jdks/temurin-17.0.20.1
 ./gradlew :app:assembleDebug :dominio:test   # verifica cambios con esto
 ./gradlew :app:installDebug                  # instala en el teléfono conectado
+./gradlew :app:connectedDebugAndroidTest     # pruebas instrumentadas (base cifrada, Keystore) en el teléfono
 ```
 
 ### Prototipo previo (retirado del repo)

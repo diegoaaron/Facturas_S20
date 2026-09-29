@@ -15,10 +15,10 @@ public record Contribuyente(String ruc, String nombre, String titular, LocalDate
         if (!ValidadorRuc.esValido(ruc)) {
             throw new ReglaNegocioException("El RUC no es válido. Revise los 11 dígitos.");
         }
-        if (nombre == null || nombre.isBlank()) {
+        if (nombre == null || nombre.trim().isEmpty()) {
             throw new ReglaNegocioException("Escriba el nombre del negocio.");
         }
-        if (titular == null || titular.isBlank()) {
+        if (titular == null || titular.trim().isEmpty()) {
             throw new ReglaNegocioException("Escriba el nombre del titular.");
         }
         nombre = nombre.trim();

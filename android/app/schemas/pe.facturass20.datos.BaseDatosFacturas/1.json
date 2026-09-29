@@ -1,0 +1,1009 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "8f846add3909d1e073fc7bbe4de1f6e5",
+    "entities": [
+      {
+        "tableName": "contribuyente",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_contribuyente` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `ruc` TEXT NOT NULL, `nombre` TEXT NOT NULL, `titular` TEXT NOT NULL, `ultimo_digito` INTEGER NOT NULL, `pin_hash` TEXT, `pin_sal` TEXT, `fecha_alta` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "idContribuyente",
+            "columnName": "id_contribuyente",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ruc",
+            "columnName": "ruc",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nombre",
+            "columnName": "nombre",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "titular",
+            "columnName": "titular",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ultimoDigito",
+            "columnName": "ultimo_digito",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pinHash",
+            "columnName": "pin_hash",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "pinSal",
+            "columnName": "pin_sal",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "fechaAlta",
+            "columnName": "fecha_alta",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id_contribuyente"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_contribuyente_ruc",
+            "unique": true,
+            "columnNames": [
+              "ruc"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_contribuyente_ruc` ON `${TABLE_NAME}` (`ruc`)"
+          }
+        ]
+      },
+      {
+        "tableName": "periodo",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_periodo` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id_contribuyente` INTEGER NOT NULL, `anio` INTEGER NOT NULL, `mes` INTEGER NOT NULL, `total_ventas` INTEGER, `estado` TEXT NOT NULL, FOREIGN KEY(`id_contribuyente`) REFERENCES `contribuyente`(`id_contribuyente`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "idPeriodo",
+            "columnName": "id_periodo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idContribuyente",
+            "columnName": "id_contribuyente",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "anio",
+            "columnName": "anio",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mes",
+            "columnName": "mes",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "totalVentas",
+            "columnName": "total_ventas",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "estado",
+            "columnName": "estado",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id_periodo"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_periodo_id_contribuyente_anio_mes",
+            "unique": true,
+            "columnNames": [
+              "id_contribuyente",
+              "anio",
+              "mes"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_periodo_id_contribuyente_anio_mes` ON `${TABLE_NAME}` (`id_contribuyente`, `anio`, `mes`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "contribuyente",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "id_contribuyente"
+            ],
+            "referencedColumns": [
+              "id_contribuyente"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "emisor",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_emisor` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `ruc` TEXT NOT NULL, `razon_social` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "idEmisor",
+            "columnName": "id_emisor",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ruc",
+            "columnName": "ruc",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "razonSocial",
+            "columnName": "razon_social",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id_emisor"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_emisor_ruc",
+            "unique": true,
+            "columnNames": [
+              "ruc"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_emisor_ruc` ON `${TABLE_NAME}` (`ruc`)"
+          }
+        ]
+      },
+      {
+        "tableName": "factura_compra",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_factura` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id_periodo` INTEGER NOT NULL, `id_emisor` INTEGER NOT NULL, `serie` TEXT NOT NULL, `numero` TEXT NOT NULL, `numero_normalizado` TEXT NOT NULL, `fecha_emision` TEXT NOT NULL, `moneda` TEXT NOT NULL, `importe_total` INTEGER NOT NULL, `origen` TEXT NOT NULL, `estado` TEXT NOT NULL, `motivo_anulacion` TEXT, `fecha_registro` TEXT NOT NULL, FOREIGN KEY(`id_periodo`) REFERENCES `periodo`(`id_periodo`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`id_emisor`) REFERENCES `emisor`(`id_emisor`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "idFactura",
+            "columnName": "id_factura",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idPeriodo",
+            "columnName": "id_periodo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idEmisor",
+            "columnName": "id_emisor",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "serie",
+            "columnName": "serie",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "numero",
+            "columnName": "numero",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "numeroNormalizado",
+            "columnName": "numero_normalizado",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fechaEmision",
+            "columnName": "fecha_emision",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "moneda",
+            "columnName": "moneda",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "importeTotal",
+            "columnName": "importe_total",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "origen",
+            "columnName": "origen",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "estado",
+            "columnName": "estado",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "motivoAnulacion",
+            "columnName": "motivo_anulacion",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "fechaRegistro",
+            "columnName": "fecha_registro",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id_factura"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_factura_compra_id_periodo_estado",
+            "unique": false,
+            "columnNames": [
+              "id_periodo",
+              "estado"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_factura_compra_id_periodo_estado` ON `${TABLE_NAME}` (`id_periodo`, `estado`)"
+          },
+          {
+            "name": "index_factura_compra_id_emisor_serie_numero_normalizado",
+            "unique": false,
+            "columnNames": [
+              "id_emisor",
+              "serie",
+              "numero_normalizado"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_factura_compra_id_emisor_serie_numero_normalizado` ON `${TABLE_NAME}` (`id_emisor`, `serie`, `numero_normalizado`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "periodo",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "id_periodo"
+            ],
+            "referencedColumns": [
+              "id_periodo"
+            ]
+          },
+          {
+            "table": "emisor",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "id_emisor"
+            ],
+            "referencedColumns": [
+              "id_emisor"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "imagen_factura",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_imagen` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id_factura` INTEGER NOT NULL, `ruta_cifrada` TEXT NOT NULL, `nitidez` REAL NOT NULL, `fecha_captura` TEXT NOT NULL, FOREIGN KEY(`id_factura`) REFERENCES `factura_compra`(`id_factura`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "idImagen",
+            "columnName": "id_imagen",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idFactura",
+            "columnName": "id_factura",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rutaCifrada",
+            "columnName": "ruta_cifrada",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nitidez",
+            "columnName": "nitidez",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fechaCaptura",
+            "columnName": "fecha_captura",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id_imagen"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_imagen_factura_id_factura",
+            "unique": true,
+            "columnNames": [
+              "id_factura"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_imagen_factura_id_factura` ON `${TABLE_NAME}` (`id_factura`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "factura_compra",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "id_factura"
+            ],
+            "referencedColumns": [
+              "id_factura"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "campo_extraido",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_campo` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id_factura` INTEGER NOT NULL, `id_modelo` INTEGER, `nombre_campo` TEXT NOT NULL, `valor_leido` TEXT, `valor_final` TEXT, `confianza` REAL NOT NULL, `corregido` INTEGER NOT NULL, FOREIGN KEY(`id_factura`) REFERENCES `factura_compra`(`id_factura`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`id_modelo`) REFERENCES `modelo_local`(`id_modelo`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "idCampo",
+            "columnName": "id_campo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idFactura",
+            "columnName": "id_factura",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idModelo",
+            "columnName": "id_modelo",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "nombreCampo",
+            "columnName": "nombre_campo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "valorLeido",
+            "columnName": "valor_leido",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "valorFinal",
+            "columnName": "valor_final",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "confianza",
+            "columnName": "confianza",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "corregido",
+            "columnName": "corregido",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id_campo"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_campo_extraido_id_factura",
+            "unique": false,
+            "columnNames": [
+              "id_factura"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_campo_extraido_id_factura` ON `${TABLE_NAME}` (`id_factura`)"
+          },
+          {
+            "name": "index_campo_extraido_id_modelo",
+            "unique": false,
+            "columnNames": [
+              "id_modelo"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_campo_extraido_id_modelo` ON `${TABLE_NAME}` (`id_modelo`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "factura_compra",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "id_factura"
+            ],
+            "referencedColumns": [
+              "id_factura"
+            ]
+          },
+          {
+            "table": "modelo_local",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "id_modelo"
+            ],
+            "referencedColumns": [
+              "id_modelo"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "modelo_local",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_modelo` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `version` TEXT NOT NULL, `tamano_mb` INTEGER NOT NULL, `sha256` TEXT NOT NULL, `estado` TEXT NOT NULL, `ruta` TEXT, `fecha_instalacion` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "idModelo",
+            "columnName": "id_modelo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tamanoMb",
+            "columnName": "tamano_mb",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sha256",
+            "columnName": "sha256",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "estado",
+            "columnName": "estado",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ruta",
+            "columnName": "ruta",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "fechaInstalacion",
+            "columnName": "fecha_instalacion",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id_modelo"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_modelo_local_version",
+            "unique": true,
+            "columnNames": [
+              "version"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_modelo_local_version` ON `${TABLE_NAME}` (`version`)"
+          }
+        ]
+      },
+      {
+        "tableName": "parametro_version",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_parametro` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `version` TEXT NOT NULL, `umbral_aviso` INTEGER NOT NULL, `tope_anual` INTEGER NOT NULL, `vigente_desde` TEXT NOT NULL, `activo` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "idParametro",
+            "columnName": "id_parametro",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "umbralAviso",
+            "columnName": "umbral_aviso",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "topeAnual",
+            "columnName": "tope_anual",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vigenteDesde",
+            "columnName": "vigente_desde",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "activo",
+            "columnName": "activo",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id_parametro"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_parametro_version_version",
+            "unique": true,
+            "columnNames": [
+              "version"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_parametro_version_version` ON `${TABLE_NAME}` (`version`)"
+          }
+        ]
+      },
+      {
+        "tableName": "categoria_nrus",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_categoria` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id_parametro` INTEGER NOT NULL, `codigo` INTEGER NOT NULL, `limite_mensual` INTEGER NOT NULL, `cuota` INTEGER NOT NULL, FOREIGN KEY(`id_parametro`) REFERENCES `parametro_version`(`id_parametro`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "idCategoria",
+            "columnName": "id_categoria",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idParametro",
+            "columnName": "id_parametro",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "codigo",
+            "columnName": "codigo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "limiteMensual",
+            "columnName": "limite_mensual",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cuota",
+            "columnName": "cuota",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id_categoria"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_categoria_nrus_id_parametro_codigo",
+            "unique": true,
+            "columnNames": [
+              "id_parametro",
+              "codigo"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_categoria_nrus_id_parametro_codigo` ON `${TABLE_NAME}` (`id_parametro`, `codigo`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "parametro_version",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "id_parametro"
+            ],
+            "referencedColumns": [
+              "id_parametro"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "cronograma_venc",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_cronograma` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id_parametro` INTEGER NOT NULL, `anio` INTEGER NOT NULL, `mes` INTEGER NOT NULL, `ultimo_digito` INTEGER NOT NULL, `fecha_limite` TEXT NOT NULL, FOREIGN KEY(`id_parametro`) REFERENCES `parametro_version`(`id_parametro`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "idCronograma",
+            "columnName": "id_cronograma",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idParametro",
+            "columnName": "id_parametro",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "anio",
+            "columnName": "anio",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mes",
+            "columnName": "mes",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ultimoDigito",
+            "columnName": "ultimo_digito",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fechaLimite",
+            "columnName": "fecha_limite",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id_cronograma"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_cronograma_venc_id_parametro_anio_mes_ultimo_digito",
+            "unique": true,
+            "columnNames": [
+              "id_parametro",
+              "anio",
+              "mes",
+              "ultimo_digito"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_cronograma_venc_id_parametro_anio_mes_ultimo_digito` ON `${TABLE_NAME}` (`id_parametro`, `anio`, `mes`, `ultimo_digito`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "parametro_version",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "id_parametro"
+            ],
+            "referencedColumns": [
+              "id_parametro"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "determinacion",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_determinacion` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id_periodo` INTEGER NOT NULL, `id_categoria` INTEGER, `total_adquisiciones` INTEGER NOT NULL, `monto_determinante` INTEGER NOT NULL, `cuota` INTEGER, `fecha_vencimiento` TEXT NOT NULL, `nivel_alerta` TEXT NOT NULL, `aviso_tope_anual` INTEGER NOT NULL, `fecha_calculo` TEXT NOT NULL, FOREIGN KEY(`id_periodo`) REFERENCES `periodo`(`id_periodo`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`id_categoria`) REFERENCES `categoria_nrus`(`id_categoria`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "idDeterminacion",
+            "columnName": "id_determinacion",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idPeriodo",
+            "columnName": "id_periodo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idCategoria",
+            "columnName": "id_categoria",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "totalAdquisiciones",
+            "columnName": "total_adquisiciones",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "montoDeterminante",
+            "columnName": "monto_determinante",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cuota",
+            "columnName": "cuota",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "fechaVencimiento",
+            "columnName": "fecha_vencimiento",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nivelAlerta",
+            "columnName": "nivel_alerta",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "avisoTopeAnual",
+            "columnName": "aviso_tope_anual",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fechaCalculo",
+            "columnName": "fecha_calculo",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id_determinacion"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_determinacion_id_periodo",
+            "unique": true,
+            "columnNames": [
+              "id_periodo"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_determinacion_id_periodo` ON `${TABLE_NAME}` (`id_periodo`)"
+          },
+          {
+            "name": "index_determinacion_id_categoria",
+            "unique": false,
+            "columnNames": [
+              "id_categoria"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_determinacion_id_categoria` ON `${TABLE_NAME}` (`id_categoria`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "periodo",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "id_periodo"
+            ],
+            "referencedColumns": [
+              "id_periodo"
+            ]
+          },
+          {
+            "table": "categoria_nrus",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "id_categoria"
+            ],
+            "referencedColumns": [
+              "id_categoria"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "aviso",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_aviso` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id_periodo` INTEGER NOT NULL, `tipo` TEXT NOT NULL, `fecha_programada` TEXT NOT NULL, `enviado` INTEGER NOT NULL, FOREIGN KEY(`id_periodo`) REFERENCES `periodo`(`id_periodo`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "idAviso",
+            "columnName": "id_aviso",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idPeriodo",
+            "columnName": "id_periodo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tipo",
+            "columnName": "tipo",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fechaProgramada",
+            "columnName": "fecha_programada",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "enviado",
+            "columnName": "enviado",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id_aviso"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_aviso_id_periodo",
+            "unique": false,
+            "columnNames": [
+              "id_periodo"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_aviso_id_periodo` ON `${TABLE_NAME}` (`id_periodo`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "periodo",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "id_periodo"
+            ],
+            "referencedColumns": [
+              "id_periodo"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "reporte_mensual",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id_reporte` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `id_periodo` INTEGER NOT NULL, `ruta_pdf` TEXT NOT NULL, `sha256` TEXT NOT NULL, `fecha_generacion` TEXT NOT NULL, FOREIGN KEY(`id_periodo`) REFERENCES `periodo`(`id_periodo`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "idReporte",
+            "columnName": "id_reporte",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "idPeriodo",
+            "columnName": "id_periodo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rutaPdf",
+            "columnName": "ruta_pdf",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sha256",
+            "columnName": "sha256",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fechaGeneracion",
+            "columnName": "fecha_generacion",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id_reporte"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_reporte_mensual_id_periodo",
+            "unique": false,
+            "columnNames": [
+              "id_periodo"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_reporte_mensual_id_periodo` ON `${TABLE_NAME}` (`id_periodo`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "periodo",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "id_periodo"
+            ],
+            "referencedColumns": [
+              "id_periodo"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8f846add3909d1e073fc7bbe4de1f6e5')"
+    ]
+  }
+}

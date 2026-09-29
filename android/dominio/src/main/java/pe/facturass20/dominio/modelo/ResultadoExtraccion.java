@@ -1,6 +1,7 @@
 package pe.facturass20.dominio.modelo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -20,7 +21,7 @@ public record ResultadoExtraccion(String versionModelo, long tiempoMs, List<Camp
 
     public ResultadoExtraccion {
         Objects.requireNonNull(versionModelo, "versionModelo");
-        campos = List.copyOf(campos);
+        campos = Collections.unmodifiableList(new ArrayList<>(campos));
     }
 
     public Optional<CampoExtraido> campo(CampoFactura nombre) {
@@ -32,7 +33,7 @@ public record ResultadoExtraccion(String versionModelo, long tiempoMs, List<Camp
         List<CampoFactura> revisar = new ArrayList<>();
         for (CampoFactura nombre : CampoFactura.values()) {
             Optional<CampoExtraido> campo = campo(nombre);
-            if (campo.isEmpty()
+            if (!campo.isPresent()
                     || campo.get().confianza() < UMBRAL_CONFIANZA
                     || ValidadorCampos.error(nombre, campo.get().valorFinal()).isPresent()) {
                 revisar.add(nombre);

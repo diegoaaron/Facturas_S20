@@ -44,7 +44,7 @@ public final class FacturaCompra {
         if (!Montos.esPositivo(importeTotal)) {
             throw new ReglaNegocioException("El importe debe ser mayor que cero.");
         }
-        if (estado == EstadoFactura.ANULADA && (motivoAnulacion == null || motivoAnulacion.isBlank())) {
+        if (estado == EstadoFactura.ANULADA && (motivoAnulacion == null || motivoAnulacion.trim().isEmpty())) {
             throw new ReglaNegocioException("Una factura anulada necesita un motivo.");
         }
         this.id = id;
@@ -71,8 +71,12 @@ public final class FacturaCompra {
      * ({@code 004821} y {@code 4821} son la misma factura).
      */
     public static String claveUnica(String rucEmisor, String serie, String numero) {
-        String sinCeros = numero.replaceFirst("^0+(?=\\d)", "");
-        return rucEmisor + "-" + serie.toUpperCase() + "-" + sinCeros;
+        return rucEmisor + "-" + serie.toUpperCase() + "-" + numeroNormalizado(numero);
+    }
+
+    /** El número sin ceros de relleno: {@code 004821 → 4821}, {@code 0000 → 0}. */
+    public static String numeroNormalizado(String numero) {
+        return numero.replaceFirst("^0+(?=\\d)", "");
     }
 
     public String claveUnica() {
@@ -92,7 +96,7 @@ public final class FacturaCompra {
         if (estado != EstadoFactura.VIGENTE) {
             throw new ReglaNegocioException("Esta factura ya está anulada.");
         }
-        if (motivo == null || motivo.isBlank()) {
+        if (motivo == null || motivo.trim().isEmpty()) {
             throw new ReglaNegocioException("Escriba el motivo de la anulación.");
         }
         estado = EstadoFactura.ANULADA;

@@ -246,6 +246,8 @@ Viajan dentro de la app en el archivo versionado `assets/parametros_nrus.json`. 
 ```
 
 > El cronograma de ejemplo es **ilustrativo**. El real lo publica la SUNAT cada año (12 meses × 10 dígitos); se carga completo en la versión de parámetros.
+>
+> **Estado actual (2026-09-28):** el `assets/parametros_nrus.json` de la app es la versión **`2026.0-provisional`**: los montos de arriba y un cronograma **inventado** (día 15 del mes siguiente para todos los dígitos, solo 2026) para poder desarrollar. **Antes de publicar** hay que cargar el cronograma oficial de la SUNAT con una versión nueva (p. ej. `2026.1`); el cargador la activa sola al abrir la app.
 
 ### 5.3 Validación del RUC (módulo 11)
 
@@ -439,19 +441,20 @@ La única base de datos del sistema es la SQLite del teléfono, cifrada con SQLC
 | `contribuyente` | **id_contribuyente**, ruc, nombre, titular, ultimo_digito, pin_hash, pin_sal, fecha_alta | ruc UNIQUE |
 | `periodo` | **id_periodo**, *id_contribuyente*, anio, mes, total_ventas, estado | UQ(id_contribuyente, anio, mes); mes 1..12 |
 | `emisor` | **id_emisor**, ruc, razon_social | ruc UNIQUE |
-| `factura_compra` | **id_factura**, *id_periodo*, *id_emisor*, serie, numero, fecha_emision, moneda, importe_total, origen, estado, motivo_anulacion, fecha_registro | UQ(id_emisor, serie, numero); importe > 0; índice (id_periodo, estado) |
+| `factura_compra` | **id_factura**, *id_periodo*, *id_emisor*, serie, numero, numero_normalizado, fecha_emision, moneda, importe_total, origen, estado, motivo_anulacion, fecha_registro | importe > 0; índices (id_periodo, estado) y (id_emisor, serie, numero_normalizado). **Sin UQ(id_emisor, serie, numero)**: el duplicado lo decide el dominio contra las VIGENTE (ver nota) |
 | `imagen_factura` | **id_imagen**, *id_factura* UNIQUE, ruta_cifrada, nitidez, fecha_captura | |
 | `campo_extraido` | **id_campo**, *id_factura*, *id_modelo*, nombre_campo, valor_leido, valor_final, confianza, corregido | índice (id_factura) |
 | `modelo_local` | **id_modelo**, version UNIQUE, tamano_mb, sha256, estado, ruta, fecha_instalacion | |
-| `parametro_version` | **id_parametro**, version UNIQUE, umbral_aviso, tope_anual, vigente_desde, activo | se llena desde `assets/parametros_nrus.json` |
+| `parametro_version` | **id_parametro**, version UNIQUE, umbral_aviso (en centésimas: 80 = 0,80), tope_anual, vigente_desde, activo | se llena desde `assets/parametros_nrus.json` |
 | `categoria_nrus` | **id_categoria**, *id_parametro*, codigo, limite_mensual, cuota | UQ(id_parametro, codigo) |
 | `cronograma_venc` | **id_cronograma**, *id_parametro*, anio, mes, ultimo_digito, fecha_limite | UQ(id_parametro, anio, mes, ultimo_digito) |
-| `determinacion` | **id_determinacion**, *id_periodo* UNIQUE, *id_categoria*, total_adquisiciones, monto_determinante, cuota, fecha_vencimiento, nivel_alerta, fecha_calculo | |
+| `determinacion` | **id_determinacion**, *id_periodo* UNIQUE, *id_categoria*, total_adquisiciones, monto_determinante, cuota, fecha_vencimiento, nivel_alerta, aviso_tope_anual, fecha_calculo | id_categoria y cuota NULL si está fuera del régimen |
 | `aviso` | **id_aviso**, *id_periodo*, tipo, fecha_programada, enviado | |
 | `reporte_mensual` | **id_reporte**, *id_periodo*, ruta_pdf, sha256, fecha_generacion | |
 
 - Fechas como `TEXT` ISO-8601. Montos: el informe los define como `NUMERIC` leídos como `BigDecimal`; en la implementación se recomienda guardarlos como **`INTEGER` en céntimos** con un `TypeConverter` a `BigDecimal`, porque SQLite trata `NUMERIC` con decimales como `REAL` y puede redondear.
-- Columnas agregadas respecto del DER del informe, necesarias para implementar: `contribuyente.titular` y `pin_sal`, `factura_compra.fecha_registro`, `modelo_local.ruta` y `determinacion.fecha_calculo`.
+- Columnas agregadas respecto del DER del informe, necesarias para implementar: `contribuyente.titular` y `pin_sal`, `factura_compra.numero_normalizado` y `fecha_registro`, `modelo_local.ruta`, `determinacion.aviso_tope_anual` y `fecha_calculo`.
+- **Duplicados (decidido el 2026-09-28):** el DER tenía UQ(id_emisor, serie, numero), pero eso impediría volver a registrar una factura anulada y dejaría pasar `4821` si ya estaba `004821`. Se quitó; `DetectorDuplicados` compara contra las facturas VIGENTE usando `numero_normalizado` (sin ceros de relleno). En el informe del APF3 hay que corregir el DER.
 - `@Transaction` para guardar factura + imagen + campos + recálculo (RNF-13).
 - **Migraciones Room** explícitas desde la versión 1 (`exportSchema = true`, esquemas en `app/schemas/`).
 
@@ -695,9 +698,9 @@ try (OutputStream destino = contentResolver.openOutputStream(uri);
 
 No hay servidor, cuentas ni sincronización: la superficie de ataque es el teléfono y el archivo exportado. La única conexión de red es la descarga del modelo, que no envía datos del usuario. Lista mínima (alineada con OWASP MASVS):
 
-- [ ] SQLCipher con clave aleatoria de 32 bytes envuelta por una clave AES del Android Keystore.
-- [ ] Imágenes cifradas con AES-GCM en almacenamiento interno; `android:allowBackup="false"` y reglas de extracción de datos (`dataExtractionRules`) que excluyan base e imágenes de las copias automáticas de Android.
-- [ ] PIN con hash (PBKDF2 + sal) y bloqueo temporal; huella con `BiometricPrompt` (`BIOMETRIC_STRONG`).
+- [x] SQLCipher con clave aleatoria de 32 bytes envuelta por una clave AES del Android Keystore (`GestorClaves`).
+- [x] Imágenes cifradas con AES-GCM en almacenamiento interno (`AlmacenImagenes`); `android:allowBackup="false"` y reglas de extracción de datos (`dataExtractionRules`) que excluyan base e imágenes de las copias automáticas de Android.
+- [ ] PIN con hash (PBKDF2 + sal) y bloqueo temporal; huella con `BiometricPrompt` (`BIOMETRIC_STRONG`). El hash ya está (`GestorPin`, PBKDF2-HMAC-SHA256, 120 000 iteraciones); faltan el bloqueo y la huella (P02).
 - [ ] **Permisos mínimos de Android:** `CAMERA`, `INTERNET` y `ACCESS_NETWORK_STATE` (solo para la descarga del modelo por Wi-Fi), `POST_NOTIFICATIONS` (Android 13+, recordatorios), `FOREGROUND_SERVICE` + `FOREGROUND_SERVICE_DATA_SYNC` (descarga larga con WorkManager). **Sin** permisos de almacenamiento (la galería usa el Photo Picker y la exportación usa SAF/`FileProvider`), ubicación ni contactos.
 - [ ] `INTERNET` solo lo usa `DescargaModeloWorker`; ningún otro flujo abre conexiones (verificar en modo avión y con un proxy que no salga ningún dato del usuario).
 - [ ] TLS 1.2+, sin tráfico en claro (`usesCleartextTraffic="false"`, `network_security_config` que solo permita el dominio del repositorio del modelo).
@@ -801,7 +804,7 @@ Son iteraciones de dos semanas, alineadas con las entregas del curso.
 | I1 | 1–4 | Análisis del contexto, alternativas y SRS | APF1 | ✅ completo |
 | I2 | 5–8 | Diseño de procesos, datos, clases, prototipo y documentación técnica | APF2 | ✅ completo |
 | Paso 0 | 8 | Configuración del equipo y proyecto Android base | App "Hello World!" en el teléfono | ✅ completo (ver 13.3) |
-| I3 | 9–10 | Front-end navegable (P01–P20) sobre la base de datos cifrada, y dominio con motor de reglas probado | Incremento 1 | ⏳ en curso (pasos 1 y 2 hechos, ver 13.4) |
+| I3 | 9–10 | Front-end navegable (P01–P20) sobre la base de datos cifrada, y dominio con motor de reglas probado | Incremento 1 | ⏳ en curso (pasos 1 a 3 hechos, ver 13.4) |
 | I4 | 11–12 | Inferencia local con el modelo convertido, medición en el teléfono y prueba de usabilidad | APF3 | pendiente |
 | I5 | 13–14 | Reporte PDF, exportación de datos e historial | Incremento 3 | pendiente |
 | I6 | 15–18 | Pruebas, validación en mes simulado y sustentación | Informe final | pendiente |
@@ -818,7 +821,7 @@ Quedó listo:
 - Íconos provisionales, `.gitignore` y `.gitattributes`.
 - La app instalada en el teléfono de pruebas (Android 15), mostrando "Hello World!".
 
-El 2026-09-28 se completaron además los pasos 1 (base de la app) y 2 (dominio) de I3; ver 13.4.
+El 2026-09-28 se completaron además los pasos 1 (base de la app), 2 (dominio) y 3 (base de datos) de I3; ver 13.4.
 
 ### 13.4 Tareas por iteración
 
@@ -841,8 +844,19 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
    - `puertos`: `ExtractorFacturas` (+ `ExtraccionException`), `FacturaRepositorio`, `PeriodoRepositorio`, `ContribuyenteRepositorio`, `ParametrosRepositorio` y `Reloj` (hora de Lima). **Cada escritura es una sola llamada que el repositorio hace en una transacción:** `FacturaRepositorio.registrar(periodo, factura, imagen, extraccion, determinacion)`, `FacturaRepositorio.anular(factura, determinacion)` y `PeriodoRepositorio.guardar(periodo, determinacion)`. `AvisoProgramador` y `ExportadorArchivos` quedan para I5.
    - `casosuso`: `VerificarFactura` (no guarda; devuelve errores por campo, si hay que confirmar el mes y el duplicado), `RegistrarFactura` (lanza `FacturaDuplicadaException` con la existente), `RegistrarVentas`, `DeterminarCategoria` (`calcular` no guarda y lo usan los demás; `ejecutar` devuelve la determinación congelada si el mes está cerrado, RF-22), `AnularFactura` y `CerrarPeriodo` (el PDF y la sugerencia de exportar, en I5).
    - Las pruebas de casos de uso usan `BaseEnMemoria`, que solo existe en `src/test` (la app no tendrá repositorios en memoria).
-3. **Base de datos (BE, el 20 %)** — ojo con dos puntos que dejó el paso 2: (a) el duplicado compara el número **sin ceros de relleno** y **solo contra facturas VIGENTE**, así que el UQ(id_emisor, serie, numero) de 7.1 tal cual chocaría al volver a registrar una factura anulada o al escribir `4821` en vez de `004821`; conviene una columna `numero_normalizado` y quitar o cambiar ese UQ (decidirlo al hacer la entidad). (b) `total_ventas` debe admitir NULL.
-   Contenido: Room (`annotationProcessor`) y SQLCipher en `libs.versions.toml`; las 13 entidades de 7.1 con UNIQUE, índices y FK; `TypeConverter`s (montos en céntimos `INTEGER` ↔ `BigDecimal`, fechas ISO-8601); DAO por agregado; `BaseDatosFacturas` versión 1 con `exportSchema = true`; `GestorClaves` (Keystore) y apertura cifrada; `assets/parametros_nrus.json` + `CargadorParametrosNrus`; repositorios que implementan los puertos con guardado `@Transaction`; `AlmacenImagenes` (AES-256-GCM); PIN con hash y sal; `allowBackup="false"` y reglas de extracción (lista de §10); pruebas instrumentadas de DAO y de la transacción.
+3. ✅ **Base de datos (BE, el 20 %)** — hecho el 2026-09-28, salvo correr las pruebas instrumentadas en el teléfono (ver abajo):
+   - Room 2.8.5 (`annotationProcessor`), `androidx.sqlite` 2.7.1 y SQLCipher **4.17.0** (desde 4.18.0 exige `compileSdk` 37; no subir mientras sea 36). El APK de depuración pesa 15,8 MB.
+   - `datos.entidades`: las 13 tablas de 7.1 con FK e índices, y `Convertidores` (montos en céntimos, fechas ISO-8601; los enums por nombre). Esquema v1 en `app/schemas/` (va en git). Decisiones en 7.1: sin UQ de factura y con `numero_normalizado`; `total_ventas` NULL = sin registrar; `aviso_tope_anual` en `determinacion`.
+   - `datos.dao`: `ContribuyenteDao`, `PeriodoDao` (+ determinación), `FacturaDao` (+ emisor, imagen y campos), `ParametrosDao`, y `ModeloDao`, `AvisoDao` y `ReporteDao` mínimos para I4–I5.
+   - `BaseDatosFacturas.abrir(contexto, clave, nombre)` con `SupportOpenHelperFactory`, y `enMemoria` para pruebas.
+   - `datos.cifrado`: `GestorClaves` (clave de 32 bytes envuelta con AES-GCM del Keystore, en preferencias privadas; otra clave del Keystore para imágenes), `AlmacenImagenes` (`filesDir/imagenes/<uuid>.jpg.enc`) y `GestorPin` (PBKDF2-HMAC-SHA256, 120 000 iteraciones, sal de 16 bytes; P01/P02 lo usarán).
+   - `datos.parametros.CargadorParametrosNrus` y `assets/parametros_nrus.json` **provisional** (ver nota de 5.2). `App` lo corre en segundo plano al iniciar.
+   - `datos.repositorios`: los 4 repositorios `…Room`. Cada escritura del puerto es un `runInTransaction`. La determinación se enlaza con la categoría de la versión activa de parámetros.
+   - `ContenedorDependencias` crea la base y los repositorios la primera vez que se piden, y entrega los casos de uso.
+   - Manifiesto: `allowBackup="false"` y reglas de copia y transferencia que excluyen todo.
+   - El dominio se limitó a la biblioteca de Java 8 + `java.time` (`Stream.toList()`, `List.of`, `isBlank()`… no existen en Android 8 y lint no revisa `:dominio`; ver comentario en `dominio/build.gradle.kts`).
+   - Pruebas instrumentadas (`app/src/androidTest/.../datos/`): `RepositoriosRoomTest` (flujo real con los casos de uso, montos exactos, duplicados, reregistro de anulada, ventas NULL vs 0, cierre y **rollback de la transacción**), `CargadorParametrosNrusTest` y `CifradoTest` (Keystore, imágenes, PIN, y que el archivo `.db` no se abre sin la clave). **Compilan, pero no se han corrido:** no había teléfono conectado. Correr con `./gradlew :app:connectedDebugAndroidTest` con el teléfono por USB.
+   - Pendiente para el paso 4: el destino inicial sigue siendo `inicio`; cambiará a `configuracion`/`acceso` cuando existan P01 y P02 (hoy son pantallas provisionales y la app quedaría trabada en P01).
 4. **Pantallas en el orden del flujo (FE, el 80 %)**, cada una con su Fragment, layout y ViewModel sobre los repositorios reales:
    - Acceso: P01 Configuración, P02 Acceso (PIN, huella, 3 fallos → 30 s).
    - Principal: P04 Inicio.

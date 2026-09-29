@@ -140,9 +140,9 @@ public final class VerificarFactura {
                 new Emisor(normal(datos, CampoFactura.RUC), normal(datos, CampoFactura.RAZON_SOCIAL)),
                 normal(datos, CampoFactura.SERIE),
                 normal(datos, CampoFactura.NUMERO),
-                fecha.orElseThrow(),
+                fecha.get(),
                 Moneda.valueOf(normal(datos, CampoFactura.MONEDA)),
-                Montos.interpretar(datos.importeTotal()).orElseThrow(),
+                Montos.interpretar(datos.importeTotal()).get(),
                 origen);
         FacturaCompra duplicado = DetectorDuplicados.buscarDuplicado(factura,
                 facturas.buscarPorEmisorYSerie(factura.emisor().ruc(), factura.serie())).orElse(null);

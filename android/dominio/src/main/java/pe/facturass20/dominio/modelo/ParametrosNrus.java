@@ -3,10 +3,13 @@ package pe.facturass20.dominio.modelo;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import pe.facturass20.dominio.reglas.Montos;
 
@@ -26,13 +29,13 @@ public record ParametrosNrus(String version, LocalDate vigenteDesde, BigDecimal 
         topeAnual = Montos.normalizar(Objects.requireNonNull(topeAnual, "topeAnual"));
         categorias = categorias.stream()
                 .sorted(Comparator.comparing(CategoriaNRUS::limiteMensual))
-                .toList();
-        cronograma = List.copyOf(cronograma);
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+        cronograma = Collections.unmodifiableList(new ArrayList<>(cronograma));
     }
 
     /** Categorías que rigen en esa fecha, ordenadas de menor a mayor límite; vacía si la versión aún no rige. */
     public List<CategoriaNRUS> categoriasVigentes(LocalDate fecha) {
-        return fecha.isBefore(vigenteDesde) ? List.of() : categorias;
+        return fecha.isBefore(vigenteDesde) ? Collections.<CategoriaNRUS>emptyList() : categorias;
     }
 
     /** Fecha límite para declarar ese mes según el último dígito del RUC, si el cronograma la trae. */
