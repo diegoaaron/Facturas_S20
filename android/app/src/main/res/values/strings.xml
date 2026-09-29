@@ -1,3 +1,54 @@
 <resources>
     <string name="app_name">Facturas S20</string>
+
+    <!-- Barra inferior -->
+    <string name="nav_inicio">Inicio</string>
+    <string name="nav_facturas">Facturas</string>
+    <string name="nav_escanear">Escanear</string>
+    <string name="nav_mes">Mes</string>
+    <string name="nav_ajustes">Ajustes</string>
+
+    <!-- Títulos de las pantallas P01–P20 (documentación técnica §8.1) -->
+    <string name="p01_titulo">Configuración inicial</string>
+    <string name="p02_titulo">Acceso</string>
+    <string name="p03_titulo">Preparar lectura con IA</string>
+    <string name="p04_titulo">Inicio</string>
+    <string name="p05_titulo">Guía de captura</string>
+    <string name="p07_titulo">Lectura</string>
+    <string name="p08_titulo">Verificación</string>
+    <string name="p10_titulo">Factura guardada</string>
+    <string name="p11_titulo">Facturas del mes</string>
+    <string name="p12_titulo">Detalle de la factura</string>
+    <string name="p13_titulo">Ventas del mes</string>
+    <string name="p14_titulo">Categoría y cuota</string>
+    <string name="p15_titulo">Vencimiento</string>
+    <string name="p16_titulo">Reporte mensual</string>
+    <string name="p17_titulo">Historial y cierre</string>
+    <string name="p18_titulo">Ajustes</string>
+    <string name="p19_titulo">Registro manual</string>
+    <string name="p20_titulo">Exportar datos</string>
+
+    <!-- Pantalla provisional mientras se construye cada destino -->
+    <string name="pendiente_codigo">Pantalla %1$s</string>
+    <string name="pendiente_detalle">Esta pantalla todavía está en construcción.</string>
+
+    <!-- Notificaciones -->
+    <string name="canal_avisos_nombre">Avisos del NRUS</string>
+    <string name="canal_avisos_descripcion">Límite de la categoría y fecha de vencimiento de la declaración</string>
+
+    <!-- Textos clave (documentación técnica §8.4) -->
+    <string name="guia_titulo">¡Hora de la foto!</string>
+    <string name="camara_acercar">Acérquese un poco más hasta que se lea el total</string>
+    <string name="lectura_sin_red">IA en el teléfono · sin conexión</string>
+    <string name="verif_baja_confianza">Confianza baja (%1$d %%): compárelo con el total impreso en la factura.</string>
+    <string name="duplicado_titulo">Esta factura ya está registrada</string>
+    <string name="aviso_80">Superó el 80 %% del límite de la categoría %1$d</string>
+    <string name="ventas_explicacion">La categoría del NRUS se decide con el mayor monto del mes: compras o ventas.</string>
+    <string name="manual_sin_ia">La lectura automática no está disponible en este equipo. Complete los datos; se validan igual que con IA.</string>
+    <string name="reporte_privacidad">El PDF se genera en su teléfono y no se envía a ningún lado</string>
+    <string name="modelo_descarga">Se descargará una sola vez (%1$s) por Wi-Fi. No se envía ningún dato suyo.</string>
+    <string name="exportar_titulo">Exportar datos</string>
+    <string name="exportar_aviso_cifrado">El archivo no va cifrado. Guárdelo en un lugar seguro y compártalo solo con personas de confianza.</string>
+    <string name="exportar_listo">Listo: se exportaron %1$d facturas de %2$s</string>
+    <string name="cierre_sugerir_exportar">Mes cerrado. Le recomendamos exportar sus datos por si pierde el teléfono.</string>
 </resources>

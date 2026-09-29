@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Tokens de medida del sistema de diseño (documentación técnica §8.3). -->
+<resources>
+    <dimen name="margen">16dp</dimen>
+    <dimen name="boton_alto">48dp</dimen>
+    <dimen name="campo_alto">58dp</dimen>
+    <dimen name="radio_tarjeta">14dp</dimen>
+    <dimen name="radio_boton">24dp</dimen>
+
+    <dimen name="texto_titulo">20sp</dimen>
+    <dimen name="texto_monto">32sp</dimen>
+    <dimen name="texto_dato">16sp</dimen>
+    <dimen name="texto_ayuda">12sp</dimen>
+
+    <!-- Botón central «Escanear» de la barra inferior. -->
+    <dimen name="escanear_diametro">64dp</dimen>
+    <dimen name="escanear_elevacion">24dp</dimen>
+</resources>

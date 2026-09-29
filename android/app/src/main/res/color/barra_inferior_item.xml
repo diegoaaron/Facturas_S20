@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Color de ícono y texto de la barra inferior: primario si está seleccionado, gris si no. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/color_primario" android:state_checked="true"/>
+    <item android:color="@color/color_inactivo"/>
+</selector>

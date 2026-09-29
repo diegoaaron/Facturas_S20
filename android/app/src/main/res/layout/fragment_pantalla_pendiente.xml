@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Pantalla provisional: muestra el código y el nombre del destino hasta que se construya su Fragment. -->
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/margen">
+
+    <TextView
+            android:id="@+id/texto_codigo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/Texto.FacturasS20.Ayuda"/>
+
+    <TextView
+            android:id="@+id/texto_titulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:textAppearance="@style/Texto.FacturasS20.Titulo"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/pendiente_detalle"
+            android:textAppearance="@style/Texto.FacturasS20.Dato"/>
+</LinearLayout>

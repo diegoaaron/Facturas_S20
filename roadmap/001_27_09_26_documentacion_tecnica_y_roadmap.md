@@ -801,8 +801,8 @@ Son iteraciones de dos semanas, alineadas con las entregas del curso.
 | I1 | 1–4 | Análisis del contexto, alternativas y SRS | APF1 | ✅ completo |
 | I2 | 5–8 | Diseño de procesos, datos, clases, prototipo y documentación técnica | APF2 | ✅ completo |
 | Paso 0 | 8 | Configuración del equipo y proyecto Android base | App "Hello World!" en el teléfono | ✅ completo (ver 13.3) |
-| I3 | 9–10 | Front-end navegable (P01–P20) y dominio con motor de reglas probado | Incremento 1 | ⏳ siguiente |
-| I4 | 11–12 | Persistencia cifrada (Room + SQLCipher) e inferencia local con el modelo convertido | APF3 | pendiente |
+| I3 | 9–10 | Front-end navegable (P01–P20) sobre la base de datos cifrada, y dominio con motor de reglas probado | Incremento 1 | ⏳ en curso (paso 1 hecho, ver 13.4) |
+| I4 | 11–12 | Inferencia local con el modelo convertido, medición en el teléfono y prueba de usabilidad | APF3 | pendiente |
 | I5 | 13–14 | Reporte PDF, exportación de datos e historial | Incremento 3 | pendiente |
 | I6 | 15–18 | Pruebas, validación en mes simulado y sustentación | Informe final | pendiente |
 
@@ -818,18 +818,36 @@ Quedó listo:
 - Íconos provisionales, `.gitignore` y `.gitattributes`.
 - La app instalada en el teléfono de pruebas (Android 15), mostrando "Hello World!".
 
-Con esto, la tarea 1 de I3 queda **parcialmente cubierta**. Falta el tema y los tokens, y `MainActivity` con NavHost y barra inferior.
+El 2026-09-28 se completó además el paso 1 de I3 (base de la app); ver 13.4.
 
 ### 13.4 Tareas por iteración
 
 **I3 · semanas 9–10 — Front-end navegable y dominio**
-1. ~~Crear el proyecto Android (`:app`, `:dominio`), `libs.versions.toml`~~ (✅ paso 0). Falta: tema y tokens (8.3), `MainActivity` con NavHost y barra inferior.
-2. `:dominio` completo con pruebas: modelo, `ValidadorRuc`, `MotorReglasNRUS`, `DetectorDuplicados`, `ParserRespuesta`.
-3. Pantallas P01–P20 con ViewModels y **repositorios en memoria** + `ExtractorFacturas` falso.
-4. CameraX en P06 con evaluación de nitidez y luz.
+
+Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~20 % de back-end, que es sobre todo la base de datos. Por eso **la base de datos se adelanta de I4 a I3** y las pantallas usan los repositorios reales desde el principio (no se hacen repositorios en memoria). Se sigue este orden:
+
+1. ✅ **Base de la app (FE)** — hecho el 2026-09-28:
+   - Navigation 2.10.2 y Fragment 1.9.1 en `libs.versions.toml`.
+   - Tokens de §8.3 en `colors.xml` y `dimens.xml`, tema Material 3 solo claro con estilos de botón, tarjeta, barra y textos (`Texto.FacturasS20.Titulo/Monto/Dato/Ayuda`), y `strings.xml` con los títulos P01–P20 y los textos de §8.4.
+   - `ui.comun.Formatos` (moneda `S/ 4 120,50` y `monedaCorta` `S/ 5 000`, fechas `22/09/2026`, `22/09`, «jueves 15 de octubre», «Septiembre 2026»), con `FormatosTest`.
+   - `App` (crea el canal de notificaciones `avisos_nrus`) y `ContenedorDependencias` (por ahora solo el ejecutor de fondo).
+   - `MainActivity` con NavHost, `nav_graph.xml` con los destinos y acciones de §8.2 y la barra inferior con el botón central Escanear (visible solo en P04, P11, P14, P17 y P18).
+   - **Todos los destinos usan `PantallaPendienteFragment`** (muestra código y título); cada pantalla la reemplaza en su `android:name` al construirse. Faltan en el grafo `CapturaActivity` (P06) y `DuplicadoDialog` (P09). El destino inicial es `inicio` hasta que exista la base; entonces será `configuracion` o `acceso`.
+   - CameraX no se agregó todavía: va con P06 (paso 4).
+2. **Dominio mínimo (BE)**: modelo y enumeraciones de 5.1; puertos (`FacturaRepositorio`, `PeriodoRepositorio`, `ContribuyenteRepositorio`, `ParametrosRepositorio`, `ExtractorFacturas`); `ValidadorRuc`, `Montos`, `MotorReglasNRUS` (7 casos de 5.4) y `DetectorDuplicados` con JUnit 5; casos de uso `RegistrarFactura`, `VerificarFactura`, `RegistrarVentas`, `DeterminarCategoria`, `AnularFactura` y `CerrarPeriodo`.
+3. **Base de datos (BE, el 20 %)**: Room (`annotationProcessor`) y SQLCipher en `libs.versions.toml`; las 13 entidades de 7.1 con UNIQUE, índices y FK; `TypeConverter`s (montos en céntimos `INTEGER` ↔ `BigDecimal`, fechas ISO-8601); DAO por agregado; `BaseDatosFacturas` versión 1 con `exportSchema = true`; `GestorClaves` (Keystore) y apertura cifrada; `assets/parametros_nrus.json` + `CargadorParametrosNrus`; repositorios que implementan los puertos con guardado `@Transaction`; `AlmacenImagenes` (AES-256-GCM); PIN con hash y sal; `allowBackup="false"` y reglas de extracción (lista de §10); pruebas instrumentadas de DAO y de la transacción.
+4. **Pantallas en el orden del flujo (FE, el 80 %)**, cada una con su Fragment, layout y ViewModel sobre los repositorios reales:
+   - Acceso: P01 Configuración, P02 Acceso (PIN, huella, 3 fallos → 30 s).
+   - Principal: P04 Inicio.
+   - Registro: P05 Guía → P06 Cámara (CameraX + `EvaluadorNitidez`) → P07 Lectura → P08 Verificación → P09 Duplicado → P10 Guardada · P19 Registro manual. P07 usa un `ExtractorFacturas` **falso** que devuelve una factura de ejemplo.
+   - Control: P11 Facturas del mes (filtros), P12 Detalle + anulación.
+   - NRUS: P13 Ventas, P14 Categoría y cuota, P15 Vencimiento.
+   - Reportes: P16 Reporte (vista previa, sin PDF real), P17 Historial y cierre.
+   - Ajustes: P18 Ajustes, P03 Preparar modelo y P20 Exportar datos (solo interfaz: sin descarga ni ZIP reales).
+5. **Cierre del incremento**: prueba Espresso del flujo principal (Escanear → disparar → Guardar, ≤ 3 toques); instalar en el teléfono y tomar capturas para el APF3.
 
 **I4 · semanas 11–12 — Persistencia e IA local (APF3)**
-5. Room + SQLCipher (13 tablas, migraciones), `AlmacenImagenes`, repositorios reales, guardado transaccional, carga de `assets/parametros_nrus.json`.
+5. ~~Room + SQLCipher~~ (se adelantó a I3, paso 3).
 6. `LiteRtLmPuente.kt`, `GestorModeloLocal` (comprobación, `assets/modelo.json`, descarga desde Hugging Face, SHA-256, prueba), P03.
 7. Medir tiempo y memoria en el teléfono de referencia con el modelo convertido.
 8. Prueba de usabilidad con 3 titulares (protocolo del informe, Anexo S). **Decidido (2026-09-27): semanas 11–12.** El informe del APF2 también la menciona en I3 (§3.7.6 y conclusión cuarta); se corrige en el informe del APF3.

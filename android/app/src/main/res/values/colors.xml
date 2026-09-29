@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Tokens de color del sistema de diseño (documentación técnica §8.3). -->
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="color_primario">#1B4D45</color>
+    <color name="color_acento">#8BC34A</color>
+    <color name="color_acento_oscuro">#5F8F2A</color>
+    <color name="color_fondo">#F5F7F6</color>
+    <color name="color_superficie">#FFFFFF</color>
+    <color name="color_texto">#1D2B28</color>
+    <color name="color_texto2">#5E6E6A</color>
+    <color name="color_alerta">#F0A202</color>
+    <color name="color_alerta_claro">#FFF4DB</color>
+    <color name="color_error">#C62828</color>
+    <color name="color_error_claro">#FDECEA</color>
+    <color name="color_ok">#2E7D32</color>
+    <color name="color_ok_claro">#E8F5E9</color>
+    <color name="color_borde">#DFE5E3</color>
+    <!-- Ícono inactivo de la barra inferior. -->
+    <color name="color_inactivo">#8A9894</color>
 </resources>

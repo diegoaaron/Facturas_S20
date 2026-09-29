@@ -1,9 +1,87 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.FacturasS20" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<resources>
+    <!-- Tema de la app. El diseño es solo claro (documentación técnica §8.3), por eso no hay values-night. -->
+    <style name="Base.Theme.FacturasS20" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/color_primario</item>
+        <item name="colorOnPrimary">@color/color_superficie</item>
+        <item name="colorPrimaryContainer">@color/color_ok_claro</item>
+        <item name="colorOnPrimaryContainer">@color/color_primario</item>
+        <item name="colorSecondary">@color/color_acento</item>
+        <item name="colorOnSecondary">@color/color_primario</item>
+        <item name="colorSecondaryContainer">@color/color_ok_claro</item>
+        <item name="colorOnSecondaryContainer">@color/color_acento_oscuro</item>
+        <item name="colorError">@color/color_error</item>
+        <item name="colorErrorContainer">@color/color_error_claro</item>
+        <item name="colorSurface">@color/color_superficie</item>
+        <item name="colorOnSurface">@color/color_texto</item>
+        <item name="colorOnSurfaceVariant">@color/color_texto2</item>
+        <item name="colorOutline">@color/color_borde</item>
+        <item name="android:colorBackground">@color/color_fondo</item>
+        <item name="android:windowLightStatusBar">false</item>
+
+        <item name="shapeAppearanceCornerMedium">@style/Forma.FacturasS20.Tarjeta</item>
+        <item name="materialButtonStyle">@style/Widget.FacturasS20.Boton</item>
+        <item name="materialCardViewStyle">@style/Widget.FacturasS20.Tarjeta</item>
     </style>
 
     <style name="Theme.FacturasS20" parent="Base.Theme.FacturasS20"/>
+
+    <!-- Formas -->
+    <style name="Forma.FacturasS20.Tarjeta" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/radio_tarjeta</item>
+    </style>
+
+    <style name="Forma.FacturasS20.Circulo" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="Forma.FacturasS20.Boton" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/radio_boton</item>
+    </style>
+
+    <!-- Componentes -->
+    <style name="Widget.FacturasS20.Boton" parent="Widget.Material3.Button">
+        <item name="android:minHeight">@dimen/boton_alto</item>
+        <item name="android:textSize">@dimen/texto_dato</item>
+        <item name="shapeAppearance">@style/Forma.FacturasS20.Boton</item>
+    </style>
+
+    <style name="Widget.FacturasS20.Tarjeta" parent="Widget.Material3.CardView.Outlined">
+        <item name="cardBackgroundColor">@color/color_superficie</item>
+        <item name="strokeColor">@color/color_borde</item>
+        <item name="shapeAppearance">@style/Forma.FacturasS20.Tarjeta</item>
+    </style>
+
+    <style name="Widget.FacturasS20.BarraInferior" parent="Widget.Material3.BottomNavigationView">
+        <item name="android:background">@color/color_superficie</item>
+        <item name="itemIconTint">@color/barra_inferior_item</item>
+        <item name="itemTextColor">@color/barra_inferior_item</item>
+        <item name="itemActiveIndicatorStyle">@null</item>
+        <item name="labelVisibilityMode">labeled</item>
+    </style>
+
+    <!-- Tipografía (títulos 18–22 sp, montos 28–36 sp, datos 16 sp, ayuda 12 sp) -->
+    <style name="Texto.FacturasS20.Titulo" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textSize">@dimen/texto_titulo</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/color_texto</item>
+    </style>
+
+    <style name="Texto.FacturasS20.Monto" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="android:textSize">@dimen/texto_monto</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/color_primario</item>
+    </style>
+
+    <style name="Texto.FacturasS20.Dato" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textSize">@dimen/texto_dato</item>
+        <item name="android:textColor">@color/color_texto</item>
+    </style>
+
+    <style name="Texto.FacturasS20.Ayuda" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textSize">@dimen/texto_ayuda</item>
+        <item name="android:textColor">@color/color_texto2</item>
+    </style>
 </resources>

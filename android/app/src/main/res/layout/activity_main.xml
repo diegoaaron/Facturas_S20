@@ -1,19 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Contenedor de la app: NavHost con los destinos de nav_graph y la barra inferior con el botón central «Escanear».
+     El fondo primario queda detrás de la barra de estado (el encabezado de las pantallas es de ese color). -->
 <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/main"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/raiz"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/color_primario"
         tools:context=".ui.comun.MainActivity">
-    <TextView
-            android:layout_width="wrap_content"
+
+    <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/contenedor_nav"
+            android:name="androidx.navigation.fragment.NavHostFragment"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/color_fondo"
+            app:defaultNavHost="true"
+            app:navGraph="@navigation/nav_graph"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/barra_inferior"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/barra_inferior"
+            style="@style/Widget.FacturasS20.BarraInferior"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Hello World!"
+            app:menu="@menu/barra_inferior"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/boton_escanear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:contentDescription="@string/nav_escanear"
+            android:src="@drawable/ic_escanear"
+            app:fabCustomSize="@dimen/escanear_diametro"
+            app:maxImageSize="32dp"
+            app:backgroundTint="@color/color_acento"
+            app:tint="@color/color_superficie"
+            app:elevation="6dp"
+            app:shapeAppearanceOverlay="@style/Forma.FacturasS20.Circulo"
+            app:layout_constraintTop_toTopOf="@id/barra_inferior"
+            app:layout_constraintBottom_toTopOf="@id/barra_inferior"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

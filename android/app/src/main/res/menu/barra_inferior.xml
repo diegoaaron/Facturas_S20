@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Barra inferior (documentación técnica §8.1). Los ids coinciden con los destinos del nav_graph,
+     salvo el central, que abre la captura y nunca queda seleccionado. -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@id/inicio" android:icon="@drawable/ic_inicio" android:title="@string/nav_inicio"/>
+    <item android:id="@id/facturas" android:icon="@drawable/ic_facturas" android:title="@string/nav_facturas"/>
+    <item android:id="@+id/escanear" android:icon="@drawable/ic_vacio" android:title="@string/nav_escanear"/>
+    <item android:id="@id/categoria" android:icon="@drawable/ic_mes" android:title="@string/nav_mes"/>
+    <item android:id="@id/ajustes" android:icon="@drawable/ic_ajustes" android:title="@string/nav_ajustes"/>
+</menu>
