@@ -33,4 +33,12 @@
     <color name="color_tecla_oscura">#265F58</color>
     <color name="color_tecla_oscura_pulsada">#3A7A71</color>
     <color name="color_tecla_clara">#EEF2F1</color>
+    <!-- Cámara P06 (prototipo pantalla_06_camara_con_encuadre.png): fondo oscuro y vista previa. -->
+    <color name="color_camara_fondo">#1F2523</color>
+    <color name="color_camara_previa">#4A443F</color>
+    <color name="color_camara_velo">#66000000</color>
+    <color name="color_camara_texto">#D9E0DE</color>
+    <color name="color_camara_boton">#2C3331</color>
+    <color name="color_camara_boton_pulsado">#3D4744</color>
+    <color name="color_camara_disparador_inactivo">#9AA3A0</color>
 </resources>

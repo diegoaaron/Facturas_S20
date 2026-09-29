@@ -28,6 +28,8 @@ import pe.facturass20.dominio.puertos.PeriodoRepositorio;
 import pe.facturass20.dominio.puertos.Reloj;
 import pe.facturass20.ui.acceso.PreferenciasAcceso;
 import pe.facturass20.ui.acceso.Sesion;
+import pe.facturass20.ui.captura.CapturaEnCurso;
+import pe.facturass20.ui.captura.PreferenciasCaptura;
 
 /**
  * Inyección de dependencias manual (documentación técnica §3.1): crea una sola vez los adaptadores
@@ -46,12 +48,15 @@ public final class ContenedorDependencias {
     private final Reloj reloj = Reloj.sistema();
     private final PreferenciasAcceso preferenciasAcceso;
     private final Sesion sesion;
+    private final PreferenciasCaptura preferenciasCaptura;
+    private final CapturaEnCurso capturaEnCurso = new CapturaEnCurso();
     private Adaptadores adaptadores;
 
     ContenedorDependencias(Context contexto) {
         this.contexto = contexto.getApplicationContext();
         preferenciasAcceso = new PreferenciasAcceso(this.contexto);
         sesion = new Sesion(ejecutor, () -> gestorPin().tienePin());
+        preferenciasCaptura = new PreferenciasCaptura(this.contexto);
     }
 
     /** Hilos de fondo para la base de datos, la inferencia, el PDF y la exportación; nunca el hilo de UI. */
@@ -70,6 +75,15 @@ public final class ContenedorDependencias {
 
     public PreferenciasAcceso preferenciasAcceso() {
         return preferenciasAcceso;
+    }
+
+    public PreferenciasCaptura preferenciasCaptura() {
+        return preferenciasCaptura;
+    }
+
+    /** La foto que va de la cámara a la lectura y la verificación (P06 → P07 → P08). */
+    public CapturaEnCurso capturaEnCurso() {
+        return capturaEnCurso;
     }
 
     public BaseDatosFacturas baseDatos() {

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- P06 Cámara (prototipo pantalla_06_camara_con_encuadre.png). La vista previa y el marco ocupan lo mismo:
+     el marco es la parte de la foto que se mide y se recorta (CapturaActivity, MarcoEncuadre). -->
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/raiz"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.captura.CapturaActivity">
+
+    <ImageButton
+            android:id="@+id/boton_cerrar"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/captura_cerrar"
+            android:src="@drawable/ic_cerrar"
+            app:tint="@color/color_superficie"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+            android:id="@+id/texto_titulo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:accessibilityHeading="true"
+            android:gravity="center"
+            android:text="@string/p06_titulo"
+            android:textAppearance="@style/Texto.FacturasS20.Titulo"
+            android:textColor="@color/color_superficie"
+            app:layout_constraintTop_toTopOf="@id/boton_cerrar"
+            app:layout_constraintBottom_toBottomOf="@id/boton_cerrar"
+            app:layout_constraintStart_toEndOf="@id/boton_cerrar"
+            app:layout_constraintEnd_toStartOf="@id/boton_linterna"/>
+
+    <ImageButton
+            android:id="@+id/boton_linterna"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginEnd="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/captura_linterna_encender"
+            android:src="@drawable/ic_linterna_apagada"
+            android:visibility="invisible"
+            app:tint="@color/color_superficie"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:visibility="visible"/>
+
+    <androidx.camera.view.PreviewView
+            android:id="@+id/vista_previa"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/color_camara_previa"
+            android:importantForAccessibility="no"
+            app:scaleType="fillCenter"
+            app:layout_constraintTop_toBottomOf="@id/boton_cerrar"
+            app:layout_constraintBottom_toTopOf="@id/panel_inferior"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    <pe.facturass20.ui.captura.MarcoEncuadreView
+            android:id="@+id/marco"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:importantForAccessibility="no"
+            app:layout_constraintTop_toTopOf="@id/vista_previa"
+            app:layout_constraintBottom_toBottomOf="@id/vista_previa"
+            app:layout_constraintStart_toStartOf="@id/vista_previa"
+            app:layout_constraintEnd_toEndOf="@id/vista_previa"/>
+
+    <TextView
+            android:id="@+id/etiqueta_estado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:accessibilityLiveRegion="polite"
+            android:background="@drawable/fondo_etiqueta_camara"
+            android:paddingStart="14dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="6dp"
+            android:textColor="@color/color_superficie"
+            android:textSize="@dimen/texto_dato"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/vista_previa"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:backgroundTint="@color/color_ok"
+            tools:text="Nitidez: buena · Luz: buena"/>
+
+    <!-- Sin permiso de cámara: explica para qué es y lleva a concederlo. La galería sigue disponible. -->
+    <LinearLayout
+            android:id="@+id/panel_permiso"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/margen_amplio"
+            android:paddingEnd="@dimen/margen_amplio"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="@id/vista_previa"
+            app:layout_constraintBottom_toBottomOf="@id/vista_previa"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:visibility="visible">
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/captura_permiso"
+                android:textAppearance="@style/Texto.FacturasS20.Dato"
+                android:textColor="@color/color_superficie"
+                android:textSize="18sp"/>
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/boton_permiso"
+                style="@style/Widget.FacturasS20.Boton.Grande.Acento"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:paddingStart="28dp"
+                android:paddingEnd="28dp"
+                android:text="@string/captura_permiso_boton"/>
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/panel_inferior"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingBottom="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+                android:id="@+id/texto_ayuda"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margen"
+                android:layout_marginTop="14dp"
+                android:layout_marginEnd="@dimen/margen"
+                android:gravity="center"
+                android:minLines="2"
+                android:textAppearance="@style/Texto.FacturasS20.Dato"
+                android:textColor="@color/color_camara_texto"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="@string/camara_acercar"/>
+
+        <ImageButton
+                android:id="@+id/boton_disparar"
+                android:layout_width="84dp"
+                android:layout_height="84dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/fondo_disparador"
+                android:contentDescription="@string/captura_disparar"
+                app:layout_constraintTop_toBottomOf="@id/texto_ayuda"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/progreso"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:visibility="gone"
+                app:indicatorColor="@color/color_acento"
+                app:layout_constraintTop_toTopOf="@id/boton_disparar"
+                app:layout_constraintBottom_toBottomOf="@id/boton_disparar"
+                app:layout_constraintStart_toStartOf="@id/boton_disparar"
+                app:layout_constraintEnd_toEndOf="@id/boton_disparar"/>
+
+        <LinearLayout
+                android:id="@+id/boton_galeria"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:clickable="true"
+                android:contentDescription="@string/captura_galeria_descripcion"
+                android:focusable="true"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                app:layout_constraintTop_toTopOf="@id/boton_disparar"
+                app:layout_constraintBottom_toBottomOf="@id/boton_disparar"
+                app:layout_constraintStart_toStartOf="parent">
+
+            <ImageView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/fondo_boton_galeria"
+                    android:duplicateParentState="true"
+                    android:importantForAccessibility="no"
+                    android:padding="14dp"
+                    android:src="@drawable/ic_galeria"
+                    app:tint="@color/color_superficie"/>
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:importantForAccessibility="no"
+                    android:text="@string/captura_galeria"
+                    android:textColor="@color/color_superficie"
+                    android:textSize="@dimen/texto_secundario"/>
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

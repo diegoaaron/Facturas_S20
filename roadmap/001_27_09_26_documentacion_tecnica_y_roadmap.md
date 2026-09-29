@@ -517,6 +517,8 @@ inicio → historial → exportarDatos
 inicio → ajustes → exportarDatos · preparacionModelo
 ```
 
+`CapturaActivity` no es un destino del `nav_graph`: P05 la abre con un `ActivityResultLauncher` y sigue a `lectura` si vuelve con la foto (13.4, paso 4).
+
 ### 8.3 Tokens de diseño (`res/values/colors.xml`, `dimens.xml`)
 
 | Token | Valor | Uso |
@@ -835,8 +837,8 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
    - `ui.comun.Formatos` (moneda `S/ 4 120,50` y `monedaCorta` `S/ 5 000`, fechas `22/09/2026`, `22/09`, «jueves 15 de octubre», «Septiembre 2026»), con `FormatosTest`.
    - `App` (crea el canal de notificaciones `avisos_nrus`) y `ContenedorDependencias` (por ahora solo el ejecutor de fondo).
    - `MainActivity` con NavHost, `nav_graph.xml` con los destinos y acciones de §8.2 y la barra inferior con el botón central Escanear (visible solo en P04, P11, P14, P17 y P18).
-   - **Todos los destinos usan `PantallaPendienteFragment`** (muestra código y título); cada pantalla la reemplaza en su `android:name` al construirse. Faltan en el grafo `CapturaActivity` (P06) y `DuplicadoDialog` (P09). El destino inicial es `inicio` hasta que exista la base; entonces será `configuracion` o `acceso`.
-   - CameraX no se agregó todavía: va con P06 (paso 4).
+   - **Todos los destinos usan `PantallaPendienteFragment`** (muestra código y título); cada pantalla la reemplaza en su `android:name` al construirse. Falta en el grafo `DuplicadoDialog` (P09); `CapturaActivity` (P06) no va en el grafo (ver el paso 4). El destino inicial es `inicio` hasta que exista la base; entonces será `configuracion` o `acceso`.
+   - CameraX se agregó con P06 (paso 4).
 2. ✅ **Dominio mínimo (BE)** — hecho el 2026-09-28. `./gradlew :dominio:check` corre 118 pruebas y JaCoCo exige ≥ 80 % de líneas en `reglas` (RNF-18; hoy 99 %). Informe en `dominio/build/reports/jacoco/test/html/`.
    - `modelo`: entidades y enumeraciones de 5.1. `FacturaCompra` y `PeriodoMensual` son clases con invariantes; el resto, `record`s. `PeriodoMensual` es el agregado: `agregarFactura`, `anularFactura(id, motivo)` (la anulación pasa por el mes, que es quien sabe si está abierto), `registrarVentas` y `cerrar`. `totalVentas` nulo = «sin registrar» (el motor lo toma como 0; `cerrar()` lo rechaza). Además: `CampoFactura` (con la clave JSON de 6.2), `ReglaNegocioException` (mensaje en español para mostrar al usuario) y `ConfiguracionNrusException` (faltan categorías o fechas en los parámetros).
    - `reglas`: `ValidadorRuc`, `Montos` (incluye `interpretar("1 450,00")`, que reutilizará `ParserRespuesta`, y céntimos para Room), `ValidadorFecha` (acepta `2026-09-22` y `22/09/2026`; regla de 5.5), `ValidadorCampos` (mensaje por campo, igual en P08 y P19; USD se rechaza con «Por ahora solo se registran compras en soles (S/).»), `DetectorDuplicados` y `MotorReglasNRUS`.
@@ -866,9 +868,16 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
      - P02: teclado propio (`TecladoPin`, también en P01), 3 fallos → 30 s con cuenta atrás (`ControlIntentos` en `PreferenciasAcceso`, sobrevive a cerrar la app y no se alarga si se atrasa la hora), huella (se pide sola al abrir si está activada) y «¿Olvidó su PIN?»: si el RUC escrito es el del negocio, crea un PIN nuevo en la misma pantalla.
      - P04 (`InicioViewModel` + `ResumenInicio`, Java puro con `ResumenInicioTest`): recalcula la determinación del mes al volver a la pantalla (crea el mes si no existe). Barra verde / ámbar (`AVISO_80`) / roja (`LIMITE_100` o fuera), marca en el umbral de los parámetros, «Le quedan…», nota si las ventas deciden la categoría, ventas (o «Sin registrar»), categoría y cuota, aviso de tope anual, vencimiento con días que faltan y las 3 últimas facturas vigentes. «recordatorio activado» del prototipo queda para I5 (WorkManager). Nuevas acciones: `inicio_a_detalleFactura` (con `idFactura`), `inicio_a_categoria` (tarjeta de categoría y campana) e `inicio_a_vencimiento`.
      - Los parámetros del NRUS se cargan al abrir la base en `ContenedorDependencias` (antes, en paralelo desde `App`, y P04 podía leerlos antes de tiempo).
+   - ✅ **Segundo bloque (2026-09-29): P05 y P06**, compilado y con pruebas unitarias (`EvaluadorNitidezTest`, `MarcoEncuadreTest`, `PreparadorFotoTest`); **falta probarlo en el teléfono**, sobre todo **calibrar el umbral de nitidez** (100) con fotos reales.
+     - Dependencias nuevas: CameraX 1.6.2 (`camera-core`, `camera2`, `lifecycle`, `view`) y `exifinterface` 1.4.2. El APK de depuración pasa a 19,8 MB. Permiso `CAMERA` (se pide al abrir P06) y `camera.any` no obligatoria.
+     - P05 `GuiaCapturaFragment`: consejos del prototipo, «Abrir cámara», «Elegir de la galería» (Photo Picker, sin permisos de almacenamiento) y «No volver a mostrar esta guía» (`PreferenciasCaptura`). Con la casilla marcada, Escanear pasa por P05 pero la cámara se abre sola, y al cerrarla sin foto se vuelve atrás; tras la foto, P05 sale de la pila. Falta en P18 la opción para volver a mostrar la guía.
+     - P06 `CapturaActivity` (tema oscuro, vertical): **no es un destino del grafo**; P05 la abre con un `ActivityResultLauncher` y, con `RESULT_OK`, navega a `lectura`. Vista previa, foto y análisis comparten el `ViewPort` de la vista previa; `MarcoEncuadreView` dibuja el marco (verde cuando todo está bien) y `MarcoEncuadre` (Java puro) lleva el marco a las coordenadas del sensor según el giro. Cada 200 ms se mide el plano Y dentro del marco con `EvaluadorNitidez` (varianza del Laplaciano; luz media entre 60 y 200) y la etiqueta muestra «Nitidez: … · Luz: …» con un consejo. El disparador solo se activa con las dos «buenas». Hay linterna si el teléfono tiene flash, galería y un panel si falta el permiso. Si se cierra el proceso o la sesión se bloquea, la actividad se cierra (no se salta el PIN).
+     - `PreparadorFoto` (§6.4): recorta al marco, gira (cámara o EXIF), reduce a 896 px de lado mayor, JPEG 90 y **vuelve a medir la foto final**: si no pasa, «Tome otra foto» (RF-02). Lo mismo con la galería (RF-03, sin recorte). `CapturaViewModel` lo corre en segundo plano, lo comparten P05 y P06.
+     - La foto queda **solo en memoria** en `CapturaEnCurso` (en `ContenedorDependencias`), como `FotoCapturada` (JPEG, nitidez, luz, fecha). P07/P08 la leen de ahí, y P08 la guarda cifrada con `AlmacenImagenes` y llama a `CapturaEnCurso.limpiar()`.
+     - Queda para I4 el paso de P06 a P19 cuando no hay modelo o falta memoria (§8.2).
    - Acceso: P01 Configuración, P02 Acceso (PIN, huella, 3 fallos → 30 s). ✅
    - Principal: P04 Inicio. ✅
-   - Registro: P05 Guía → P06 Cámara (CameraX + `EvaluadorNitidez`) → P07 Lectura → P08 Verificación → P09 Duplicado → P10 Guardada · P19 Registro manual. P07 usa un `ExtractorFacturas` **falso** que devuelve una factura de ejemplo.
+   - Registro: P05 Guía ✅ → P06 Cámara ✅ → P07 Lectura → P08 Verificación → P09 Duplicado → P10 Guardada · P19 Registro manual. P07 usa un `ExtractorFacturas` **falso** que devuelve una factura de ejemplo.
    - Control: P11 Facturas del mes (filtros), P12 Detalle + anulación.
    - NRUS: P13 Ventas, P14 Categoría y cuota, P15 Vencimiento.
    - Reportes: P16 Reporte (vista previa, sin PDF real), P17 Historial y cierre.

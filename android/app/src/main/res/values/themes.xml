@@ -33,6 +33,12 @@
         <item name="postSplashScreenTheme">@style/Theme.FacturasS20</item>
     </style>
 
+    <!-- Cámara P06: fondo oscuro detrás de las barras del sistema. -->
+    <style name="Theme.FacturasS20.Camara" parent="Theme.FacturasS20">
+        <item name="android:windowBackground">@color/color_camara_fondo</item>
+        <item name="android:colorBackground">@color/color_camara_fondo</item>
+    </style>
+
     <!-- Formas -->
     <style name="Forma.FacturasS20.Tarjeta" parent="">
         <item name="cornerFamily">rounded</item>
@@ -61,6 +67,15 @@
         <item name="android:minHeight">@dimen/boton_grande_alto</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Botón principal de acento: «Abrir cámara» de P05. Texto primario, que contrasta con el acento. -->
+    <style name="Widget.FacturasS20.Boton.Grande.Acento">
+        <item name="backgroundTint">@color/color_acento</item>
+        <item name="android:textColor">@color/color_primario</item>
+        <item name="iconTint">@color/color_primario</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">12dp</item>
     </style>
 
     <style name="Widget.FacturasS20.Boton.Texto" parent="Widget.Material3.Button.TextButton">

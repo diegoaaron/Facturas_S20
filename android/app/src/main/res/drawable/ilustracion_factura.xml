@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Factura de la ilustración de P05 (prototipo pantalla_05_guia_de_captura.png), algo inclinada. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="180dp" android:height="190dp" android:viewportWidth="180" android:viewportHeight="190">
+    <group android:pivotX="90" android:pivotY="95" android:rotation="-3">
+        <path android:fillColor="#FFFDFAF3" android:strokeColor="#FFCFC8BA" android:strokeWidth="1.5"
+              android:pathData="M12,8h156v174h-156z"/>
+        <!-- Razón social y RUC -->
+        <path android:fillColor="#FF1D2B28" android:pathData="M24,22h100v7h-100z"/>
+        <path android:fillColor="#FF8A9894" android:pathData="M24,36h56v4h-56z"/>
+        <!-- Recuadro de la serie y el número, y la fecha -->
+        <path android:fillColor="#00000000" android:strokeColor="#FF5E6E6A" android:strokeWidth="1.2"
+              android:pathData="M108,50h48v24h-48z"/>
+        <path android:fillColor="#FF1D2B28" android:pathData="M116,62h32v5h-32z"/>
+        <path android:fillColor="#FF8A9894" android:pathData="M24,58h44v4h-44z"/>
+        <!-- Líneas del detalle -->
+        <path android:fillColor="#FFD8D1C4"
+              android:pathData="M24,88h96v4h-96zM132,88h24v4h-24zM24,102h96v4h-96zM132,102h24v4h-24zM24,116h96v4h-96zM132,116h24v4h-24zM24,130h96v4h-96zM132,130h24v4h-24z"/>
+        <!-- Total -->
+        <path android:fillColor="#FF1D2B28" android:pathData="M88,156h68v9h-68z"/>
+    </group>
+</vector>

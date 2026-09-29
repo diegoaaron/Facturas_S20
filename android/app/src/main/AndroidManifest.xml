@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permisos mínimos (documentación técnica §10). La galería usa el Photo Picker: sin permisos de almacenamiento. -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- Sin cámara igual se puede registrar desde la galería o a mano (P19). -->
+    <uses-feature android:name="android.hardware.camera.any" android:required="false"/>
+
     <application
             android:name=".App"
             android:allowBackup="false"
@@ -23,6 +28,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- P06 Cámara: la abre P05 y devuelve el resultado. Vertical: el marco de encuadre es de una factura de pie. -->
+        <activity
+                android:name=".ui.captura.CapturaActivity"
+                android:exported="false"
+                android:screenOrientation="portrait"
+                android:theme="@style/Theme.FacturasS20.Camara"
+                tools:ignore="DiscouragedApi,LockedOrientationActivity"/>
     </application>
 
 </manifest>

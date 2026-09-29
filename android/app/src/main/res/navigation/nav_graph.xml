@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Grafo de navegación (documentación técnica §8.2).
      Los destinos que aún no se construyen usan PantallaPendienteFragment; cada uno se reemplaza por su Fragment.
-     Faltan CapturaActivity (P06, entre guiaCaptura y lectura) y DuplicadoDialog (P09, desde verificacion).
+     P06 CapturaActivity no es un destino: guiaCaptura (P05) la abre con un ActivityResultLauncher y, si vuelve
+     con la foto, sigue a lectura. Falta DuplicadoDialog (P09, desde verificacion).
      MainActivity cambia el destino inicial según ui.acceso.Sesion: configuracion (P01) sin configurar,
      acceso (P02) bloqueada, inicio (P04) desbloqueada. Por eso P01 y P02 no navegan: desbloquean la sesión y
      MainActivity reemplaza el grafo con inicio como raíz (así Atrás no vuelve al PIN).
@@ -35,10 +36,8 @@
         <action android:id="@+id/inicio_a_historial" app:destination="@id/historial"/>
         <action android:id="@+id/inicio_a_ajustes" app:destination="@id/ajustes"/>
     </fragment>
-    <fragment android:id="@+id/guiaCaptura" android:name="pe.facturass20.ui.comun.PantallaPendienteFragment"
+    <fragment android:id="@+id/guiaCaptura" android:name="pe.facturass20.ui.captura.GuiaCapturaFragment"
               android:label="@string/p05_titulo">
-        <argument android:name="codigo" app:argType="string" android:defaultValue="P05"/>
-        <argument android:name="titulo" app:argType="reference" android:defaultValue="@string/p05_titulo"/>
         <action android:id="@+id/guiaCaptura_a_lectura" app:destination="@id/lectura"/>
         <action android:id="@+id/guiaCaptura_a_registroManual" app:destination="@id/registroManual"/>
     </fragment>

@@ -14,6 +14,7 @@
     <string name="p03_titulo">Preparar lectura con IA</string>
     <string name="p04_titulo">Inicio</string>
     <string name="p05_titulo">Guía de captura</string>
+    <string name="p06_titulo">Encuadre la factura</string>
     <string name="p07_titulo">Lectura</string>
     <string name="p08_titulo">Verificación</string>
     <string name="p10_titulo">Factura guardada</string>
@@ -136,6 +137,44 @@
     <string name="p04_sin_facturas">Aún no registra facturas este mes</string>
     <string name="p04_sin_facturas_ayuda">Toque Escanear para registrar la primera.</string>
     <string name="p04_documento">%1$s-%2$s · %3$s</string>
+
+    <!-- P05 Guía de captura -->
+    <string name="atras">Atrás</string>
+    <string name="p05_barra">Registrar factura</string>
+    <string name="guia_luz">Busque buena luz y evite sombras sobre el papel.</string>
+    <string name="guia_plana">Ponga la factura sobre una superficie plana.</string>
+    <string name="guia_acercar">Acérquese hasta que el total se lea con claridad.</string>
+    <string name="guia_sin_internet">No necesita internet: la lectura se hace aquí.</string>
+    <string name="guia_no_mostrar">No volver a mostrar esta guía</string>
+    <string name="guia_abrir_camara">Abrir cámara</string>
+    <string name="guia_galeria">Elegir de la galería</string>
+
+    <!-- P06 Cámara -->
+    <string name="captura_cerrar">Cerrar la cámara</string>
+    <string name="captura_linterna_encender">Encender la linterna</string>
+    <string name="captura_linterna_apagar">Apagar la linterna</string>
+    <string name="captura_disparar">Tomar la foto</string>
+    <string name="captura_galeria">Galería</string>
+    <string name="captura_galeria_descripcion">Elegir una foto de la galería</string>
+    <string name="captura_enfocando">Enfocando…</string>
+    <string name="captura_estado">Nitidez: %1$s · Luz: %2$s</string>
+    <string name="captura_nitidez_buena">buena</string>
+    <string name="captura_nitidez_baja">baja</string>
+    <string name="captura_luz_buena">buena</string>
+    <string name="captura_luz_baja">poca</string>
+    <string name="captura_luz_excesiva">demasiada</string>
+    <string name="captura_ayuda_lista">Toque el botón para tomar la foto</string>
+    <string name="captura_ayuda_poca_luz">Busque más luz o encienda la linterna</string>
+    <string name="captura_ayuda_brillo">Hay demasiado brillo: evite los reflejos sobre el papel</string>
+    <string name="captura_foto_borrosa">La foto salió borrosa. Tome otra foto.</string>
+    <string name="captura_foto_oscura">La foto salió muy oscura. Busque más luz y tome otra foto.</string>
+    <string name="captura_foto_brillo">La foto tiene demasiado brillo. Evite los reflejos y tome otra foto.</string>
+    <string name="captura_imagen_invalida">No se pudo abrir esa imagen. Elija otra.</string>
+    <string name="captura_error_camara">No se pudo abrir la cámara. Puede elegir una foto de la galería.</string>
+    <string name="captura_error_disparo">No se pudo tomar la foto. Intente de nuevo.</string>
+    <string name="captura_permiso">Para fotografiar la factura, permita que la app use la cámara. La foto se queda en su teléfono.</string>
+    <string name="captura_permiso_boton">Permitir la cámara</string>
+    <string name="captura_permiso_ajustes">Abrir los ajustes</string>
 
     <!-- Notificaciones -->
     <string name="canal_avisos_nombre">Avisos del NRUS</string>

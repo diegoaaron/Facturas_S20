@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Disparador de P06: anillo de acento y círculo blanco; gris mientras la nitidez o la luz no son buenas. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false">
+        <layer-list>
+            <item>
+                <shape android:shape="oval">
+                    <stroke android:width="6dp" android:color="@color/color_inactivo"/>
+                </shape>
+            </item>
+            <item android:bottom="12dp" android:left="12dp" android:right="12dp" android:top="12dp">
+                <shape android:shape="oval">
+                    <solid android:color="@color/color_camara_disparador_inactivo"/>
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    <item android:state_pressed="true">
+        <layer-list>
+            <item>
+                <shape android:shape="oval">
+                    <stroke android:width="6dp" android:color="@color/color_acento"/>
+                </shape>
+            </item>
+            <item android:bottom="16dp" android:left="16dp" android:right="16dp" android:top="16dp">
+                <shape android:shape="oval">
+                    <solid android:color="@color/color_superficie"/>
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    <item>
+        <layer-list>
+            <item>
+                <shape android:shape="oval">
+                    <stroke android:width="6dp" android:color="@color/color_acento"/>
+                </shape>
+            </item>
+            <item android:bottom="12dp" android:left="12dp" android:right="12dp" android:top="12dp">
+                <shape android:shape="oval">
+                    <solid android:color="@color/color_superficie"/>
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+</selector>

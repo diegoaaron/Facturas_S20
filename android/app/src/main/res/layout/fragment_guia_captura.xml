@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- P05 Guía de captura (prototipo pantalla_05_guia_de_captura.png). Los botones quedan abajo, al alcance
+     del pulgar; los consejos se desplazan si la pantalla es baja. -->
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_superficie"
+        android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/barra"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/color_primario"
+            app:navigationContentDescription="@string/atras"
+            app:navigationIcon="@drawable/ic_atras"
+            app:navigationIconTint="@color/color_superficie"
+            app:title="@string/p05_barra"
+            app:titleTextAppearance="@style/Texto.FacturasS20.Titulo"
+            app:titleTextColor="@color/color_superficie"/>
+
+    <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="210dp"
+                    android:background="@color/color_ok_claro">
+
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ilustracion_factura"/>
+
+                <ImageView
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:layout_gravity="center_horizontal|top"
+                        android:layout_marginStart="170dp"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/fondo_circulo_acento"
+                        android:importantForAccessibility="no"
+                        android:padding="16dp"
+                        android:src="@drawable/ic_escanear"
+                        app:tint="@color/color_superficie"/>
+            </FrameLayout>
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="@dimen/margen_amplio"
+                    android:paddingTop="24dp"
+                    android:paddingEnd="@dimen/margen_amplio"
+                    android:paddingBottom="8dp">
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:accessibilityHeading="true"
+                        android:text="@string/guia_titulo"
+                        android:textAppearance="@style/Texto.FacturasS20.TituloGrande"
+                        android:textSize="30sp"/>
+
+                <include android:id="@+id/consejo_luz" layout="@layout/item_consejo_captura"/>
+                <include android:id="@+id/consejo_plana" layout="@layout/item_consejo_captura"/>
+                <include android:id="@+id/consejo_acercar" layout="@layout/item_consejo_captura"/>
+                <include android:id="@+id/consejo_sin_internet" layout="@layout/item_consejo_captura"/>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/margen_amplio"
+            android:paddingEnd="@dimen/margen_amplio"
+            android:paddingBottom="12dp">
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/casilla_no_mostrar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/boton_alto"
+                android:text="@string/guia_no_mostrar"
+                android:textAppearance="@style/Texto.FacturasS20.Secundario"/>
+
+        <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp">
+
+            <com.google.android.material.button.MaterialButton
+                    android:id="@+id/boton_abrir_camara"
+                    style="@style/Widget.FacturasS20.Boton.Grande.Acento"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/guia_abrir_camara"
+                    app:icon="@drawable/ic_escanear"/>
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/progreso"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    app:indicatorColor="@color/color_primario"/>
+        </FrameLayout>
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/boton_galeria"
+                style="@style/Widget.FacturasS20.Boton.Texto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/guia_galeria"/>
+    </LinearLayout>
+</LinearLayout>

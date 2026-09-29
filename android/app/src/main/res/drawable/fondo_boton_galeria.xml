@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Botón «Galería» de P06. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/color_camara_boton_pulsado"/>
+            <stroke android:width="2dp" android:color="@color/color_superficie"/>
+            <corners android:radius="12dp"/>
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/color_camara_boton"/>
+            <stroke android:width="2dp" android:color="@color/color_superficie"/>
+            <corners android:radius="12dp"/>
+        </shape>
+    </item>
+</selector>
