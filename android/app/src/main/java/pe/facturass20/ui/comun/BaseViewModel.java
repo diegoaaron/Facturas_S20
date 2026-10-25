@@ -10,6 +10,8 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import java.time.YearMonth;
+import java.time.format.DateTimeParseException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
@@ -58,6 +60,21 @@ public abstract class BaseViewModel extends AndroidViewModel {
 
     protected final ContenedorDependencias contenedor() {
         return contenedor;
+    }
+
+    /**
+     * El mes de un argumento de navegación {@code periodo} ({@code "2026-09"}); vacío o inválido es el mes en
+     * curso.
+     */
+    protected final YearMonth periodoDe(String argumento) {
+        if (argumento != null && !argumento.isEmpty()) {
+            try {
+                return YearMonth.parse(argumento);
+            } catch (DateTimeParseException e) {
+                Log.w(ETIQUETA, "Período inválido en los argumentos");
+            }
+        }
+        return YearMonth.from(contenedor.reloj().hoy());
     }
 
     protected final String texto(@StringRes int id, Object... argumentos) {

@@ -52,10 +52,14 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         // La barra inferior ya se ajusta sola a la barra de navegación del sistema; abajo solo cuenta el teclado.
+        // En las pantallas sin barra inferior, el contenido deja libre el alto de la barra del sistema.
         ViewCompat.setOnApplyWindowInsetsListener(binding.raiz, (v, insets) -> {
             Insets barras = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets teclado = insets.getInsets(WindowInsetsCompat.Type.ime());
             v.setPadding(barras.left, barras.top, barras.right, teclado.bottom);
+            boolean sinBarraInferior = binding.barraInferior.getVisibility() != View.VISIBLE;
+            binding.contenedorNav.setPadding(0, 0, 0,
+                    sinBarraInferior && teclado.bottom == 0 ? barras.bottom : 0);
             return insets;
         });
 
@@ -121,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
             int visibilidad = DESTINOS_CON_BARRA.contains(destino.getId()) ? View.VISIBLE : View.GONE;
             binding.barraInferior.setVisibility(visibilidad);
             binding.botonEscanear.setVisibility(visibilidad);
+            ViewCompat.requestApplyInsets(binding.raiz);
         });
     }
 

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos de P18 Ajustes, P03 Preparar lectura con IA y P20 Exportar datos. -->
+<resources>
+    <!-- P18 -->
+    <string name="ajustes_negocio">Mi negocio</string>
+    <string name="ajustes_seguridad">Seguridad y captura</string>
+    <string name="ajustes_lector">Lector de facturas (IA)</string>
+    <string name="ajustes_parametros">Parámetros del NRUS</string>
+    <string name="ajustes_datos">Mis datos</string>
+    <string name="ajustes_nombre">Nombre del negocio</string>
+    <string name="ajustes_titular">Titular</string>
+    <string name="ajustes_cambiar_pin">Cambiar PIN</string>
+    <string name="ajustes_huella_no_disponible">Este teléfono no tiene una huella registrada</string>
+    <string name="ajustes_mostrar_guia">Mostrar la guía antes de la cámara</string>
+    <string name="ajustes_mostrar_guia_detalle">Los consejos para tomar una buena foto</string>
+    <string name="ajustes_modelo">Gemma 4 E2B facturas</string>
+    <string name="ajustes_modelo_estado">Aún no instalado · se usa el lector de prueba</string>
+    <string name="ajustes_modelo_nuevo">Modelo nuevo</string>
+    <string name="ajustes_modelo_nuevo_detalle">Llega con cada actualización de la app</string>
+    <string name="ajustes_parametros_version">Versión</string>
+    <string name="ajustes_parametros_detalle">%1$s · vigente desde %2$s</string>
+    <string name="ajustes_exportar">Exportar datos para PC</string>
+    <string name="ajustes_version">Facturas S20 · versión %1$s</string>
+    <string name="ajustes_pin_actual">PIN actual</string>
+    <string name="ajustes_pin_nuevo">PIN nuevo (4 dígitos)</string>
+    <string name="ajustes_pin_repetir">Repita el PIN nuevo</string>
+    <string name="ajustes_guardar_pin">Cambiar</string>
+    <string name="ajustes_pin_formato">El PIN nuevo debe tener 4 dígitos.</string>
+    <string name="ajustes_pin_actual_incorrecto">El PIN actual no es correcto.</string>
+    <string name="ajustes_pin_cambiado">Su PIN se cambió.</string>
+
+    <!-- P03 -->
+    <string name="modelo_titulo">Lectura sin internet</string>
+    <string name="modelo_subtitulo">Preparación única del lector de facturas</string>
+    <string name="modelo_comprobacion">Comprobación del equipo</string>
+    <string name="modelo_memoria">Memoria del teléfono</string>
+    <string name="modelo_espacio">Espacio libre</string>
+    <string name="modelo_espacio_valor">%1$s (necesita %2$s)</string>
+    <string name="modelo_conexion">Conexión</string>
+    <string name="modelo_wifi">Wi-Fi</string>
+    <string name="modelo_sin_wifi">Sin Wi-Fi</string>
+    <string name="modelo_android">Versión de Android</string>
+    <string name="modelo_cumple">%1$s: %2$s, cumple</string>
+    <string name="modelo_no_cumple">%1$s: %2$s, no alcanza</string>
+    <string name="modelo_nombre">Gemma 4 E2B · facturas</string>
+    <string name="modelo_descripcion">Modelo de IA que lee sus facturas en el teléfono</string>
+    <string name="modelo_no_publicado">El modelo todavía no está publicado. Mientras tanto, la app usa un lector de prueba con datos de ejemplo, o puede registrar sus facturas a mano.</string>
+    <string name="modelo_no_apto">Este teléfono no tiene memoria o espacio suficiente para el modelo. Puede registrar sus facturas a mano; se validan igual.</string>
+    <string name="modelo_sha">Al terminar se verifica la huella SHA-256 del archivo antes de activarlo.</string>
+    <string name="modelo_descargar">Descargar modelo</string>
+    <string name="modelo_a_mano">Registrar a mano mientras tanto</string>
+    <string name="modelo_privacidad">Solo se descarga el modelo; sus datos no salen del teléfono</string>
+
+    <!-- P20 -->
+    <string name="exportar_subtitulo">Para revisar sus compras en una PC</string>
+    <string name="exportar_explicacion">Se genera un archivo ZIP que se abre en Excel o LibreOffice.</string>
+    <string name="exportar_sin_datos">Aún no hay facturas ni ventas para exportar.</string>
+    <string name="exportar_periodo">Período</string>
+    <string name="exportar_un_mes">Un mes</string>
+    <string name="exportar_todo_anio">Todo el año</string>
+    <string name="exportar_mes">Mes</string>
+    <string name="exportar_anio">Año</string>
+    <string name="exportar_contenido">Contenido del archivo</string>
+    <string name="exportar_csv">Facturas y totales (CSV)</string>
+    <string name="exportar_csv_detalle">facturas, períodos y determinaciones</string>
+    <string name="exportar_imagenes">Incluir imágenes de facturas</string>
+    <plurals name="exportar_imagenes_detalle">
+        <item quantity="one">%d imagen JPEG</item>
+        <item quantity="many">%d imágenes JPEG</item>
+        <item quantity="other">%d imágenes JPEG</item>
+    </plurals>
+    <string name="exportar_pdf">Incluir reporte PDF</string>
+    <string name="exportar_pdf_mes">facturas-s20_%1$s.pdf</string>
+    <string name="exportar_pdf_anio">Un PDF por cada mes</string>
+    <string name="exportar_archivo">facturas_s20_%1$s.zip · ≈ %2$s</string>
+    <string name="exportar_guardar">Guardar en el teléfono o la PC</string>
+    <string name="exportar_compartir">Compartir</string>
+    <string name="exportar_sin_servidor">La app no envía sus datos a ningún servidor</string>
+    <string name="exportar_pronto">La exportación del ZIP estará disponible en la próxima versión.</string>
+</resources>

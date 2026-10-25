@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Lupa de P11: muestra u oculta el campo de búsqueda. -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/buscar"
+          android:icon="@drawable/ic_buscar"
+          android:title="@string/facturas_buscar"
+          app:iconTint="@color/color_superficie"
+          app:showAsAction="always"/>
+</menu>

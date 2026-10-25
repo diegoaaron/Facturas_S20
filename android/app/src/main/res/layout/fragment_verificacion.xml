@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- P08 Verificación (prototipo pantalla_08_verificacion_de_datos.png): la foto arriba, los campos que
+     leyó la IA y, abajo al alcance del pulgar, Guardar y Tomar otra foto. -->
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_fondo"
+        android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/barra"
+            style="@style/Widget.FacturasS20.BarraSuperior.Atras"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:subtitle="@string/verif_subtitulo"
+            app:title="@string/verif_titulo"/>
+
+    <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/margen">
+
+            <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="170dp"
+                    android:background="@drawable/fondo_imagen_factura">
+
+                <ImageView
+                        android:id="@+id/imagen"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/foto_factura"
+                        android:padding="6dp"
+                        android:scaleType="fitCenter"/>
+
+                <ImageButton
+                        android:id="@+id/boton_ampliar"
+                        android:layout_width="@dimen/boton_alto"
+                        android:layout_height="@dimen/boton_alto"
+                        android:layout_gravity="bottom|end"
+                        android:layout_margin="8dp"
+                        android:background="@drawable/fondo_etiqueta_camara"
+                        android:backgroundTint="@color/color_camara_boton"
+                        android:contentDescription="@string/ampliar_foto"
+                        android:src="@drawable/ic_acercar"
+                        app:tint="@color/color_superficie"/>
+            </FrameLayout>
+
+            <include
+                    android:id="@+id/campos"
+                    layout="@layout/campos_factura"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"/>
+
+            <TextView
+                    android:id="@+id/texto_campos_leidos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/fondo_etiqueta_ok"
+                    android:paddingStart="12dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="4dp"
+                    android:textAppearance="@style/Texto.FacturasS20.Etiqueta"
+                    android:textColor="@color/color_primario"
+                    tools:text="7 campos leídos"/>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/margen"
+            android:paddingTop="8dp"
+            android:paddingEnd="@dimen/margen"
+            android:paddingBottom="8dp">
+
+        <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <com.google.android.material.button.MaterialButton
+                    android:id="@+id/boton_guardar"
+                    style="@style/Widget.FacturasS20.Boton.Grande"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/verif_guardar"/>
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/progreso"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    app:indicatorColor="@color/color_superficie"/>
+        </FrameLayout>
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/boton_otra_foto"
+                style="@style/Widget.FacturasS20.Boton.Texto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/verif_otra_foto"/>
+    </LinearLayout>
+</LinearLayout>

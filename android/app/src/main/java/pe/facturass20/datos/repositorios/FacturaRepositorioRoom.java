@@ -9,6 +9,7 @@ import pe.facturass20.datos.dao.FacturaConEmisor;
 import pe.facturass20.datos.dao.FacturaDao;
 import pe.facturass20.datos.entidades.CampoExtraidoEntity;
 import pe.facturass20.datos.entidades.EmisorEntity;
+import pe.facturass20.datos.entidades.ImagenFacturaEntity;
 import pe.facturass20.datos.entidades.ModeloLocalEntity;
 import pe.facturass20.dominio.modelo.CampoExtraido;
 import pe.facturass20.dominio.modelo.Determinacion;
@@ -53,6 +54,21 @@ public final class FacturaRepositorioRoom implements FacturaRepositorio {
     public Optional<Emisor> buscarEmisor(String ruc) {
         EmisorEntity fila = dao.buscarEmisor(ruc);
         return fila == null ? Optional.empty() : Optional.of(Mapeos.aDominio(fila));
+    }
+
+    @Override
+    public Optional<ImagenFactura> buscarImagen(long idFactura) {
+        ImagenFacturaEntity fila = dao.buscarImagen(idFactura);
+        return fila == null ? Optional.empty() : Optional.of(Mapeos.aDominio(fila));
+    }
+
+    @Override
+    public List<CampoExtraido> buscarCampos(long idFactura) {
+        List<CampoExtraido> campos = new ArrayList<>();
+        for (CampoExtraidoEntity fila : dao.listarCampos(idFactura)) {
+            campos.add(Mapeos.aDominio(fila));
+        }
+        return campos;
     }
 
     @Override

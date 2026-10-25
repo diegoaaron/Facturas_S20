@@ -4,6 +4,8 @@
 
     <!-- Permisos mínimos (documentación técnica §10). La galería usa el Photo Picker: sin permisos de almacenamiento. -->
     <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- P03 comprueba si hay Wi-Fi antes de ofrecer la descarga del modelo (§6.6); no da acceso a internet. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <!-- Sin cámara igual se puede registrar desde la galería o a mano (P19). -->
     <uses-feature android:name="android.hardware.camera.any" android:required="false"/>
 

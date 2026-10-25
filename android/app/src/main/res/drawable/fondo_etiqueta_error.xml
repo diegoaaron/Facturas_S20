@@ -1,0 +1,5 @@
+<!-- Etiqueta «anulada» de P11 y P12. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/color_error_claro"/>
+    <corners android:radius="14dp"/>
+</shape>

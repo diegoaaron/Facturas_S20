@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- «Semana del 21 al 27» en P11. -->
+<TextView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:accessibilityHeading="true"
+        android:textAppearance="@style/Texto.FacturasS20.Secundario"
+        android:textStyle="bold"
+        tools:text="Semana del 21 al 27"/>

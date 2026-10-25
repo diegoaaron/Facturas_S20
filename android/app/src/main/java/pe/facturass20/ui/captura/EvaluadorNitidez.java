@@ -10,8 +10,17 @@ package pe.facturass20.ui.captura;
  */
 public final class EvaluadorNitidez {
 
-    /** Umbral inicial de §6.4; hay que calibrarlo con el teléfono de referencia. */
-    public static final double UMBRAL_NITIDEZ = 100;
+    /**
+     * Umbral de la vista previa para habilitar el disparador. §6.4 partía de 100, pero con boletas (mucho
+     * papel blanco) rechazaba fotos bien enfocadas; sigue pendiente calibrarlo con el teléfono de referencia.
+     */
+    public static final double UMBRAL_NITIDEZ = 50;
+    /**
+     * Umbral de la foto ya preparada. Es más bajo porque el JPEG de la cámara (con reducción de ruido) y el
+     * escalado a 896 px suavizan los bordes y bajan la varianza respecto de la vista previa, que ya
+     * comprobó el enfoque; aquí solo se descartan las fotos claramente movidas.
+     */
+    public static final double UMBRAL_NITIDEZ_FOTO = 25;
     public static final double LUZ_MINIMA = 60;
     public static final double LUZ_MAXIMA = 200;
 
@@ -82,9 +91,22 @@ public final class EvaluadorNitidez {
             return luz > LUZ_MAXIMA ? Luz.EXCESIVA : Luz.BUENA;
         }
 
-        /** Nitidez y luz «buenas»: se puede disparar y la foto pasa a la lectura. */
+        /** Nitidez y luz «buenas» en la vista previa: se puede disparar. */
         public boolean legible() {
             return nitidezBuena() && nivelLuz() == Luz.BUENA;
+        }
+
+        /** La foto preparada (cámara o galería) pasa a la lectura; más tolerante que {@link #legible()}. */
+        public boolean fotoAceptable() {
+            return nitidez >= UMBRAL_NITIDEZ_FOTO && nivelLuz() == Luz.BUENA;
+        }
+
+        /**
+         * Imagen de la galería: como {@link #fotoAceptable()}, pero admite el brillo excesivo, porque una
+         * factura electrónica guardada como imagen (captura o PDF) es casi toda blanca y se lee bien.
+         */
+        public boolean imagenAceptable() {
+            return nitidez >= UMBRAL_NITIDEZ_FOTO && nivelLuz() != Luz.BAJA;
         }
     }
 }

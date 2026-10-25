@@ -127,5 +127,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/guia_galeria"/>
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/boton_manual"
+                style="@style/Widget.FacturasS20.Boton.Texto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/guia_a_mano"
+                android:textColor="@color/color_texto2"
+                android:textStyle="normal"/>
     </LinearLayout>
 </LinearLayout>

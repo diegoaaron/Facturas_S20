@@ -15,14 +15,13 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.google.android.material.snackbar.Snackbar;
-
 import pe.facturass20.R;
 import pe.facturass20.databinding.FragmentInicioBinding;
 import pe.facturass20.databinding.ItemFacturaResumenBinding;
 import pe.facturass20.dominio.modelo.FacturaCompra;
 import pe.facturass20.dominio.modelo.NivelAlerta;
 import pe.facturass20.ui.comun.Formatos;
+import pe.facturass20.ui.comun.Mensajes;
 
 /**
  * P04 Inicio: compras del mes con la barra del límite, ventas, categoría y cuota, vencimiento y las
@@ -53,12 +52,7 @@ public class InicioFragment extends Fragment {
         modelo.resumen().observe(getViewLifecycleOwner(), this::mostrar);
         modelo.ocupado().observe(getViewLifecycleOwner(), ocupado ->
                 binding.progreso.setVisibility(ocupado && modelo.resumen().getValue() == null ? View.VISIBLE : View.GONE));
-        modelo.mensaje().observe(getViewLifecycleOwner(), evento -> {
-            String texto = evento.tomar();
-            if (texto != null) {
-                Snackbar.make(binding.getRoot(), texto, Snackbar.LENGTH_LONG).show();
-            }
-        });
+        Mensajes.observar(this, modelo, binding.getRoot());
     }
 
     @Override

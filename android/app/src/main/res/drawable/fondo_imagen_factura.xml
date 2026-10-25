@@ -1,0 +1,5 @@
+<!-- Marco oscuro de la foto en P08 y P12. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/color_camara_fondo"/>
+    <corners android:radius="@dimen/radio_tarjeta"/>
+</shape>

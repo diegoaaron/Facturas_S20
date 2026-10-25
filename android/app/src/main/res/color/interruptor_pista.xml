@@ -1,0 +1,6 @@
+<!-- Pista de los interruptores: acento cuando están activados (prototipo P14, P15, P18). -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/color_borde" android:state_enabled="false"/>
+    <item android:color="@color/color_acento" android:state_checked="true"/>
+    <item android:color="@color/color_pista_barra"/>
+</selector>

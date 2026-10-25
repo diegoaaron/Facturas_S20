@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos de P16 Reporte y P17 Historial y cierre. -->
+<resources>
+    <!-- P16 -->
+    <string name="reporte_titulo">Reporte del mes</string>
+    <string name="reporte_encabezado">Reporte mensual de compras</string>
+    <string name="reporte_negocio">%1$s · RUC %2$s · NRUS</string>
+    <string name="reporte_categoria_corta">Cat. %1$d</string>
+    <string name="reporte_resumen_1">Compras %1$s · %2$s</string>
+    <string name="reporte_resumen_2">Cuota %1$s · vence %2$s</string>
+    <string name="reporte_fila">%1$s · %2$s</string>
+    <plurals name="reporte_mas">
+        <item quantity="one">… y %d factura más</item>
+        <item quantity="many">… y %d facturas más</item>
+        <item quantity="other">… y %d facturas más</item>
+    </plurals>
+    <plurals name="reporte_archivo">
+        <item quantity="one">%1$s · %2$d página</item>
+        <item quantity="many">%1$s · %2$d páginas</item>
+        <item quantity="other">%1$s · %2$d páginas</item>
+    </plurals>
+    <string name="reporte_incluidas">Facturas incluidas</string>
+    <plurals name="reporte_facturas_con_imagen">
+        <item quantity="one">%1$d (%2$d con imagen)</item>
+        <item quantity="many">%1$d (%2$d con imagen)</item>
+        <item quantity="other">%1$d (%2$d con imagen)</item>
+    </plurals>
+    <string name="reporte_ventas">Ventas del mes</string>
+    <string name="reporte_determinante">Monto determinante</string>
+    <string name="reporte_categoria_cuota">Categoría y cuota</string>
+    <string name="reporte_categoria_y_cuota">%1$d · %2$s</string>
+    <string name="reporte_compartir">Compartir con mi contador</string>
+    <string name="reporte_guardar">Guardar PDF en el teléfono</string>
+    <string name="reporte_faltan_ventas">Aún no registra las ventas del mes. El reporte las mostrará como «Sin registrar».</string>
+    <string name="reporte_pronto">La generación del PDF estará disponible en la próxima versión.</string>
+
+    <!-- P17 -->
+    <string name="historial_titulo">Historial de meses</string>
+    <string name="historial_abierto">abierto</string>
+    <string name="historial_cerrado">cerrado</string>
+    <string name="historial_montos">Compras %1$s · Ventas %2$s</string>
+    <string name="historial_compras">Compras %1$s</string>
+    <string name="historial_categoria_larga">Categoría %1$d · cuota %2$s</string>
+    <string name="historial_categoria_corta">Cat. %1$d · %2$s</string>
+    <string name="historial_cerrar">Cerrar el mes</string>
+    <string name="historial_registrar_ventas">Registrar ventas para cerrar</string>
+    <string name="historial_ver_facturas">Ver facturas del mes</string>
+    <string name="historial_cerrar_titulo">¿Cerrar %1$s?</string>
+    <string name="historial_cerrar_mensaje">Después ya no podrá registrar, anular ni cambiar las ventas de %1$s. La categoría y la cuota quedan fijas.</string>
+    <string name="historial_cerrar_en_curso">El mes todavía no termina.</string>
+    <string name="historial_cerrado_titulo">%1$s cerrado</string>
+    <string name="historial_exportar_ahora">Exportar ahora</string>
+    <string name="historial_despues">Después</string>
+    <string name="historial_acumulado">Acumulado de %1$d</string>
+    <string name="historial_compras_anio">Compras %1$s de %2$s (tope anual)</string>
+    <string name="historial_ventas_anio">Ventas registradas: %1$s</string>
+    <string name="historial_exportar_detalle">CSV, imágenes y PDF en un ZIP para su PC</string>
+</resources>

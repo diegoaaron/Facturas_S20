@@ -22,6 +22,8 @@
         <item name="materialButtonStyle">@style/Widget.FacturasS20.Boton</item>
         <item name="materialCardViewStyle">@style/Widget.FacturasS20.Tarjeta</item>
         <item name="textInputStyle">@style/Widget.FacturasS20.Campo</item>
+        <item name="materialSwitchStyle">@style/Widget.FacturasS20.Interruptor</item>
+        <item name="chipStyle">@style/Widget.FacturasS20.Chip</item>
     </style>
 
     <style name="Theme.FacturasS20" parent="Base.Theme.FacturasS20"/>
@@ -99,6 +101,61 @@
         <item name="shapeAppearance">@style/Forma.FacturasS20.Boton</item>
     </style>
 
+    <!-- Botón secundario con borde primario: «Ir al inicio» de P10, «Guardar PDF» de P16. -->
+    <style name="Widget.FacturasS20.Boton.Contorno" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:minHeight">@dimen/boton_grande_alto</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/boton_contorno_texto</item>
+        <item name="iconTint">@color/boton_contorno_texto</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">12dp</item>
+        <item name="strokeColor">@color/color_primario</item>
+        <item name="strokeWidth">2dp</item>
+        <item name="shapeAppearance">@style/Forma.FacturasS20.Boton</item>
+    </style>
+
+    <!-- «Anular y recalcular el mes» de P12. -->
+    <style name="Widget.FacturasS20.Boton.Contorno.Error">
+        <item name="android:textColor">@color/color_error</item>
+        <item name="iconTint">@color/color_error</item>
+        <item name="strokeColor">@color/color_error</item>
+    </style>
+
+    <!-- Barra superior primaria de las pantallas internas; el subtítulo es el mes o una ayuda. -->
+    <style name="Widget.FacturasS20.BarraSuperior" parent="Widget.Material3.Toolbar">
+        <item name="android:background">@color/color_primario</item>
+        <item name="android:minHeight">?attr/actionBarSize</item>
+        <item name="titleTextAppearance">@style/Texto.FacturasS20.Titulo</item>
+        <item name="titleTextColor">@color/color_superficie</item>
+        <item name="subtitleTextAppearance">@style/Texto.FacturasS20.Secundario</item>
+        <item name="subtitleTextColor">@color/color_texto_sobre_primario</item>
+        <item name="navigationIconTint">@color/color_superficie</item>
+    </style>
+
+    <style name="Widget.FacturasS20.BarraSuperior.Atras">
+        <item name="navigationIcon">@drawable/ic_atras</item>
+        <item name="navigationContentDescription">@string/atras</item>
+    </style>
+
+    <!-- Filtros de P11 y período de P20. -->
+    <style name="Widget.FacturasS20.Chip" parent="Widget.Material3.Chip.Filter">
+        <item name="chipBackgroundColor">@color/chip_fondo</item>
+        <item name="android:textColor">@color/chip_texto</item>
+        <item name="android:textSize">@dimen/texto_dato</item>
+        <item name="chipStrokeColor">@color/color_borde</item>
+        <item name="chipStrokeWidth">1.5dp</item>
+        <item name="chipMinHeight">@dimen/boton_alto</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="chipCornerRadius">@dimen/radio_boton</item>
+    </style>
+
+    <style name="Widget.FacturasS20.Interruptor" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="trackTint">@color/interruptor_pista</item>
+        <item name="trackDecorationTint">@android:color/transparent</item>
+        <item name="thumbTint">@color/color_superficie</item>
+    </style>
+
     <!-- Campo de texto con borde y esquinas de tarjeta (P01, P08, P19). -->
     <style name="Widget.FacturasS20.Campo" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="boxCornerRadiusTopStart">@dimen/radio_tarjeta</item>
@@ -172,6 +229,14 @@
     <style name="Texto.FacturasS20.Etiqueta" parent="TextAppearance.Material3.LabelLarge">
         <item name="android:textSize">@dimen/texto_secundario</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Encabezados de sección en mayúsculas: «MI NEGOCIO» (P18), «PERÍODO» (P20). -->
+    <style name="Texto.FacturasS20.Seccion" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textSize">@dimen/texto_secundario</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/color_texto2</item>
     </style>
 
     <style name="Texto.FacturasS20.Ayuda" parent="TextAppearance.Material3.BodySmall">

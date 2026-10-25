@@ -62,6 +62,41 @@ public class EvaluadorNitidezTest {
     }
 
     @Test
+    public void laFotoPreparadaToleraMenosNitidezQueLaVistaPrevia() {
+        // Bordes suaves (entre los dos umbrales): no habilita el disparador, pero la foto sí pasa.
+        byte[] luma = new byte[ANCHO * ALTO];
+        for (int y = 0; y < ALTO; y++) {
+            for (int x = 0; x < ANCHO; x++) {
+                luma[y * ANCHO + x] = (byte) (((x / 4 + y / 4) % 2 == 0) ? 120 : 125);
+            }
+        }
+        EvaluadorNitidez.Evaluacion evaluacion = EvaluadorNitidez.evaluar(luma, ANCHO, ALTO);
+        assertTrue(evaluacion.nitidez() >= EvaluadorNitidez.UMBRAL_NITIDEZ_FOTO);
+        assertTrue(evaluacion.nitidez() < EvaluadorNitidez.UMBRAL_NITIDEZ);
+        assertFalse(evaluacion.legible());
+        assertTrue(evaluacion.fotoAceptable());
+    }
+
+    @Test
+    public void facturaDigitalBlancaSeAceptaSoloDesdeLaGaleria() {
+        // Texto negro sobre blanco casi puro, como una factura electrónica guardada como imagen.
+        byte[] luma = uniforme(250);
+        for (int x = 8; x < ANCHO - 8; x++) {
+            luma[20 * ANCHO + x] = 0;
+        }
+        EvaluadorNitidez.Evaluacion evaluacion = EvaluadorNitidez.evaluar(luma, ANCHO, ALTO);
+        assertEquals(EvaluadorNitidez.Luz.EXCESIVA, evaluacion.nivelLuz());
+        assertFalse(evaluacion.fotoAceptable());
+        assertTrue(evaluacion.imagenAceptable());
+        assertFalse(EvaluadorNitidez.evaluar(uniforme(250), ANCHO, ALTO).imagenAceptable());
+    }
+
+    @Test
+    public void fotoUniformeNoEsAceptable() {
+        assertFalse(EvaluadorNitidez.evaluar(uniforme(128), ANCHO, ALTO).fotoAceptable());
+    }
+
+    @Test
     public void luzSeClasificaPorLaMedia() {
         assertEquals(EvaluadorNitidez.Luz.BAJA, EvaluadorNitidez.evaluar(uniforme(30), ANCHO, ALTO).nivelLuz());
         assertEquals(EvaluadorNitidez.Luz.BUENA, EvaluadorNitidez.evaluar(uniforme(60), ANCHO, ALTO).nivelLuz());

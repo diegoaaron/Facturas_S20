@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- P19 Registro manual (prototipo pantalla_19_registro_manual_sin.png): aviso de por qué se registra a
+     mano, los campos de la factura (sin moneda: solo soles) y la foto opcional. -->
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_fondo"
+        android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/barra"
+            style="@style/Widget.FacturasS20.BarraSuperior.Atras"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="@string/p19_titulo"/>
+
+    <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/margen">
+
+            <LinearLayout
+                    android:id="@+id/aviso"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/fondo_aviso"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/relleno_tarjeta">
+
+                <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_alerta"
+                        app:tint="@color/color_alerta_oscuro"/>
+
+                <TextView
+                        android:id="@+id/texto_aviso"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:textAppearance="@style/Texto.FacturasS20.Dato"
+                        tools:text="@string/manual_sin_ia"/>
+            </LinearLayout>
+
+            <include
+                    android:id="@+id/campos"
+                    layout="@layout/campos_factura"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"/>
+
+            <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tarjeta_foto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:minHeight="72dp"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/relleno_tarjeta">
+
+                    <ImageView
+                            android:id="@+id/imagen_foto"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:importantForAccessibility="no"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/ic_escanear"
+                            app:tint="@color/color_primario"/>
+
+                    <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                        <TextView
+                                android:id="@+id/texto_foto"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/manual_adjuntar_foto"
+                                android:textAppearance="@style/Texto.FacturasS20.Dato"
+                                android:textStyle="bold"/>
+
+                        <TextView
+                                android:id="@+id/texto_foto_ayuda"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/manual_adjuntar_ayuda"
+                                android:textAppearance="@style/Texto.FacturasS20.Ayuda"
+                                android:textSize="@dimen/texto_secundario"/>
+                    </LinearLayout>
+
+                    <com.google.android.material.progressindicator.CircularProgressIndicator
+                            android:id="@+id/progreso_foto"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:indeterminate="true"
+                            android:visibility="gone"
+                            app:indicatorColor="@color/color_primario"
+                            app:indicatorSize="24dp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/margen"
+            android:paddingTop="8dp"
+            android:paddingEnd="@dimen/margen"
+            android:paddingBottom="8dp">
+
+        <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <com.google.android.material.button.MaterialButton
+                    android:id="@+id/boton_guardar"
+                    style="@style/Widget.FacturasS20.Boton.Grande"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/verif_guardar"/>
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/progreso"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    app:indicatorColor="@color/color_superficie"/>
+        </FrameLayout>
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/boton_cancelar"
+                style="@style/Widget.FacturasS20.Boton.Texto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/cancelar"/>
+    </LinearLayout>
+</LinearLayout>

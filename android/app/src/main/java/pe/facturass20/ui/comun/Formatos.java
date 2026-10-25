@@ -57,6 +57,16 @@ public final class Formatos {
         return Character.toUpperCase(mes.charAt(0)) + mes.substring(1) + " " + periodo.getYear();
     }
 
+    /** {@code "septiembre"}, para frases como «Compras de septiembre». */
+    public static String mes(YearMonth periodo) {
+        return MESES[periodo.getMonthValue() - 1];
+    }
+
+    /** {@code 1450.5 → "1450,50"}: el importe tal como se escribe en un campo, sin «S/» ni separador de miles. */
+    public static String decimal(BigDecimal monto) {
+        return monto.setScale(2, RoundingMode.HALF_UP).toPlainString().replace('.', ',');
+    }
+
     private static String formatear(BigDecimal monto, boolean conDecimales) {
         BigDecimal redondeado = monto.setScale(2, RoundingMode.HALF_UP);
         String digitos = redondeado.abs().toPlainString();

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Compartir de P12: los datos de la factura como texto (la foto no sale del teléfono). -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/compartir"
+          android:icon="@drawable/ic_compartir"
+          android:title="@string/detalle_compartir"
+          app:iconTint="@color/color_superficie"
+          app:showAsAction="always"/>
+</menu>

@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- P14 Categoría y cuota (prototipo pantalla_14_categoria_y_cuota.png): lo que le corresponde, qué monto
+     decide, la tabla vigente y los avisos. Es la pestaña «Mes» de la barra inferior. -->
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_fondo"
+        android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/barra"
+            style="@style/Widget.FacturasS20.BarraSuperior"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="@string/p14_titulo"
+            tools:subtitle="Septiembre 2026"/>
+
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+        <androidx.core.widget.NestedScrollView
+                android:id="@+id/desplazamiento"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="40dp"
+                android:visibility="invisible"
+                tools:visibility="visible">
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/margen">
+
+                <!-- Le corresponde -->
+                <LinearLayout
+                        android:id="@+id/tarjeta_categoria"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/fondo_tarjeta_primaria"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="20dp">
+
+                    <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                        <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/p04_le_corresponde"
+                                android:textAppearance="@style/Texto.FacturasS20.Secundario"
+                                android:textColor="@color/color_texto_sobre_primario"/>
+
+                        <TextView
+                                android:id="@+id/texto_categoria"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="@style/Texto.FacturasS20.Monto"
+                                android:textColor="@color/color_superficie"
+                                tools:text="Categoría 1"/>
+
+                        <TextView
+                                android:id="@+id/texto_cuota"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:textAppearance="@style/Texto.FacturasS20.Dato"
+                                android:textColor="@color/color_acento"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                tools:text="Cuota mensual: S/ 20,00"/>
+                    </LinearLayout>
+
+                    <TextView
+                            android:id="@+id/texto_numero_categoria"
+                            android:layout_width="72dp"
+                            android:layout_height="72dp"
+                            android:background="@drawable/fondo_circulo_tecla_oscura"
+                            android:gravity="center"
+                            android:importantForAccessibility="no"
+                            android:textColor="@color/color_superficie"
+                            android:textSize="36sp"
+                            android:textStyle="bold"
+                            tools:text="1"/>
+                </LinearLayout>
+
+                <TextView
+                        android:id="@+id/texto_tope_anual"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/fondo_aviso"
+                        android:drawablePadding="10dp"
+                        android:gravity="center_vertical"
+                        android:padding="@dimen/relleno_tarjeta"
+                        android:textAppearance="@style/Texto.FacturasS20.Dato"
+                        android:textColor="@color/color_alerta_oscuro"
+                        android:visibility="gone"
+                        app:drawableStartCompat="@drawable/ic_alerta"
+                        app:drawableTint="@color/color_alerta_oscuro"
+                        tools:text="Sus compras o ventas del año se acercan al tope de S/ 96 000"
+                        tools:visibility="visible"/>
+
+                <!-- ¿Qué monto decide la categoría? -->
+                <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp">
+
+                    <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="@dimen/relleno_tarjeta">
+
+                        <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:accessibilityHeading="true"
+                                android:text="@string/categoria_que_decide"
+                                android:textAppearance="@style/Texto.FacturasS20.Dato"
+                                android:textStyle="bold"/>
+
+                        <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:orientation="horizontal">
+
+                            <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="@string/categoria_compras"
+                                    android:textAppearance="@style/Texto.FacturasS20.Secundario"/>
+
+                            <TextView
+                                    android:id="@+id/texto_compras"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textAppearance="@style/Texto.FacturasS20.Dato"
+                                    android:textStyle="bold"
+                                    tools:text="S/ 4 120,50 ← mayor"/>
+                        </LinearLayout>
+
+                        <pe.facturass20.ui.comun.BarraLimiteView
+                                android:id="@+id/barra_compras"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"/>
+
+                        <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:orientation="horizontal">
+
+                            <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="@string/categoria_ventas"
+                                    android:textAppearance="@style/Texto.FacturasS20.Secundario"/>
+
+                            <TextView
+                                    android:id="@+id/texto_ventas"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textAppearance="@style/Texto.FacturasS20.Dato"
+                                    android:textStyle="bold"
+                                    tools:text="S/ 3 900,00"/>
+                        </LinearLayout>
+
+                        <pe.facturass20.ui.comun.BarraLimiteView
+                                android:id="@+id/barra_ventas"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"/>
+
+                        <TextView
+                                android:id="@+id/texto_marca"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:textAppearance="@style/Texto.FacturasS20.Ayuda"
+                                android:textSize="@dimen/texto_secundario"
+                                tools:text="Línea negra: aviso al 80 % del límite (S/ 4 000)"/>
+
+                        <com.google.android.material.button.MaterialButton
+                                android:id="@+id/boton_ventas"
+                                style="@style/Widget.FacturasS20.Boton.Texto"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="@string/categoria_registrar_ventas"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Tabla del NRUS vigente -->
+                <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp">
+
+                    <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="@dimen/relleno_tarjeta">
+
+                        <TextView
+                                android:id="@+id/texto_tabla"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:accessibilityHeading="true"
+                                android:textAppearance="@style/Texto.FacturasS20.Dato"
+                                android:textStyle="bold"
+                                tools:text="Tabla del NRUS vigente (v2026.1)"/>
+
+                        <LinearLayout
+                                android:id="@+id/tabla"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="vertical"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Avisos -->
+                <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp">
+
+                    <LinearLayout
+                            android:id="@+id/avisos"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp">
+
+                        <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:accessibilityHeading="true"
+                                android:paddingStart="@dimen/relleno_tarjeta"
+                                android:paddingTop="8dp"
+                                android:paddingEnd="@dimen/relleno_tarjeta"
+                                android:text="@string/categoria_avisos"
+                                android:textAppearance="@style/Texto.FacturasS20.Dato"
+                                android:textStyle="bold"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Vencimiento e historial -->
+                <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp">
+
+                    <LinearLayout
+                            android:id="@+id/enlaces"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"/>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/progreso"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:visibility="gone"
+                app:indicatorColor="@color/color_primario"/>
+    </FrameLayout>
+</LinearLayout>

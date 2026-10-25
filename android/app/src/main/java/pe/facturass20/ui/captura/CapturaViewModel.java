@@ -3,6 +3,7 @@ package pe.facturass20.ui.captura;
 import android.app.Application;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -34,7 +35,7 @@ public class CapturaViewModel extends BaseViewModel {
     /** Ver {@link PreparadorFoto#desdeCamara}; los datos ya se copiaron del {@code ImageProxy}. */
     public void desdeCamara(byte[] jpeg, int ancho, int alto, Rect visible, int giro, MarcoEncuadre marco) {
         enFondo(() -> PreparadorFoto.desdeCamara(jpeg, ancho, alto, visible, giro, marco, contenedor().reloj().ahora()),
-                this::revisar);
+                foto -> revisar(foto, false));
     }
 
     public void desdeGaleria(Uri uri) {
@@ -44,16 +45,19 @@ public class CapturaViewModel extends BaseViewModel {
             } catch (IOException | PreparadorFoto.FotoInvalidaException | SecurityException e) {
                 return null;
             }
-        }, this::revisar);
+        }, foto -> revisar(foto, true));
     }
 
-    private void revisar(FotoCapturada foto) {
+    private void revisar(FotoCapturada foto, boolean deGaleria) {
         if (foto == null) {
             mostrarMensaje(texto(R.string.captura_imagen_invalida));
             return;
         }
         EvaluadorNitidez.Evaluacion evaluacion = foto.evaluacion();
-        if (!evaluacion.legible()) {
+        // Para calibrar los umbrales con fotos reales: adb logcat -s FacturasS20
+        Log.d("FacturasS20", String.format(java.util.Locale.ROOT, "Foto: nitidez %.1f, luz %.1f",
+                evaluacion.nitidez(), evaluacion.luz()));
+        if (!(deGaleria ? evaluacion.imagenAceptable() : evaluacion.fotoAceptable())) {
             mostrarMensaje(texto(motivo(evaluacion)));
             return;
         }

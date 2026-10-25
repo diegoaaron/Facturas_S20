@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- P03 Preparar lectura con IA (prototipo pantalla_03_preparar_lectura_con.png): comprobación del
+     teléfono, el modelo y las acciones. -->
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_fondo"
+        android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/barra"
+            style="@style/Widget.FacturasS20.BarraSuperior.Atras"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:subtitle="@string/modelo_subtitulo"
+            app:title="@string/modelo_titulo"/>
+
+    <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/margen">
+
+            <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/relleno_tarjeta">
+
+                    <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:accessibilityHeading="true"
+                            android:text="@string/modelo_comprobacion"
+                            android:textAppearance="@style/Texto.FacturasS20.Titulo"/>
+
+                    <LinearLayout
+                            android:id="@+id/comprobaciones"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="vertical"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/relleno_tarjeta">
+
+                    <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                        <ImageView
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/ic_procesador"
+                                app:tint="@color/color_primario"/>
+
+                        <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="14dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                            <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/modelo_nombre"
+                                    android:textAppearance="@style/Texto.FacturasS20.Titulo"/>
+
+                            <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/modelo_descripcion"
+                                    android:textAppearance="@style/Texto.FacturasS20.Secundario"/>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <TextView
+                            android:id="@+id/texto_estado"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:background="@drawable/fondo_nota"
+                            android:padding="12dp"
+                            android:text="@string/modelo_no_publicado"
+                            android:textAppearance="@style/Texto.FacturasS20.Dato"/>
+
+                    <TextView
+                            android:id="@+id/texto_descarga"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:textAppearance="@style/Texto.FacturasS20.Secundario"
+                            tools:text="Se descargará una sola vez (≈ 2,6 GB) por Wi-Fi. No se envía ningún dato suyo."/>
+
+                    <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:drawablePadding="10dp"
+                            android:text="@string/modelo_sha"
+                            android:textAppearance="@style/Texto.FacturasS20.Secundario"
+                            android:textColor="@color/color_ok"
+                            app:drawableStartCompat="@drawable/ic_candado"
+                            app:drawableTint="@color/color_ok"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/margen"
+            android:paddingEnd="@dimen/margen"
+            android:paddingBottom="8dp">
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/boton_descargar"
+                style="@style/Widget.FacturasS20.Boton.Contorno"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:text="@string/modelo_descargar"
+                app:icon="@drawable/ic_descargar"/>
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/boton_manual"
+                style="@style/Widget.FacturasS20.Boton.Texto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/modelo_a_mano"/>
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/modelo_privacidad"
+                android:textAppearance="@style/Texto.FacturasS20.Ayuda"/>
+    </LinearLayout>
+</LinearLayout>

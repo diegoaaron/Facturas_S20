@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Un mes cerrado en P17: compras, categoría y cuota congeladas; tocarlo abre su reporte (P16). -->
+<com.google.android.material.card.MaterialCardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:minHeight="80dp"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/relleno_tarjeta"
+            android:paddingTop="12dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="12dp">
+
+        <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+            <TextView
+                    android:id="@+id/texto_mes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/Texto.FacturasS20.Dato"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    tools:text="Agosto 2026"/>
+
+            <TextView
+                    android:id="@+id/texto_compras"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textAppearance="@style/Texto.FacturasS20.Secundario"
+                    tools:text="Compras S/ 4 480,20"/>
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:orientation="vertical">
+
+            <TextView
+                    android:id="@+id/texto_categoria"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/Texto.FacturasS20.Dato"
+                    android:textColor="@color/color_primario"
+                    android:textStyle="bold"
+                    tools:text="Cat. 1 · S/ 20"/>
+
+            <TextView
+                    android:id="@+id/texto_estado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/fondo_etiqueta_neutra"
+                    android:paddingStart="12dp"
+                    android:paddingTop="2dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="2dp"
+                    android:text="@string/historial_cerrado"
+                    android:textAppearance="@style/Texto.FacturasS20.Etiqueta"
+                    android:textColor="@color/color_texto2"/>
+        </LinearLayout>
+
+        <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="8dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_chevron"
+                app:tint="@color/color_inactivo"/>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

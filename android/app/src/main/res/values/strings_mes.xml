@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos de P13 Ventas, P14 Categoría y cuota y P15 Vencimiento. -->
+<resources>
+    <!-- P13 -->
+    <string name="ventas_titulo">Ventas de %1$s</string>
+    <string name="ventas_solo_total">Ingrese solo el total de ventas del mes.</string>
+    <string name="ventas_total">Total de ventas del mes</string>
+    <string name="ventas_compras">Compras registradas: %1$s</string>
+    <string name="ventas_guardar">Guardar ventas</string>
+    <string name="ventas_hasta_cerrar">Puede cambiarlo hasta cerrar el mes</string>
+    <string name="ventas_mes_cerrado">Este mes ya está cerrado; las ventas no se pueden cambiar.</string>
+
+    <!-- P14 -->
+    <string name="categoria_cuota_mensual">Cuota mensual: %1$s</string>
+    <string name="categoria_que_decide">¿Qué monto decide la categoría?</string>
+    <string name="categoria_compras">Compras</string>
+    <string name="categoria_ventas">Ventas</string>
+    <string name="categoria_mayor">" ← mayor"</string>
+    <string name="categoria_marca">Línea negra: aviso al %1$s del límite (%2$s)</string>
+    <string name="categoria_registrar_ventas">Registrar ventas</string>
+    <string name="categoria_editar_ventas">Editar ventas</string>
+    <string name="categoria_tabla">Tabla del NRUS vigente (v%1$s)</string>
+    <string name="categoria_codigo">Cat. %1$d</string>
+    <string name="categoria_hasta">hasta %1$s</string>
+    <string name="categoria_avisos">Avisos</string>
+    <string name="categoria_aviso_80" formatted="false">Al llegar al 80 % del límite</string>
+    <string name="categoria_aviso_100">Al superar el límite de la categoría</string>
+    <string name="categoria_aviso_tope">Al acercarse a los topes anuales</string>
+    <string name="categoria_vencimiento_detalle">Hasta cuándo declarar y pagar</string>
+    <string name="categoria_historial_detalle">Meses anteriores y cierre del mes</string>
+
+    <!-- P15 -->
+    <string name="vencimiento_declare">Declare y pague hasta el</string>
+    <string name="vencimiento_digito">La declaración de %1$s vence según el último dígito de su RUC (%2$d) en el cronograma de la SUNAT.</string>
+    <string name="vencimiento_dia_limite">%1$d, fecha límite</string>
+    <string name="vencimiento_recordatorios">Recordatorios</string>
+    <string name="vencimiento_5_dias">5 días antes</string>
+    <string name="vencimiento_1_dia">1 día antes</string>
+    <string name="vencimiento_ver_reporte">Ver reporte para declarar</string>
+</resources>

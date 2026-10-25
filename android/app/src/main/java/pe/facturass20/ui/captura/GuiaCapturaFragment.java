@@ -30,7 +30,7 @@ import pe.facturass20.databinding.ItemConsejoCapturaBinding;
 
 /**
  * P05 Guía de captura (prototipo pantalla_05_guia_de_captura.png): consejos para la foto, «Abrir cámara»
- * (P06), «Elegir de la galería» (RF-03) y «No volver a mostrar esta guía».
+ * (P06), «Elegir de la galería» (RF-03), «Escribir los datos a mano» (P19) y «No volver a mostrar esta guía».
  *
  * <p>Si el usuario marcó esa casilla, Escanear sigue pasando por aquí pero la cámara se abre sola y, al
  * cerrarla sin foto, se vuelve a la pantalla anterior; así el flujo principal queda en 3 toques (RNF-09).</p>
@@ -88,6 +88,8 @@ public class GuiaCapturaFragment extends Fragment {
         binding.botonAbrirCamara.setOnClickListener(v -> abrirCamara());
         binding.botonGaleria.setOnClickListener(v -> elegirDeGaleria.launch(new PickVisualMediaRequest.Builder()
                 .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE).build()));
+        binding.botonManual.setOnClickListener(v ->
+                NavHostFragment.findNavController(this).navigate(R.id.guiaCaptura_a_registroManual));
 
         modelo.fotoLista().observe(getViewLifecycleOwner(), evento -> {
             if (evento.tomar() != null) {

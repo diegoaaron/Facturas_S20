@@ -88,6 +88,14 @@ final class Mapeos {
         return e;
     }
 
+    static ImagenFactura aDominio(ImagenFacturaEntity e) {
+        return new ImagenFactura(e.rutaCifrada, e.nitidez, e.fechaCaptura);
+    }
+
+    static CampoExtraido aDominio(CampoExtraidoEntity e) {
+        return new CampoExtraido(e.nombreCampo, e.valorLeido, e.valorFinal, e.confianza);
+    }
+
     static CampoExtraidoEntity aEntidad(CampoExtraido campo, long idFactura, Long idModelo) {
         CampoExtraidoEntity e = new CampoExtraidoEntity();
         e.idFactura = idFactura;

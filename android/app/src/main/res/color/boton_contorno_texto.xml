@@ -1,0 +1,5 @@
+<!-- Texto de los botones con borde; gris si están desactivados. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/color_inactivo" android:state_enabled="false"/>
+    <item android:color="@color/color_primario"/>
+</selector>

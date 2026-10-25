@@ -3,6 +3,7 @@ package pe.facturass20.dominio.puertos;
 import java.util.List;
 import java.util.Optional;
 
+import pe.facturass20.dominio.modelo.CampoExtraido;
 import pe.facturass20.dominio.modelo.Determinacion;
 import pe.facturass20.dominio.modelo.Emisor;
 import pe.facturass20.dominio.modelo.FacturaCompra;
@@ -23,6 +24,12 @@ public interface FacturaRepositorio {
 
     /** Para autocompletar la razón social en el registro manual (P19). */
     Optional<Emisor> buscarEmisor(String ruc);
+
+    /** La foto guardada de la factura (P12); vacía si se registró a mano sin foto. */
+    Optional<ImagenFactura> buscarImagen(long idFactura);
+
+    /** Lo que leyó la IA y lo que dejó el usuario, campo por campo (P12); vacía si se registró a mano. */
+    List<CampoExtraido> buscarCampos(long idFactura);
 
     /**
      * En una sola transacción: crea el mes si no existe, guarda o actualiza el emisor, inserta la factura,

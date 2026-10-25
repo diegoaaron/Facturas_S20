@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- P07 Lectura (prototipo pantalla_07_lectura_en_el.png): porcentaje en el círculo, campos que se van
+     leyendo y el aviso de que la IA corre en el teléfono. -->
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_superficie"
+        android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/barra"
+            style="@style/Widget.FacturasS20.BarraSuperior.Atras"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="@string/lectura_titulo"/>
+
+    <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingStart="@dimen/margen_amplio"
+                android:paddingTop="32dp"
+                android:paddingEnd="@dimen/margen_amplio"
+                android:paddingBottom="16dp">
+
+            <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                        android:id="@+id/circulo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:max="100"
+                        app:indicatorColor="@color/color_primario"
+                        app:indicatorSize="190dp"
+                        app:trackColor="@color/color_pista_barra"
+                        app:trackThickness="18dp"
+                        app:indicatorTrackGapSize="0dp"
+                        tools:progress="71"/>
+
+                <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical">
+
+                    <TextView
+                            android:id="@+id/texto_porcentaje"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/Texto.FacturasS20.Monto"
+                            android:textSize="44sp"
+                            tools:text="71 %"/>
+
+                    <TextView
+                            android:id="@+id/texto_restante"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/Texto.FacturasS20.Secundario"
+                            tools:text="≈ 4 s restantes"/>
+                </LinearLayout>
+            </FrameLayout>
+
+            <LinearLayout
+                    android:id="@+id/lista_campos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    android:orientation="vertical"/>
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="28dp"
+                    android:background="@drawable/fondo_tarjeta_ok"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/relleno_tarjeta">
+
+                <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_procesador"
+                        app:tint="@color/color_primario"/>
+
+                <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                    <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/lectura_sin_red"
+                            android:textAppearance="@style/Texto.FacturasS20.Dato"
+                            android:textColor="@color/color_primario"
+                            android:textStyle="bold"/>
+
+                    <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/lectura_modelo_prueba"
+                            android:textAppearance="@style/Texto.FacturasS20.Ayuda"
+                            android:textSize="@dimen/texto_secundario"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.button.MaterialButton
+            android:id="@+id/boton_cancelar"
+            style="@style/Widget.FacturasS20.Boton.Texto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margen_amplio"
+            android:layout_marginEnd="@dimen/margen_amplio"
+            android:layout_marginBottom="16dp"
+            android:text="@string/cancelar"/>
+</LinearLayout>

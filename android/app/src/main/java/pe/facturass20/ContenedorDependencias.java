@@ -22,14 +22,17 @@ import pe.facturass20.dominio.casosuso.RegistrarFactura;
 import pe.facturass20.dominio.casosuso.RegistrarVentas;
 import pe.facturass20.dominio.casosuso.VerificarFactura;
 import pe.facturass20.dominio.puertos.ContribuyenteRepositorio;
+import pe.facturass20.dominio.puertos.ExtractorFacturas;
 import pe.facturass20.dominio.puertos.FacturaRepositorio;
 import pe.facturass20.dominio.puertos.ParametrosRepositorio;
 import pe.facturass20.dominio.puertos.PeriodoRepositorio;
 import pe.facturass20.dominio.puertos.Reloj;
+import pe.facturass20.inferencia.ExtractorFalso;
 import pe.facturass20.ui.acceso.PreferenciasAcceso;
 import pe.facturass20.ui.acceso.Sesion;
 import pe.facturass20.ui.captura.CapturaEnCurso;
 import pe.facturass20.ui.captura.PreferenciasCaptura;
+import pe.facturass20.ui.mes.PreferenciasAvisos;
 
 /**
  * Inyección de dependencias manual (documentación técnica §3.1): crea una sola vez los adaptadores
@@ -38,18 +41,22 @@ import pe.facturass20.ui.captura.PreferenciasCaptura;
  * <p>La base de datos y sus repositorios se crean la primera vez que se piden (la clave sale del
  * Keystore), siempre desde un hilo de fondo; en ese momento también se cargan los parámetros del NRUS,
  * así ninguna pantalla los lee antes de tiempo. La primera en pedirlos es {@link Sesion#comprobar()}, al
- * abrir la app. Faltan por agregar el extractor de facturas (falso primero, Gemma después) y el
- * exportador de datos.</p>
+ * abrir la app. El extractor de facturas es por ahora {@link ExtractorFalso} (en I4, Gemma en el
+ * teléfono); falta agregar el exportador de datos (I5).</p>
  */
 public final class ContenedorDependencias {
 
     private final Context contexto;
     private final ExecutorService ejecutor = Executors.newFixedThreadPool(2);
+    /** Un solo hilo para el modelo: nunca corren dos lecturas a la vez (cada una ocupa ~2 GB con Gemma). */
+    private final ExecutorService ejecutorInferencia = Executors.newSingleThreadExecutor();
     private final Reloj reloj = Reloj.sistema();
     private final PreferenciasAcceso preferenciasAcceso;
     private final Sesion sesion;
     private final PreferenciasCaptura preferenciasCaptura;
     private final CapturaEnCurso capturaEnCurso = new CapturaEnCurso();
+    private final PreferenciasAvisos preferenciasAvisos;
+    private final ExtractorFacturas extractor = new ExtractorFalso(reloj::hoy);
     private Adaptadores adaptadores;
 
     ContenedorDependencias(Context contexto) {
@@ -57,11 +64,22 @@ public final class ContenedorDependencias {
         preferenciasAcceso = new PreferenciasAcceso(this.contexto);
         sesion = new Sesion(ejecutor, () -> gestorPin().tienePin());
         preferenciasCaptura = new PreferenciasCaptura(this.contexto);
+        preferenciasAvisos = new PreferenciasAvisos(this.contexto);
     }
 
     /** Hilos de fondo para la base de datos, la inferencia, el PDF y la exportación; nunca el hilo de UI. */
     public ExecutorService ejecutor() {
         return ejecutor;
+    }
+
+    /** Hilo de la lectura con IA (P07). */
+    public ExecutorService ejecutorInferencia() {
+        return ejecutorInferencia;
+    }
+
+    /** Lee los 7 campos de la foto (P07). */
+    public ExtractorFacturas extractor() {
+        return extractor;
     }
 
     public Reloj reloj() {
@@ -79,6 +97,11 @@ public final class ContenedorDependencias {
 
     public PreferenciasCaptura preferenciasCaptura() {
         return preferenciasCaptura;
+    }
+
+    /** Avisos del NRUS y recordatorios del vencimiento que el usuario activó (P14, P15). */
+    public PreferenciasAvisos preferenciasAvisos() {
+        return preferenciasAvisos;
     }
 
     /** La foto que va de la cámara a la lectura y la verificación (P06 → P07 → P08). */

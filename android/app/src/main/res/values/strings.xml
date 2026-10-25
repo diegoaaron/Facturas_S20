@@ -29,10 +29,6 @@
     <string name="p19_titulo">Registro manual</string>
     <string name="p20_titulo">Exportar datos</string>
 
-    <!-- Pantalla provisional mientras se construye cada destino -->
-    <string name="pendiente_codigo">Pantalla %1$s</string>
-    <string name="pendiente_detalle">Esta pantalla todavía está en construcción.</string>
-
     <!-- Comunes -->
     <string name="cancelar">Cancelar</string>
     <string name="error_generico">Ocurrió un problema. Intente de nuevo.</string>

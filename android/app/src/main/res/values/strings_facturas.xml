@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos de P11 Facturas del mes y P12 Detalle y anulación. -->
+<resources>
+    <!-- P11 -->
+    <string name="facturas_titulo">Facturas de %1$s</string>
+    <string name="facturas_buscar">Buscar</string>
+    <string name="facturas_buscar_ayuda">Proveedor, RUC o número</string>
+    <string name="facturas_filtro_todas">Todas</string>
+    <string name="facturas_filtro_ia">Leídas por IA</string>
+    <string name="facturas_filtro_manuales">Manuales</string>
+    <string name="facturas_filtro_anuladas">Anuladas</string>
+    <string name="facturas_filtro_con_numero">%1$s (%2$d)</string>
+    <string name="facturas_semana">Semana del %1$d al %2$d</string>
+    <string name="facturas_documento">%1$s-%2$s · %3$s</string>
+    <string name="facturas_etiqueta_ia">IA</string>
+    <string name="facturas_etiqueta_manual">manual</string>
+    <string name="facturas_etiqueta_anulada">anulada</string>
+    <string name="facturas_sin_resultados">No hay facturas con ese filtro</string>
+    <plurals name="facturas_total_mes">
+        <item quantity="one">Total del mes (%d factura)</item>
+        <item quantity="many">Total del mes (%d facturas)</item>
+        <item quantity="other">Total del mes (%d facturas)</item>
+    </plurals>
+
+    <!-- P12 -->
+    <string name="detalle_ruc">RUC</string>
+    <string name="detalle_serie_numero">Serie y número</string>
+    <string name="detalle_registro">Registro</string>
+    <string name="detalle_registro_manual">Escrita a mano</string>
+    <string name="detalle_registro_ia">Leída por IA</string>
+    <plurals name="detalle_registro_ia_corregida">
+        <item quantity="one">Leída por IA · %d campo corregido</item>
+        <item quantity="many">Leída por IA · %d campos corregidos</item>
+        <item quantity="other">Leída por IA · %d campos corregidos</item>
+    </plurals>
+    <string name="detalle_sin_foto">Registrada sin foto</string>
+    <string name="detalle_anular">Anular esta factura</string>
+    <string name="detalle_anulada">Anulada: %1$s. Ya no suma al total del mes.</string>
+    <string name="detalle_anulada_ok">Factura anulada. El total del mes se recalculó.</string>
+    <string name="detalle_mes_cerrado">El mes de esta factura está cerrado; ya no se puede anular.</string>
+    <string name="detalle_compartir">Compartir los datos</string>
+    <string name="detalle_compartir_texto">Factura de compra\n%1$s (RUC %2$s)\n%3$s-%4$s · %5$s\nImporte: %6$s</string>
+
+    <!-- Hoja de anulación -->
+    <string name="anulacion_titulo">Anular esta factura</string>
+    <string name="anulacion_descuento">Se descontará %1$s del total del mes.</string>
+    <string name="anulacion_motivo_error">Registrada por error</string>
+    <string name="anulacion_motivo_duplicado">Es un duplicado</string>
+    <string name="anulacion_motivo_devolucion">Mercadería devuelta al proveedor</string>
+    <string name="anulacion_motivo_otro">Otro motivo</string>
+    <string name="anulacion_otro_ayuda">Escriba el motivo</string>
+    <string name="anulacion_otro_falta">Escriba el motivo de la anulación.</string>
+    <string name="anulacion_confirmar">Anular y recalcular el mes</string>
+</resources>

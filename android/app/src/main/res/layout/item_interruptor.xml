@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fila con interruptor: avisos de P14, recordatorios de P15, huella y guía de P18, contenido de P20. -->
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:minHeight="56dp"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/relleno_tarjeta"
+        android:paddingEnd="12dp">
+
+    <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+        <TextView
+                android:id="@+id/texto_titulo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/Texto.FacturasS20.Dato"
+                tools:text="Al llegar al 80 % del límite"/>
+
+        <TextView
+                android:id="@+id/texto_detalle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/Texto.FacturasS20.Secundario"
+                android:visibility="gone"/>
+    </LinearLayout>
+
+    <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/interruptor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"/>
+</LinearLayout>

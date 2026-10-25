@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Grafo de navegación (documentación técnica §8.2).
-     Los destinos que aún no se construyen usan PantallaPendienteFragment; cada uno se reemplaza por su Fragment.
      P06 CapturaActivity no es un destino: guiaCaptura (P05) la abre con un ActivityResultLauncher y, si vuelve
-     con la foto, sigue a lectura. Falta DuplicadoDialog (P09, desde verificacion).
+     con la foto, sigue a lectura. P09 DuplicadoDialog tampoco: lo abren verificacion y registroManual como
+     diálogo hijo y les devuelve la elección.
      MainActivity cambia el destino inicial según ui.acceso.Sesion: configuracion (P01) sin configurar,
      acceso (P02) bloqueada, inicio (P04) desbloqueada. Por eso P01 y P02 no navegan: desbloquean la sesión y
-     MainActivity reemplaza el grafo con inicio como raíz (así Atrás no vuelve al PIN).
-     En I4, si no hay modelo instalado, la sesión desbloqueada empezará en preparacionModelo (P03). -->
+     MainActivity reemplaza el grafo con inicio como raíz (así Atrás no vuelve al PIN). Como inicio siempre es
+     la raíz, las pantallas que terminan un flujo (P08, P10, P19) vuelven con popUpTo inicio.
+     En I4, si no hay modelo instalado, la sesión desbloqueada empezará en preparacionModelo (P03).
+     Los argumentos «periodo» van como texto AAAA-MM; vacío es el mes en curso. -->
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/nav_graph"
@@ -18,10 +20,8 @@
               android:label="@string/p01_titulo"/>
     <fragment android:id="@+id/acceso" android:name="pe.facturass20.ui.acceso.AccesoFragment"
               android:label="@string/p02_titulo"/>
-    <fragment android:id="@+id/preparacionModelo" android:name="pe.facturass20.ui.comun.PantallaPendienteFragment"
+    <fragment android:id="@+id/preparacionModelo" android:name="pe.facturass20.ui.ajustes.PreparacionModeloFragment"
               android:label="@string/p03_titulo">
-        <argument android:name="codigo" app:argType="string" android:defaultValue="P03"/>
-        <argument android:name="titulo" app:argType="reference" android:defaultValue="@string/p03_titulo"/>
         <action android:id="@+id/preparacionModelo_a_inicio" app:destination="@id/inicio"/>
         <action android:id="@+id/preparacionModelo_a_registroManual" app:destination="@id/registroManual"/>
     </fragment>
@@ -41,82 +41,79 @@
         <action android:id="@+id/guiaCaptura_a_lectura" app:destination="@id/lectura"/>
         <action android:id="@+id/guiaCaptura_a_registroManual" app:destination="@id/registroManual"/>
     </fragment>
-    <fragment android:id="@+id/lectura" android:name="pe.facturass20.ui.comun.PantallaPendienteFragment"
+    <fragment android:id="@+id/lectura" android:name="pe.facturass20.ui.verificacion.LecturaFragment"
               android:label="@string/p07_titulo">
-        <argument android:name="codigo" app:argType="string" android:defaultValue="P07"/>
-        <argument android:name="titulo" app:argType="reference" android:defaultValue="@string/p07_titulo"/>
-        <action android:id="@+id/lectura_a_verificacion" app:destination="@id/verificacion"/>
+        <action android:id="@+id/lectura_a_verificacion" app:destination="@id/verificacion"
+                app:popUpTo="@id/lectura" app:popUpToInclusive="true"/>
+        <action android:id="@+id/lectura_a_registroManual" app:destination="@id/registroManual"
+                app:popUpTo="@id/lectura" app:popUpToInclusive="true"/>
     </fragment>
-    <fragment android:id="@+id/verificacion" android:name="pe.facturass20.ui.comun.PantallaPendienteFragment"
+    <fragment android:id="@+id/verificacion" android:name="pe.facturass20.ui.verificacion.VerificacionFragment"
               android:label="@string/p08_titulo">
-        <argument android:name="codigo" app:argType="string" android:defaultValue="P08"/>
-        <argument android:name="titulo" app:argType="reference" android:defaultValue="@string/p08_titulo"/>
-        <action android:id="@+id/verificacion_a_guardada" app:destination="@id/guardada"/>
+        <action android:id="@+id/verificacion_a_guardada" app:destination="@id/guardada"
+                app:popUpTo="@id/inicio"/>
+        <action android:id="@+id/verificacion_a_detalleFactura" app:destination="@id/detalleFactura"
+                app:popUpTo="@id/inicio"/>
     </fragment>
-    <fragment android:id="@+id/guardada" android:name="pe.facturass20.ui.comun.PantallaPendienteFragment"
+    <fragment android:id="@+id/guardada" android:name="pe.facturass20.ui.verificacion.GuardadaFragment"
               android:label="@string/p10_titulo">
-        <argument android:name="codigo" app:argType="string" android:defaultValue="P10"/>
-        <argument android:name="titulo" app:argType="reference" android:defaultValue="@string/p10_titulo"/>
-        <action android:id="@+id/guardada_a_guiaCaptura" app:destination="@id/guiaCaptura"/>
-        <action android:id="@+id/guardada_a_inicio" app:destination="@id/inicio"/>
+        <argument android:name="idFactura" app:argType="long"/>
+        <action android:id="@+id/guardada_a_guiaCaptura" app:destination="@id/guiaCaptura"
+                app:popUpTo="@id/inicio"/>
     </fragment>
-    <fragment android:id="@+id/facturas" android:name="pe.facturass20.ui.comun.PantallaPendienteFragment"
+    <fragment android:id="@+id/facturas" android:name="pe.facturass20.ui.facturas.ListaFacturasFragment"
               android:label="@string/p11_titulo">
-        <argument android:name="codigo" app:argType="string" android:defaultValue="P11"/>
-        <argument android:name="titulo" app:argType="reference" android:defaultValue="@string/p11_titulo"/>
+        <argument android:name="periodo" app:argType="string" android:defaultValue=""/>
         <action android:id="@+id/facturas_a_detalleFactura" app:destination="@id/detalleFactura"/>
     </fragment>
-    <fragment android:id="@+id/detalleFactura" android:name="pe.facturass20.ui.comun.PantallaPendienteFragment"
+    <fragment android:id="@+id/detalleFactura" android:name="pe.facturass20.ui.facturas.DetalleFacturaFragment"
               android:label="@string/p12_titulo">
-        <argument android:name="codigo" app:argType="string" android:defaultValue="P12"/>
-        <argument android:name="titulo" app:argType="reference" android:defaultValue="@string/p12_titulo"/>
         <argument android:name="idFactura" app:argType="long" android:defaultValue="0L"/>
     </fragment>
-    <fragment android:id="@+id/ventas" android:name="pe.facturass20.ui.comun.PantallaPendienteFragment"
+    <fragment android:id="@+id/ventas" android:name="pe.facturass20.ui.mes.VentasFragment"
               android:label="@string/p13_titulo">
-        <argument android:name="codigo" app:argType="string" android:defaultValue="P13"/>
-        <argument android:name="titulo" app:argType="reference" android:defaultValue="@string/p13_titulo"/>
-        <action android:id="@+id/ventas_a_categoria" app:destination="@id/categoria"/>
+        <!-- "AAAA-MM" de un mes abierto anterior (desde P17); vacío = mes en curso. -->
+        <argument android:name="periodo" app:argType="string" android:defaultValue=""/>
+        <action android:id="@+id/ventas_a_categoria" app:destination="@id/categoria"
+                app:popUpTo="@id/ventas" app:popUpToInclusive="true"/>
     </fragment>
-    <fragment android:id="@+id/categoria" android:name="pe.facturass20.ui.comun.PantallaPendienteFragment"
+    <fragment android:id="@+id/categoria" android:name="pe.facturass20.ui.mes.CategoriaFragment"
               android:label="@string/p14_titulo">
-        <argument android:name="codigo" app:argType="string" android:defaultValue="P14"/>
-        <argument android:name="titulo" app:argType="reference" android:defaultValue="@string/p14_titulo"/>
         <action android:id="@+id/categoria_a_vencimiento" app:destination="@id/vencimiento"/>
+        <action android:id="@+id/categoria_a_ventas" app:destination="@id/ventas"/>
+        <action android:id="@+id/categoria_a_historial" app:destination="@id/historial"/>
     </fragment>
-    <fragment android:id="@+id/vencimiento" android:name="pe.facturass20.ui.comun.PantallaPendienteFragment"
+    <fragment android:id="@+id/vencimiento" android:name="pe.facturass20.ui.mes.VencimientoFragment"
               android:label="@string/p15_titulo">
-        <argument android:name="codigo" app:argType="string" android:defaultValue="P15"/>
-        <argument android:name="titulo" app:argType="reference" android:defaultValue="@string/p15_titulo"/>
         <action android:id="@+id/vencimiento_a_reporte" app:destination="@id/reporte"/>
     </fragment>
-    <fragment android:id="@+id/reporte" android:name="pe.facturass20.ui.comun.PantallaPendienteFragment"
+    <fragment android:id="@+id/reporte" android:name="pe.facturass20.ui.reportes.ReporteFragment"
               android:label="@string/p16_titulo">
-        <argument android:name="codigo" app:argType="string" android:defaultValue="P16"/>
-        <argument android:name="titulo" app:argType="reference" android:defaultValue="@string/p16_titulo"/>
+        <argument android:name="periodo" app:argType="string" android:defaultValue=""/>
     </fragment>
-    <fragment android:id="@+id/historial" android:name="pe.facturass20.ui.comun.PantallaPendienteFragment"
+    <fragment android:id="@+id/historial" android:name="pe.facturass20.ui.reportes.HistorialFragment"
               android:label="@string/p17_titulo">
-        <argument android:name="codigo" app:argType="string" android:defaultValue="P17"/>
-        <argument android:name="titulo" app:argType="reference" android:defaultValue="@string/p17_titulo"/>
         <action android:id="@+id/historial_a_exportarDatos" app:destination="@id/exportarDatos"/>
+        <action android:id="@+id/historial_a_reporte" app:destination="@id/reporte"/>
+        <action android:id="@+id/historial_a_facturas" app:destination="@id/facturas"/>
+        <action android:id="@+id/historial_a_ventas" app:destination="@id/ventas"/>
     </fragment>
-    <fragment android:id="@+id/ajustes" android:name="pe.facturass20.ui.comun.PantallaPendienteFragment"
+    <fragment android:id="@+id/ajustes" android:name="pe.facturass20.ui.ajustes.AjustesFragment"
               android:label="@string/p18_titulo">
-        <argument android:name="codigo" app:argType="string" android:defaultValue="P18"/>
-        <argument android:name="titulo" app:argType="reference" android:defaultValue="@string/p18_titulo"/>
         <action android:id="@+id/ajustes_a_exportarDatos" app:destination="@id/exportarDatos"/>
         <action android:id="@+id/ajustes_a_preparacionModelo" app:destination="@id/preparacionModelo"/>
+        <action android:id="@+id/ajustes_a_categoria" app:destination="@id/categoria"/>
     </fragment>
-    <fragment android:id="@+id/registroManual" android:name="pe.facturass20.ui.comun.PantallaPendienteFragment"
+    <fragment android:id="@+id/registroManual" android:name="pe.facturass20.ui.ajustes.RegistroManualFragment"
               android:label="@string/p19_titulo">
-        <argument android:name="codigo" app:argType="string" android:defaultValue="P19"/>
-        <argument android:name="titulo" app:argType="reference" android:defaultValue="@string/p19_titulo"/>
-        <action android:id="@+id/registroManual_a_guardada" app:destination="@id/guardada"/>
+        <!-- Por qué se registra a mano: «guia» (lo eligió en P05), «lectura» (la IA no pudo leer la foto, que se
+             adjunta) o «sin_ia» (el teléfono no puede usar el modelo, P03). Cambia el aviso de arriba. -->
+        <argument android:name="motivo" app:argType="string" android:defaultValue="guia"/>
+        <action android:id="@+id/registroManual_a_guardada" app:destination="@id/guardada"
+                app:popUpTo="@id/inicio"/>
+        <action android:id="@+id/registroManual_a_detalleFactura" app:destination="@id/detalleFactura"
+                app:popUpTo="@id/inicio"/>
     </fragment>
-    <fragment android:id="@+id/exportarDatos" android:name="pe.facturass20.ui.comun.PantallaPendienteFragment"
-              android:label="@string/p20_titulo">
-        <argument android:name="codigo" app:argType="string" android:defaultValue="P20"/>
-        <argument android:name="titulo" app:argType="reference" android:defaultValue="@string/p20_titulo"/>
-    </fragment>
+    <fragment android:id="@+id/exportarDatos" android:name="pe.facturass20.ui.exportacion.ExportarDatosFragment"
+              android:label="@string/p20_titulo"/>
 </navigation>

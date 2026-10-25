@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- P16 Reporte (prototipo pantalla_16_reporte_mensual.png): vista previa de la primera página del PDF,
+     resumen y las acciones Compartir y Guardar. -->
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_fondo"
+        android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/barra"
+            style="@style/Widget.FacturasS20.BarraSuperior.Atras"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="@string/reporte_titulo"
+            tools:subtitle="Septiembre 2026"/>
+
+    <androidx.core.widget.NestedScrollView
+            android:id="@+id/desplazamiento"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="invisible"
+            tools:visibility="visible">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/margen">
+
+            <TextView
+                    android:id="@+id/aviso_ventas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/fondo_aviso"
+                    android:drawablePadding="10dp"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/relleno_tarjeta"
+                    android:text="@string/reporte_faltan_ventas"
+                    android:textAppearance="@style/Texto.FacturasS20.Dato"
+                    android:textColor="@color/color_alerta_oscuro"
+                    android:visibility="gone"
+                    app:drawableStartCompat="@drawable/ic_alerta"
+                    app:drawableTint="@color/color_alerta_oscuro"
+                    tools:visibility="visible"/>
+
+            <!-- Vista previa de la hoja -->
+            <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginEnd="24dp">
+
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                    <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/color_primario"
+                            android:padding="14dp"
+                            android:text="@string/reporte_encabezado"
+                            android:textAppearance="@style/Texto.FacturasS20.Dato"
+                            android:textColor="@color/color_superficie"
+                            android:textStyle="bold"/>
+
+                    <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="14dp">
+
+                        <TextView
+                                android:id="@+id/texto_negocio"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="@style/Texto.FacturasS20.Ayuda"
+                                android:textColor="@color/color_texto"
+                                tools:text="Bodega El Progreso · RUC 10456789124 · NRUS"/>
+
+                        <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:background="@drawable/fondo_fila_resaltada"
+                                android:orientation="vertical"
+                                android:padding="10dp">
+
+                            <TextView
+                                    android:id="@+id/texto_resumen_1"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:textAppearance="@style/Texto.FacturasS20.Ayuda"
+                                    android:textColor="@color/color_primario"
+                                    android:textStyle="bold"
+                                    tools:text="Compras S/ 4 120,50 · Cat. 1"/>
+
+                            <TextView
+                                    android:id="@+id/texto_resumen_2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:textAppearance="@style/Texto.FacturasS20.Ayuda"
+                                    android:textColor="@color/color_texto"
+                                    tools:text="Cuota S/ 20 · vence 15/10/2026"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                                android:id="@+id/tabla"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:orientation="vertical"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                    android:id="@+id/texto_archivo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:textAppearance="@style/Texto.FacturasS20.Secundario"
+                    tools:text="facturas-s20_2026-09.pdf · 3 páginas"/>
+
+            <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                <LinearLayout
+                        android:id="@+id/resumen"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingStart="@dimen/relleno_tarjeta"
+                        android:paddingTop="6dp"
+                        android:paddingEnd="@dimen/relleno_tarjeta"
+                        android:paddingBottom="6dp"/>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/margen"
+            android:paddingEnd="@dimen/margen"
+            android:paddingBottom="8dp">
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/boton_compartir"
+                style="@style/Widget.FacturasS20.Boton.Grande"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/reporte_compartir"
+                app:icon="@drawable/ic_compartir"
+                app:iconGravity="textStart"
+                app:iconPadding="12dp"/>
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/boton_guardar"
+                style="@style/Widget.FacturasS20.Boton.Contorno"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/reporte_guardar"
+                app:icon="@drawable/ic_descargar"/>
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:text="@string/reporte_privacidad"
+                android:textAppearance="@style/Texto.FacturasS20.Ayuda"/>
+    </LinearLayout>
+</LinearLayout>

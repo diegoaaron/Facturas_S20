@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Hoja de anulación de P12 (prototipo pantalla_12_detalle_y_anulacion.png). -->
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="@dimen/margen_amplio"
+        android:paddingTop="8dp"
+        android:paddingEnd="@dimen/margen_amplio"
+        android:paddingBottom="16dp">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+        <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_papelera"
+                app:tint="@color/color_error"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:accessibilityHeading="true"
+                android:text="@string/anulacion_titulo"
+                android:textAppearance="@style/Texto.FacturasS20.Titulo"
+                android:textSize="22sp"/>
+    </LinearLayout>
+
+    <TextView
+            android:id="@+id/texto_descuento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAppearance="@style/Texto.FacturasS20.Secundario"
+            tools:text="Se descontará S/ 386,40 del total del mes."/>
+
+    <RadioGroup
+            android:id="@+id/motivos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/motivo_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:minHeight="@dimen/boton_alto"
+                android:text="@string/anulacion_motivo_error"
+                android:textAppearance="@style/Texto.FacturasS20.Dato"/>
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/motivo_duplicado"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/boton_alto"
+                android:text="@string/anulacion_motivo_duplicado"
+                android:textAppearance="@style/Texto.FacturasS20.Dato"/>
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/motivo_devolucion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/boton_alto"
+                android:text="@string/anulacion_motivo_devolucion"
+                android:textAppearance="@style/Texto.FacturasS20.Dato"/>
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/motivo_otro"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/boton_alto"
+                android:text="@string/anulacion_motivo_otro"
+                android:textAppearance="@style/Texto.FacturasS20.Dato"/>
+    </RadioGroup>
+
+    <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/campo_otro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/anulacion_otro_ayuda"
+            android:visibility="gone">
+
+        <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapSentences"
+                android:maxLength="120"
+                android:textStyle="normal"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+            android:id="@+id/boton_anular"
+            style="@style/Widget.FacturasS20.Boton.Contorno.Error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/anulacion_confirmar"/>
+
+    <com.google.android.material.button.MaterialButton
+            android:id="@+id/boton_cancelar"
+            style="@style/Widget.FacturasS20.Boton.Texto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/cancelar"/>
+</LinearLayout>

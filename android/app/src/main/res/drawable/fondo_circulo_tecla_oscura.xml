@@ -1,0 +1,4 @@
+<!-- Número de la categoría en la tarjeta oscura de P14. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="@color/color_tecla_oscura"/>
+</shape>

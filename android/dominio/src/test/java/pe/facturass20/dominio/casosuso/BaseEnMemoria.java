@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import pe.facturass20.dominio.Datos;
+import pe.facturass20.dominio.modelo.CampoExtraido;
 import pe.facturass20.dominio.modelo.Contribuyente;
 import pe.facturass20.dominio.modelo.Determinacion;
 import pe.facturass20.dominio.modelo.Emisor;
@@ -33,6 +34,8 @@ final class BaseEnMemoria implements PeriodoRepositorio, FacturaRepositorio, Con
     ImagenFactura ultimaImagen;
     ResultadoExtraccion ultimaExtraccion;
     int escrituras;
+    private final Map<Long, ImagenFactura> imagenes = new HashMap<>();
+    private final Map<Long, ResultadoExtraccion> extracciones = new HashMap<>();
     private long siguienteId = 1;
 
     @Override
@@ -86,6 +89,17 @@ final class BaseEnMemoria implements PeriodoRepositorio, FacturaRepositorio, Con
     }
 
     @Override
+    public Optional<ImagenFactura> buscarImagen(long idFactura) {
+        return Optional.ofNullable(imagenes.get(idFactura));
+    }
+
+    @Override
+    public List<CampoExtraido> buscarCampos(long idFactura) {
+        ResultadoExtraccion extraccion = extracciones.get(idFactura);
+        return extraccion == null ? List.of() : extraccion.campos();
+    }
+
+    @Override
     public long registrar(PeriodoMensual periodo, FacturaCompra factura, ImagenFactura imagen,
             ResultadoExtraccion extraccion, Determinacion determinacion) {
         periodos.put(periodo.periodo(), periodo);
@@ -93,7 +107,14 @@ final class BaseEnMemoria implements PeriodoRepositorio, FacturaRepositorio, Con
         ultimaImagen = imagen;
         ultimaExtraccion = extraccion;
         escrituras++;
-        return siguienteId++;
+        long id = siguienteId++;
+        if (imagen != null) {
+            imagenes.put(id, imagen);
+        }
+        if (extraccion != null) {
+            extracciones.put(id, extraccion);
+        }
+        return id;
     }
 
     @Override

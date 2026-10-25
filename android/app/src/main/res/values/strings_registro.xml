@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos del registro de una factura: P07 Lectura, P08 Verificación, P09 Duplicado, P10 Guardada y
+     P19 Registro manual. Los de §8.4 siguen en strings.xml. -->
+<resources>
+    <!-- Comunes -->
+    <string name="cerrar">Cerrar</string>
+    <string name="foto_factura">Foto de la factura</string>
+    <string name="ampliar_foto">Ver la foto más grande</string>
+    <string name="error_factura_no_existe">No se encontró la factura.</string>
+
+    <!-- Campos de la factura (P08, P19) -->
+    <string name="campo_ruc">RUC del proveedor</string>
+    <string name="campo_proveedor">Proveedor</string>
+    <string name="campo_serie">Serie</string>
+    <string name="campo_numero">Número</string>
+    <string name="campo_fecha">Fecha de emisión</string>
+    <string name="campo_fecha_formato">dd/mm/aaaa</string>
+    <string name="campo_moneda">Moneda</string>
+    <string name="campo_importe">Importe total</string>
+    <string name="campo_importe_prefijo">S/ </string>
+    <string name="campo_valido">Dato válido</string>
+    <string name="campo_revisar">Revise este dato</string>
+    <string name="verif_baja_confianza_campo">Confianza baja (%1$d %%): compárelo con lo impreso en la factura.</string>
+
+    <!-- P05: enlace al registro manual -->
+    <string name="guia_a_mano">Escribir los datos a mano</string>
+
+    <!-- P07 Lectura -->
+    <string name="lectura_titulo">Leyendo factura</string>
+    <string name="lectura_restante">≈ %1$d s restantes</string>
+    <string name="lectura_casi_listo">Casi listo…</string>
+    <string name="lectura_paso_proveedor">Proveedor y RUC</string>
+    <string name="lectura_paso_serie">Serie y número</string>
+    <string name="lectura_paso_fecha">Fecha de emisión</string>
+    <string name="lectura_paso_moneda">Moneda</string>
+    <string name="lectura_paso_importe">Importe total</string>
+    <string name="lectura_modelo_prueba">Lector de prueba: completa datos de ejemplo · la foto no sale del teléfono</string>
+    <string name="lectura_sin_foto">Ya no está la foto. Tómela otra vez.</string>
+    <string name="lectura_tiempo_agotado">La lectura tardó demasiado. Tome otra foto o registre los datos a mano.</string>
+    <string name="lectura_fallo_titulo">No pudimos leer la factura</string>
+    <string name="lectura_otra_foto">Tomar otra foto</string>
+    <string name="lectura_a_mano">Registrar a mano</string>
+
+    <!-- P08 Verificación -->
+    <string name="verif_titulo">Verifique los datos</string>
+    <string name="verif_subtitulo">Toque un campo para corregirlo</string>
+    <string name="verif_guardar">Guardar factura</string>
+    <string name="verif_otra_foto">Tomar otra foto</string>
+    <string name="verif_sin_foto">Ya no está la foto. Vuelva a escanear la factura.</string>
+    <plurals name="verif_campos_leidos">
+        <item quantity="one">%d campo leído</item>
+        <item quantity="many">%d campos leídos</item>
+        <item quantity="other">%d campos leídos</item>
+    </plurals>
+    <string name="verif_mes_anterior_titulo">¿Registrar en %1$s?</string>
+    <string name="verif_mes_anterior_mensaje">La fecha de la factura es de un mes anterior. Se sumará a las compras de %1$s.</string>
+    <string name="verif_mes_anterior_si">Sí, registrar</string>
+    <string name="verif_mes_anterior_no">Revisar la fecha</string>
+
+    <!-- P09 Duplicado -->
+    <string name="duplicado_documento">%1$s · %2$s</string>
+    <string name="duplicado_detalle">Emitida el %1$s · %2$s</string>
+    <string name="duplicado_criterio">Se detectó por RUC + serie + número</string>
+    <string name="duplicado_ver">Ver la registrada</string>
+    <string name="duplicado_descartar_foto">Descartar esta foto</string>
+    <string name="duplicado_descartar_registro">Descartar este registro</string>
+
+    <!-- P10 Guardada -->
+    <string name="guardada_documento">%1$s · %2$s-%3$s</string>
+    <string name="guardada_importe">+ %1$s</string>
+    <string name="guardada_compras_de">Compras de %1$s</string>
+    <string name="guardada_escanear_otra">Escanear otra factura</string>
+    <string name="guardada_ir_inicio">Ir al inicio</string>
+    <string name="aviso_100">Llegó al límite de la categoría %1$d</string>
+
+    <!-- P19 Registro manual -->
+    <string name="manual_lectura_fallida">La IA no pudo leer esta foto. Complete los datos; se validan igual que con IA.</string>
+    <string name="manual_elegido">Escriba los datos tal como están en la factura; se validan igual que con IA.</string>
+    <string name="manual_ruc_conocido">RUC válido · %1$s</string>
+    <string name="manual_adjuntar_foto">Adjuntar foto de la factura</string>
+    <string name="manual_adjuntar_ayuda">Recomendado para sustentar la compra</string>
+    <string name="manual_foto_adjunta">Foto adjunta</string>
+    <string name="manual_foto_cambiar">Toque para elegir otra</string>
+    <string name="manual_elegir_fecha">Elegir la fecha en el calendario</string>
+</resources>
