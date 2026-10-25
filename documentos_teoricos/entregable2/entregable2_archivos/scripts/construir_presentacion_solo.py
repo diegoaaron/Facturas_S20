@@ -35,24 +35,25 @@ def notas(slide, texto):
 # ---------------------------------------------------------------- diapositivas nuevas
 def objetivos():
     s = diapositiva("Objetivos y alcance", "Objetivo general, siete objetivos específicos y límites", "diego",
-                    "Diego: El objetivo general es desarrollar Facturas S20, una app Android en Java que registre las facturas "
-                    "por foto con Gemma 4 ajustado y ejecutado en el teléfono, y que calcule el total del mes y la categoría del "
-                    "NRUS. Lo desglosamos en siete objetivos específicos, cada uno con un resultado medible: del modelado de "
-                    "procesos a la validación en un mes simulado. A la derecha, lo que queda fuera: la app calcula y prepara, "
+                    "Diego: El objetivo general repite el título del proyecto: desarrollar una aplicación móvil con IA "
+                    "multimodal, Gemma 4, para mejorar la exactitud de la declaración mensual del NRUS en bodegas de San Juan "
+                    "de Lurigancho. Lo desglosamos en siete objetivos específicos directos, cada uno con su indicador de "
+                    "medición; los valores se miden y se reportan al final del proyecto, no en este avance. A la derecha, lo "
+                    "que queda fuera: la app calcula y prepara, "
                     "pero la declaración se presenta por los canales de la SUNAT.")
     rect(s, 0.55, 1.45, 8.3, 1.1, AZUL)
     caja_texto(s, 0.75, 1.5, 7.9, 1.0, [[("Objetivo general: ", True), (
-        "app Android nativa en Java que registra las facturas de compra por fotografía con Gemma 4 E2B ajustado y "
-        "ejecutado en el teléfono, sin conexión, y calcula el total mensual y la categoría del NRUS.", False)]],
+        "desarrollar una aplicación móvil con IA multimodal (Gemma 4) para mejorar la exactitud de la declaración "
+        "mensual del NRUS en bodegas de S.J.L.", False)]],
                size=13, color=BLANCO, anchor=MSO_ANCHOR.MIDDLE)
-    filas = [["Cód.", "Objetivo específico", "Resultado esperado"],
-             ["OE1", "Modelar el proceso actual y el propuesto", "AS-IS y TO-BE con puntos de error"],
-             ["OE2", "Conjunto de facturas peruanas etiquetadas", "Entrenamiento, validación y prueba"],
-             ["OE3", "Ajuste fino de Gemma 4 E2B y conversión a .litertlm", "Mejor que el modelo base tras convertir"],
-             ["OE4", "Motor de reglas del NRUS", "Verificado con casos de la norma"],
-             ["OE5", "App Android en Java con LiteRT-LM", "Sin conexión, ≥ 50 % de Java"],
-             ["OE6", "Exportación a CSV, imágenes y PDF", "Cero envíos automáticos de datos"],
-             ["OE7", "Validar en un mes simulado", "≥ 90 % por campo · ≤ 20 s · < 2 % en el total"]]
+    filas = [["Cód.", "Objetivo específico", "Indicador de medición"],
+             ["OE1", "Modelar con BPMN el proceso actual y el propuesto", "Puntos de error eliminados o automatizados"],
+             ["OE2", "Construir el conjunto de facturas etiquetadas", "Facturas y formatos de emisor etiquetados"],
+             ["OE3", "Ajustar y convertir Gemma 4 E2B al teléfono", "Exactitud por campo frente al modelo base"],
+             ["OE4", "Implementar el motor de reglas del NRUS", "Casos de prueba de la norma resueltos"],
+             ["OE5", "Desarrollar la app Android en Java sin conexión", "Tiempo de lectura y % de código Java"],
+             ["OE6", "Exportar los datos a CSV y PDF", "Archivos abiertos en PC; envíos no autorizados"],
+             ["OE7", "Evaluar la declaración en un mes simulado", "Diferencia con el cálculo manual; categoría"]]
     tabla(s, 0.55, 2.75, 8.3, filas, [0.7, 3.9, 3.7], size=11.5, alto_fila=0.5)
     tarjeta(s, 9.1, 1.45, 3.7, 3.0, "Fuera del alcance", ["Presentar y pagar ante la SUNAT", "Registrar cada venta diaria",
                                                           "Emitir comprobantes electrónicos", "Contabilidad, inventario o planillas",
@@ -121,7 +122,7 @@ def conclusiones():
     s = diapositiva("Conclusiones", "Lo que demuestra el diseño", "diego",
                     "Diego: Cinco conclusiones. El problema es operativo y el proceso propuesto elimina sus tres puntos de error. "
                     "El diseño cubre el 100 % del alcance. Todo vive en una sola base cifrada en el teléfono y el titular exporta "
-                    "sus datos cuando quiere. El registro toma tres toques y se validará con usuarios en la iteración 3. Y la "
+                    "sus datos cuando quiere. El registro toma tres toques y se validará con usuarios en las semanas 11 y 12, en la iteración 4. Y la "
                     "solución mantiene 85 % de Java sin costo mensual de operación.")
     items = [("1 · Problema operativo", "Los tres puntos de error del AS-IS —guardar sin registrar, sumar a mano y estimar "
               "ante la duda— se eliminan o automatizan en el TO-BE.", AZUL),
@@ -130,7 +131,7 @@ def conclusiones():
              ("3 · Datos en el teléfono", "Una sola base SQLite cifrada; sin servidor de respaldo. El titular exporta a CSV y "
               "PDF cuando quiere.", AZUL),
              ("4 · Tres toques", "El registro de una factura toma tres toques desde el inicio; se validará con usuarios "
-              "en la iteración I3.", VERDE),
+              "en las semanas 11–12 (I4).", VERDE),
              ("5 · Java y costo", "Alrededor de 85 % de código Java y sin costo de operación mensual: no hay servidor "
               "que mantener.", AZUL)]
     for i, (t, c, col) in enumerate(items):

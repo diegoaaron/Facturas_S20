@@ -139,6 +139,93 @@ class Documento:
                 self.body.append(it)
         self.body.append(sect)
         self.numerar()
+        self.notas_tablas()
+        self.leyendas_apa()
+        self.verificar_figuras()
+
+    # ---------- formato APA 7 de tablas y figuras ----------
+    @staticmethod
+    def _texto(el):
+        return "".join(t.text or "" for t in el.iter(W + "t"))
+
+    def notas_tablas(self):
+        """APA 7: toda tabla lleva debajo una nota con su fuente. Si una tabla no la tiene, se agrega
+        «Nota. Elaboración propia.» o la nota específica de C.NOTAS_TABLAS (buscada por el inicio del título)."""
+        patron = re.compile(r"^Tabla \d+\. (.*)$")
+        agregadas = 0
+        for tbl in [e for e in self.body if e.tag == W + "tbl"]:
+            previo, siguiente = tbl.getprevious(), tbl.getnext()
+            m = patron.match(self._texto(previo)) if previo is not None else None
+            if not m:
+                continue
+            if siguiente is not None and self._texto(siguiente).startswith("Nota."):
+                continue
+            titulo = m.group(1)
+            texto = next((v for k, v in C.NOTAS_TABLAS.items() if titulo.startswith(k)), "Elaboración propia.")
+            nota = etree.fromstring(f"<w:root {D.NS}>{D.nota(texto)}</w:root>")[0]
+            vacio = (siguiente is not None and siguiente.tag == W + "p" and not self._texto(siguiente)
+                     and siguiente.find(".//" + W + "drawing") is None and siguiente.find(".//" + W + "sectPr") is None)
+            if vacio:
+                self.body.replace(siguiente, nota)
+            else:
+                tbl.addnext(nota)
+            agregadas += 1
+        print(f"  {agregadas} notas de tabla agregadas")
+
+    def leyendas_apa(self):
+        """APA 7: «Tabla N» / «Figura N» en negrita en una línea y el título en cursiva en la línea siguiente."""
+        patron = re.compile(r"^(Tabla|Figura) (\d+)\. ")
+        for par in [e for e in self.body if e.tag == W + "p"]:
+            runs = par.findall(W + "r")
+            if not runs:
+                continue
+            t0 = runs[0].find(W + "t")
+            if t0 is None or not t0.text or not patron.match(t0.text) or len(t0.text) > 40:
+                continue
+            titulo = copy.deepcopy(par)
+            # línea 1: solo el número, en negrita
+            t0.text = patron.match(t0.text).group(1) + " " + patron.match(t0.text).group(2)
+            for r in runs[1:]:
+                par.remove(r)
+            sp = par.find(W + "pPr/" + W + "spacing")
+            if sp is not None:
+                sp.set(W + "after", "0")
+            # línea 2: el título, en cursiva
+            truns = titulo.findall(W + "r")
+            resto = patron.sub("", truns[0].find(W + "t").text)
+            if resto:
+                truns[0].find(W + "t").text = resto
+            else:
+                titulo.remove(truns[0])
+            for r in titulo.findall(W + "r"):
+                rpr = r.find(W + "rPr")
+                if rpr is None:
+                    rpr = etree.SubElement(r, W + "rPr")
+                    r.insert(0, rpr)
+                for tag in ("b", "bCs"):
+                    for e in rpr.findall(W + tag):
+                        rpr.remove(e)
+                if rpr.find(W + "i") is None:
+                    rpr.insert(0, etree.Element(W + "iCs"))
+                    rpr.insert(0, etree.Element(W + "i"))
+            sp = titulo.find(W + "pPr/" + W + "spacing")
+            if sp is not None:
+                sp.set(W + "before", "0")
+            par.addnext(titulo)
+
+    def verificar_figuras(self):
+        """Cada figura debe tener su nota APA debajo de la imagen."""
+        els = list(self.body)
+        faltan = []
+        for i, el in enumerate(els):
+            if el.tag == W + "p" and re.fullmatch(r"Figura \d+", self._texto(el)):
+                j = i + 2
+                while j < len(els) and els[j].find(".//" + W + "drawing") is not None:
+                    j += 1
+                if j >= len(els) or not self._texto(els[j]).startswith("Nota."):
+                    faltan.append(self._texto(el))
+        if faltan:
+            raise SystemExit(f"Figuras sin nota: {faltan}")
 
     def numerar(self):
         cont = {"Tabla": 0, "Figura": 0}

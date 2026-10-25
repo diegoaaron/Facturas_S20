@@ -386,7 +386,7 @@ def validacion():
                     "Fabrizzio: Validamos el diseño con matrices de cobertura. Cada uno de los 22 requerimientos funcionales tiene "
                     "pantalla, caso de uso, clase y tabla; los 19 no funcionales tienen una decisión de diseño verificable. "
                     "Hicimos una evaluación heurística con las diez heurísticas de Nielsen y un recorrido de seis tareas, y "
-                    "definimos la prueba con tres titulares para la iteración 3. Devuelvo la palabra a Diego.")
+                    "definimos la prueba con tres titulares para las semanas 11 y 12, en la iteración 4. Devuelvo la palabra a Diego.")
     stats = [("22 / 22", "requerimientos funcionales cubiertos", VERDE), ("19 / 19", "no funcionales con decisión de diseño", VERDE),
              ("10 / 10", "heurísticas de Nielsen revisadas", AZUL), ("6", "tareas en la prueba con 3 titulares", AZUL)]
     for i, (v, e, c) in enumerate(stats):
@@ -400,7 +400,7 @@ def validacion():
              ["Más del 80 % del límite", "Barra y aviso en ámbar", "P04, P10, P14"],
              ["Anular por error", "Se descuenta y recalcula", "P12"]]
     tabla(s, 0.55, 3.15, 8.2, filas, [3.0, 3.2, 1.8], size=12, alto_fila=0.47)
-    tarjeta(s, 9.0, 3.15, 3.8, 3.3, "Metas de usabilidad (I3)", ["≥ 5 de 6 tareas sin ayuda", "≤ 3 toques para registrar",
+    tarjeta(s, 9.0, 3.15, 3.8, 3.3, "Metas de usabilidad (I4, sem. 11–12)", ["≥ 5 de 6 tareas sin ayuda", "≤ 3 toques para registrar",
                                                                 "≤ 30 s por factura", "SUS ≥ 70 puntos", "0 errores al leer la categoría"],
             color=VERDE, size=12.5)
 

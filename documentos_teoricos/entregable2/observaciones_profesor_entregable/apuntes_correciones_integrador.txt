@@ -1,0 +1,26 @@
+avance 3
+--- informe
+------- Word
+------- pdf del Word
+------- ppt
+---- base de datos
+--------bd física
+--------bd lógica
+-------- entidad relación (grafico)
+----- anexo
+---------lean canvas
+---------charter
+---------FODA
+---------otros
+------proyecto
+---------apk
+---------zip del proyecto de intellij
+------GitHub
+--------link
+------diccionario de datos (4ta unidad)
+------manual de usuarios (4ta unidad)
+------Fuentes
+---------variables dependientes (pdf de investigación)
+---------variables independientes (pdf de investigación)
+------prototipos
+--------imágenes de figma 

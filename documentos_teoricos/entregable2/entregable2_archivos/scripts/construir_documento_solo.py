@@ -163,7 +163,7 @@ def verificar_referencias(els):
 
 
 def renumerar(els):
-    leyenda = re.compile(r"^(Tabla|Figura) (\d+)\. ")
+    leyenda = re.compile(r"^(Tabla|Figura) (\d+)$")  # APA 7: el número va solo en su línea
     mapa, cont = {"Tabla": {}, "Figura": {}}, {"Tabla": 0, "Figura": 0}
     for el in els:
         m = leyenda.match(texto(el)) if el.startswith("<w:p") else None

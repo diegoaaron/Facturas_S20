@@ -17,6 +17,51 @@ TITULO_E1_PORTADA = ("Facturas S20: aplicación móvil con IA multimodal (Gemma 
                      "exactitud de la declaración mensual del NRUS en bodegas de San Juan de Lurigancho")
 TITULO_E1_CHARTER = "Facturas S20: aplicación móvil con Gemma 4 embebido para la declaración del NRUS"
 
+# Objetivo general alineado con el título (observación del docente al APF2: «debe ser directo»).
+OBJETIVO_GENERAL = ("Desarrollar una aplicación móvil con IA multimodal (Gemma 4) para mejorar la exactitud de la declaración "
+                    "mensual del NRUS en bodegas de S.J.L.")
+OBJETIVO_GENERAL_E1 = ("Desarrollar Facturas S20, una aplicación móvil Android nativa desarrollada en lenguaje Java que registre "
+                       "las facturas de compra de las bodegas acogidas al NRUS mediante fotografía, empleando un modelo Gemma 4 "
+                       "con ajuste fino sobre imágenes de facturas peruanas embebido y ejecutado en el propio teléfono para "
+                       "extraer sus datos clave sin conexión, y que calcule automáticamente el total mensual de adquisiciones y "
+                       "la categoría del régimen que corresponde, a fin de mejorar la exactitud de la declaración mensual y "
+                       "reducir el tiempo que el titular dedica a ese cálculo.")
+
+# Objetivos específicos: directos y con un indicador de medición cada uno. El valor del indicador se mide y se
+# reporta al final del proyecto (observación del docente: «el resultado final se evalúa al final del proyecto»).
+OBJETIVOS_ESPECIFICOS = [
+    ["OE1", "Modelar con BPMN el proceso actual y el proceso propuesto de registro de facturas y declaración del NRUS.",
+     "Puntos de error del proceso actual que el proceso propuesto elimina o automatiza."],
+    ["OE2", "Construir un conjunto etiquetado de imágenes de facturas de compra peruanas tomadas en bodegas.",
+     "Número de facturas etiquetadas y de formatos de emisor distintos."],
+    ["OE3", "Ajustar y convertir Gemma 4 E2B para que lea las facturas dentro del teléfono.",
+     "Exactitud por campo del modelo convertido frente a la del modelo base, en el conjunto de prueba."],
+    ["OE4", "Implementar el motor de reglas del NRUS: acumulado mensual, categoría, cuota, topes y vencimiento.",
+     "Porcentaje de casos de prueba de la norma que el motor resuelve correctamente."],
+    ["OE5", "Desarrollar la aplicación móvil Android en Java que registre las facturas por fotografía sin conexión.",
+     "Tiempo de lectura por factura en el teléfono de referencia y porcentaje del código en Java."],
+    ["OE6", "Implementar la exportación de los datos a archivos CSV y PDF sin enviar datos fuera del teléfono.",
+     "Archivos exportados que se abren en una hoja de cálculo y envíos de datos no autorizados."],
+    ["OE7", "Evaluar la exactitud de la declaración mensual que calcula la aplicación en un mes simulado.",
+     "Diferencia entre el total mensual de la aplicación y el cálculo manual de control, y categoría correcta."],
+]
+
+# Notas APA de tablas que no son de elaboración propia sin más (clave: inicio del título de la tabla). Las demás
+# tablas sin nota reciben «Nota. Elaboración propia.» al construir el documento.
+NOTAS_TABLAS = {
+    "Perfil de la empresa cliente": "Elaboración propia con base en el Decreto Legislativo N.° 937 (Congreso de la "
+                                    "República del Perú, 2003), SUNAT (s. f.-b) e INEI (2018).",
+    "Bodegas de referencia": "Elaboración propia. Caso simulado autorizado por el docente.",
+    "Catálogo de casos de uso": "Elaboración propia con la técnica de casos de uso descrita por Sommerville (2016).",
+    "Business Model Canvas": "Elaboración propia con el lienzo de Osterwalder y Pigneur (2010).",
+    "Requerimientos no funcionales": "Elaboración propia con las características de calidad de ISO/IEC 25010 (ISO, 2011).",
+    "Estructura del SRS": "Adaptado de ISO/IEC/IEEE 29148 (ISO, 2018).",
+    "Metas de la prueba de usabilidad": "Elaboración propia. La escala SUS es la propuesta por Brooke (1996).",
+    "Evaluación heurística": "Elaboración propia con las heurísticas de usabilidad de Nielsen (1994).",
+    "Elementos BPMN utilizados": "Elaboración propia con la notación BPMN 2.0.2 (OMG, 2014).",
+}
+NOTA_BPMN = "Elaboración propia con la notación BPMN 2.0.2 (OMG, 2014)."
+
 
 def escribir(d):
     portada_e_introduccion(d)
@@ -54,8 +99,30 @@ def portada_e_introduccion(d):
 
 # ======================================================================
 def capitulo1(d):
-    d.e1(26, 73)
-    d.add(subtitulo("d) Impacto del problema en los procesos de la empresa y alcance de la solución informática"))
+    # a) Análisis del contexto, con citas de autores (observación 1 del docente al APF2)
+    d.e1(26, 31)
+    d.e1(32, reemplazos=[(
+        "El titular no lleva registros contables porque el régimen no lo obliga.",
+        "El titular no lleva registros contables porque el régimen no lo obliga: el NRUS reemplaza el Impuesto a la Renta "
+        "y el Impuesto General a las Ventas por una cuota mensual fija que depende de la categoría del contribuyente "
+        "(Congreso de la República del Perú, 2003; Superintendencia Nacional de Aduanas y de Administración Tributaria "
+        "[SUNAT], s. f.-b).")])
+    d.e1(33, reemplazos=[(
+        "El caso se sitúa en San Juan de Lurigancho, el distrito más poblado del país.",
+        "El caso se sitúa en San Juan de Lurigancho, el distrito más poblado del país, con 1 038 495 habitantes según los "
+        "Censos Nacionales 2017 (Instituto Nacional de Estadística e Informática [INEI], 2018).")])
+    d.add(p("Este perfil coincide con lo que la literatura describe para el pequeño comercio peruano. Loayza (2008) explica "
+            "que la informalidad en el Perú no tiene una causa única, sino que resulta de la combinación de servicios "
+            "públicos deficientes, un marco regulatorio oneroso y una capacidad débil del Estado para fiscalizar; para un "
+            "negocio pequeño, cada obligación que consume tiempo eleva el costo de permanecer en la formalidad. En el caso "
+            "del NRUS, Silva Pérez y Soria Asencios (2024) señalan que, aunque es el régimen con la mayor cantidad de "
+            "contribuyentes, entre 2015 y 2019 la SUNAT dejó de recaudar alrededor de S/ 561 millones por este régimen, y "
+            "ubican la causa principal en la falta de incentivos para el cumplimiento tributario. Ambos antecedentes "
+            "respaldan la premisa del proyecto: facilitar el cumplimiento reduciendo el costo de registrar, en lugar de "
+            "añadir obligaciones al titular."))
+    d.e1(34, 71)
+    # La formulación del problema (bloques 72-73) se retira: el docente indicó que no corresponde a este trabajo.
+    d.add(subtitulo("c) Impacto del problema en los procesos de la empresa y alcance de la solución informática"))
     d.add(p("El problema no afecta a un proceso aislado, sino a la cadena que va desde que llega la mercadería hasta que se paga "
             "la cuota. El modelado del proceso actual con BPMN (apartado 3.5.3) permite ubicar con precisión dónde se origina "
             "cada consecuencia y, por tanto, qué debe cubrir la solución. La Tabla {ref:t_impacto} relaciona cada proceso "
@@ -85,14 +152,14 @@ def capitulo1(d):
              ["Reportes e historial", "Reporte PDF, cierre del mes, histórico", "RF-15 a RF-17", "P16–P17"],
              ["Exportación y modelo", "Exportación de datos para PC, instalación y actualización del modelo, parámetros vigentes", "RF-20 a RF-22", "P03, P18, P20"]],
             [2.3, 4.0, 2.0, 1.6])
-    d.e1(74, 125, reemplazos=[
-        ("Desarrollar un servicio de respaldo en Java sobre Spring Boot, con persistencia en Oracle o SQL Server, que conserve "
-         "el histórico de forma opcional y publique los parámetros del NRUS y las versiones del modelo.",
-         "Implementar en Java la exportación de los datos registrados a archivos abiertos (CSV, imágenes y PDF) para "
-         "analizarlos en una PC, y la actualización de los parámetros del NRUS con cada versión de la app, sin que ningún "
-         "dato salga del teléfono sin la acción del titular."),
-        ("Servicio REST desplegado y documentado, con base de datos relacional operativa.",
-         "Exportación a CSV y ZIP verificada en una hoja de cálculo; cero envíos automáticos de datos."),
+    d.e1(74, 75)
+    d.e1_texto(76, OBJETIVO_GENERAL)
+    d.e1(77)
+    d.add(p("Cada objetivo específico tiene un indicador con el que se medirá su logro. Los valores de los indicadores no se "
+            "presentan en este avance: se miden y se reportan al final del proyecto, en el capítulo de resultados."))
+    d.tabla("t_oe", "Objetivos específicos e indicadores de medición",
+            ["Cód.", "Objetivo específico", "Indicador de medición"], OBJETIVOS_ESPECIFICOS, [0.9, 5.0, 4.1], centrar=(0,))
+    d.e1(81, 125, reemplazos=[
         ("Instalación y actualización del modelo en el teléfono, y respaldo opcional cifrado en un servidor propio.",
          "Instalación y actualización del modelo en el teléfono, y exportación de los datos a archivos para analizarlos en "
          "una PC. Respecto del primer avance se retiró el servidor de respaldo opcional: toda la información permanece en "
@@ -110,37 +177,54 @@ def capitulo2(d):
          "para descargar una vez el archivo del")])
     d.add(h3("2.1.7. Modelado de procesos de negocio con BPMN"))
     d.add(p("La gestión de procesos de negocio (BPM, *Business Process Management*) es la disciplina que identifica, modela, "
-            "analiza y mejora los procesos de una organización. Su herramienta de modelado estándar es BPMN (*Business Process "
-            "Model and Notation*), cuya versión 2.0.2 publica el Object Management Group y fue adoptada como la norma "
-            "ISO/IEC 19510. BPMN define una notación gráfica común para el negocio y para los desarrolladores, de modo que el "
-            "mismo diagrama sirve para discutir el problema con el bodeguero y para derivar los requerimientos del software."))
+            "analiza y mejora los procesos de una organización (Dumas et al., 2018). Su herramienta de modelado estándar es "
+            "BPMN (*Business Process Model and Notation*), cuya versión 2.0.2 publica el Object Management Group (OMG, 2014) "
+            "y fue adoptada como la norma ISO/IEC 19510 (International Organization for Standardization [ISO], 2013). BPMN "
+            "define una notación gráfica común para el negocio y para los desarrolladores, de modo que el mismo diagrama sirve "
+            "para discutir el problema con el bodeguero y para derivar los requerimientos del software."))
     d.add(p("Los elementos de BPMN se agrupan en cuatro categorías. Los objetos de flujo son los eventos (inicio, intermedio y "
             "fin, que pueden ser de mensaje o de temporizador), las actividades (tareas y subprocesos) y las compuertas "
             "(exclusiva, paralela, inclusiva). Los objetos de conexión son el flujo de secuencia, el flujo de mensaje entre "
             "participantes y la asociación. Los contenedores son los *pools*, que representan a cada participante, y los "
             "carriles, que separan responsabilidades dentro de él. Los artefactos son los objetos de datos, los almacenes de "
             "datos y las anotaciones. El proyecto modela primero el proceso actual (AS-IS) para ubicar los puntos de error y "
-            "luego el proceso propuesto (TO-BE) que implementa la aplicación."))
+            "luego el proceso propuesto (TO-BE) que implementa la aplicación, siguiendo la secuencia de descubrimiento, "
+            "análisis y rediseño de procesos que proponen Dumas et al. (2018)."))
     d.add(h3("2.1.8. Diseño de bases de datos y seguridad de la información"))
-    d.add(p("El diseño de una base de datos relacional avanza en tres niveles. El modelo conceptual identifica las entidades y "
-            "sus relaciones, independientemente de la tecnología; el modelo lógico las traduce a tablas con claves primarias y "
+    d.add(p("El diseño de una base de datos relacional parte del modelo relacional de Codd (1970), que representa los datos "
+            "como relaciones independientes de la forma en que se almacenan físicamente e introduce la normalización. Elmasri "
+            "y Navathe (2016) organizan el diseño en tres niveles. El modelo conceptual identifica las entidades y sus "
+            "relaciones, independientemente de la tecnología; el modelo lógico las traduce a tablas con claves primarias y "
             "foráneas normalizadas, al menos hasta la tercera forma normal, para evitar redundancias y anomalías de "
-            "actualización; y el modelo físico fija los tipos de datos, las restricciones, los índices y el motor concreto. El "
-            "diagrama entidad-relación con notación de pata de gallo expresa la cardinalidad mínima y máxima de cada relación."))
-    d.add(p("La seguridad se diseña junto con el esquema y no después. Los principios aplicados son el de mínimo privilegio "
-            "(el usuario de la aplicación solo tiene los permisos que necesita), la defensa en profundidad (cifrado en tránsito "
-            "con TLS y en reposo con AES-256), la minimización de datos (no se guarda lo que no se usa), la integridad "
-            "verificable (huellas SHA-256 del modelo y de los reportes), el control de acceso con PIN o huella y la prevención "
-            "de inyección SQL mediante consultas parametrizadas, que Room genera por defecto. En el teléfono se siguen las "
-            "recomendaciones del estándar OWASP MASVS para el almacenamiento seguro en dispositivos móviles."))
+            "actualización; y el modelo físico fija los tipos de datos, las restricciones, los índices y el motor concreto. "
+            "El modelo conceptual se expresa con el diagrama entidad-relación propuesto por Chen (1976); en este proyecto se "
+            "dibuja con la notación de pata de gallo, que indica la cardinalidad mínima y máxima de cada relación."))
+    d.add(p("La seguridad se diseña junto con el esquema y no después. Saltzer y Schroeder (1975) formularon principios de "
+            "diseño de mecanismos de protección que siguen vigentes, entre ellos el de mínimo privilegio (cada componente "
+            "solo tiene los permisos que necesita) y el de valores predeterminados seguros (lo que no está permitido de forma "
+            "explícita se niega). A ellos el proyecto suma la defensa en profundidad (cifrado en tránsito con TLS y en reposo "
+            "con AES-256), la minimización de datos (no se guarda lo que no se usa), la integridad verificable (huellas "
+            "SHA-256 del modelo y de los reportes), el control de acceso con PIN o huella y la prevención de inyección SQL "
+            "mediante consultas parametrizadas, que Room arma a partir de los parámetros de cada consulta (Google, s. f.-e)."))
+    d.add(p("En el teléfono se siguen los grupos de controles del estándar OWASP MASVS —almacenamiento, criptografía, "
+            "autenticación, comunicación de red, interacción con la plataforma, calidad del código, resiliencia y privacidad— "
+            "(OWASP Foundation, s. f.). La base local se cifra completa con SQLCipher, que aplica cifrado AES de 256 bits a "
+            "todo el archivo de la base de datos (Zetetic, s. f.)."))
     d.add(h3("2.1.9. Diseño de experiencia de usuario, prototipado y reportes"))
-    d.add(p("El diseño de experiencia de usuario (UX) se ocupa de que el producto sea útil y fácil de usar para su usuario real, "
-            "y el diseño de interfaz (UI) de su expresión visual. Un prototipo es una representación del sistema que permite "
-            "evaluar el diseño antes de programarlo: los *wireframes* fijan la estructura, los *mockups* la apariencia y los "
-            "prototipos navegables la interacción. Herramientas como Balsamiq, Figma o Penpot se emplean para elaborarlos."))
-    d.add(p("La calidad de uso se evalúa con criterios conocidos: las diez heurísticas de usabilidad de Nielsen, las pautas de "
-            "accesibilidad WCAG 2.1 (contraste mínimo de 4,5:1 y objetivos táctiles suficientes) y las guías de Material Design "
-            "para Android, que recomiendan objetivos táctiles de al menos 48 dp. Para un usuario sin formación contable que "
+    d.add(p("La norma ISO 9241-210 define el diseño centrado en las personas como un enfoque que busca que los sistemas "
+            "interactivos sean utilizables al centrarse en sus usuarios, sus necesidades y sus requisitos, y que evalúa las "
+            "soluciones con los usuarios de forma iterativa a lo largo del ciclo de vida (ISO, 2019). Norman (2013) agrega "
+            "que un buen diseño hace visibles las acciones posibles y da retroalimentación inmediata, de modo que el usuario "
+            "entienda qué puede hacer y qué acaba de ocurrir. El diseño de experiencia de usuario (UX) se ocupa de que el "
+            "producto sea útil y fácil de usar para su usuario real, y el diseño de interfaz (UI) de su expresión visual."))
+    d.add(p("Un prototipo es una representación del sistema que permite evaluar el diseño antes de programarlo: los "
+            "*wireframes* fijan la estructura, los *mockups* la apariencia y los prototipos navegables la interacción. "
+            "Herramientas como Balsamiq, Figma o Penpot se emplean para elaborarlos."))
+    d.add(p("La calidad de uso se evalúa con criterios conocidos: las diez heurísticas de usabilidad de Nielsen (1994), que "
+            "guían la evaluación heurística del Anexo S; las pautas de accesibilidad WCAG 2.1, que exigen un contraste mínimo "
+            "de 4,5:1 para el texto (World Wide Web Consortium [W3C], 2018); y las guías de Material Design para Android, que "
+            "recomiendan objetivos táctiles de al menos 48 dp (Google, s. f.-d). La satisfacción se mide con la escala SUS "
+            "(*System Usability Scale*), un cuestionario de diez ítems propuesto por Brooke (1996). Para un usuario sin formación contable que "
             "trabaja de pie en el mostrador, estos criterios se traducen en pocas pantallas por tarea, textos en lenguaje "
             "cotidiano, botones grandes y mensajes que indican qué hacer. Los reportes clave se diseñan con el mismo criterio: "
             "deben contener solo la información que el usuario o su contador necesitan para declarar."))
@@ -303,12 +387,15 @@ def capitulo3(d):
              ["Requerimientos", "RF-20; RNF-05, RNF-06, RNF-07, RNF-16, RNF-19"]],
             [2.0, 8.0])
     d.add(h3("3.4.5. Requerimientos funcionales"))
+    d.add(p("Los requerimientos se especificaron siguiendo a Sommerville (2016), que distingue los requerimientos funcionales "
+            "—lo que el sistema debe hacer— de los no funcionales —las restricciones y cualidades con que debe hacerlo—, y la "
+            "norma ISO/IEC/IEEE 29148 (ISO, 2018), que exige que cada requerimiento sea necesario, inequívoco y verificable."))
     d.add(p("La especificación define 22 requerimientos funcionales con su prioridad y el caso de uso del que provienen. La tabla "
             "completa está en el Anexo H. Por prioridad, 13 son de prioridad alta, 8 de prioridad media y 1 de prioridad baja; "
             "los de prioridad alta forman el núcleo que se construye primero (captura, lectura, validación, acumulado, "
             "determinación, vencimiento, acceso e instalación del modelo)."))
     d.add(h3("3.4.6. Requerimientos no funcionales"))
-    d.add(p("Los 19 requerimientos no funcionales se clasifican con las características de calidad de la norma ISO/IEC 25010 y "
+    d.add(p("Los 19 requerimientos no funcionales se clasifican con las características de calidad de la norma ISO/IEC 25010 (ISO, 2011) y "
             "cada uno tiene una métrica de aceptación verificable (Anexo I). En el diseño, cada uno se tradujo en una decisión "
             "concreta de arquitectura, de datos o de interfaz, como muestra la verificación del apartado 3.7.6."))
     d.add(h3("3.4.7. Especificación de Requerimientos de Software (SRS)"))
@@ -355,7 +442,8 @@ def capitulo3(d):
             "todos los diagramas, con un ejemplo tomado del propio proyecto para cada uno. Se modelaron cinco procesos: el "
             "proceso actual (AS-IS), el proceso propuesto (TO-BE) y tres subprocesos del proceso propuesto que la aplicación "
             "automatiza: el registro de una factura, el cierre mensual y la publicación y actualización del modelo."))
-    d.figura("f_notacion", "bpmn_00_notacion.png", "Elementos de la notación BPMN 2.0 utilizados, con ejemplos del proyecto")
+    d.figura("f_notacion", "bpmn_00_notacion.png", "Elementos de la notación BPMN 2.0 utilizados, con ejemplos del proyecto",
+             nota="Elaboración propia con base en la especificación BPMN 2.0.2 (OMG, 2014).")
     d.tabla("t_procesos", "Procesos de negocio modelados",
             ["Proceso", "Tipo", "Participantes (pools)", "Figura", "Casos de uso"],
             [["Recepción de facturas y declaración mensual", "AS-IS", "Distribuidor, bodega, SUNAT", "{ref:f_asis}", "—"],
@@ -372,14 +460,17 @@ def capitulo3(d):
             "que faltan, suma a mano y decide la categoría. La compuerta «¿Seguro de la categoría?» es donde se origina el pago "
             "en exceso: cuando la respuesta es no, el titular declara la categoría superior. Las anotaciones en rojo marcan los "
             "tres puntos de error que el diagnóstico cuantificó."))
-    d.figura("f_asis", "bpmn_01_asis.png", "Proceso actual (AS-IS) de recepción de facturas y declaración del NRUS")
+    d.figura("f_asis", "bpmn_01_asis.png", "Proceso actual (AS-IS) de recepción de facturas y declaración del NRUS", nota=NOTA_BPMN)
     d.add(subtitulo("b) Proceso propuesto (TO-BE)"))
     d.add(p("En el proceso propuesto la bodega se divide en dos carriles: el bodeguero y la aplicación en su teléfono. La factura "
             "se fotografía en el momento en que llega, la lectura la hace Gemma 4 dentro del teléfono y el bodeguero solo "
             "verifica. El acumulado y la categoría se recalculan con cada factura, y la compuerta «¿≥ 80 % del límite?» dispara "
             "un aviso antes de que el problema ocurra. El cierre mensual deja de ser una tarea manual: un temporizador recuerda "
-            "el vencimiento y pide solo el total de ventas. Desaparecen la caja, la suma a mano y la estimación ante la duda."))
-    d.figura("f_tobe", "bpmn_02_tobe.png", "Proceso propuesto (TO-BE) con Facturas S20")
+            "el vencimiento y pide solo el total de ventas. Desaparecen la caja, la suma a mano y la estimación ante la duda. "
+            "El diagrama es de elaboración propia del equipo, con la notación BPMN 2.0.2 (OMG, 2014), y aplica el rediseño "
+            "de procesos de Dumas et al. (2018): parte del modelo AS-IS, elimina las tareas que no agregan valor y "
+            "automatiza las que dependen del cálculo."))
+    d.figura("f_tobe", "bpmn_02_tobe.png", "Proceso propuesto (TO-BE) con Facturas S20", nota=NOTA_BPMN)
     d.tabla("t_asis_tobe", "Comparación del proceso actual y el propuesto",
             ["Aspecto", "Proceso actual (AS-IS)", "Proceso propuesto (TO-BE)"],
             [["Momento del registro", "Fin de mes, si se registra", "Al recibir la factura"],
@@ -395,7 +486,7 @@ def capitulo3(d):
             "está instalado o la memoria no alcanza se ofrece el registro manual; y si la factura ya existe se muestra el aviso "
             "de duplicado y el proceso termina sin registrar. Solo después de la revisión del bodeguero se guarda la factura, en "
             "una transacción que incluye la imagen y los campos leídos, y se recalcula la determinación del mes."))
-    d.figura("f_registro", "bpmn_03_registro.png", "Subproceso «Registrar factura con IA» (CU-01 y CU-02)")
+    d.figura("f_registro", "bpmn_03_registro.png", "Subproceso «Registrar factura con IA» (CU-01 y CU-02)", nota=NOTA_BPMN)
     d.add(p("Los subprocesos de cierre mensual y de publicación del modelo se presentan en el Anexo K (Figuras "
             "{ref:f_cierre} y {ref:f_modelo})."))
 
@@ -726,8 +817,9 @@ CREATE TABLE categoria_nrus (
             "heurísticas de Nielsen y un recorrido cognitivo de las seis tareas de la Tabla {ref:t_flujos}, verificando que "
             "cada paso tenga una pantalla, una acción visible y una respuesta del sistema. El resultado y las mejoras que "
             "introdujo en el diseño están en el Anexo S. Segundo, se definió el protocolo de prueba de usabilidad con tres "
-            "titulares de bodega sin formación contable, que se aplicará sobre el prototipo navegable en la iteración I3 con "
-            "las metas de la Tabla {ref:t_metas_usabilidad}."))
+            "titulares de bodega sin formación contable, que se aplicará sobre el prototipo navegable en las semanas 11 y 12 "
+            "(iteración I4) con las metas de la Tabla {ref:t_metas_usabilidad}. La prueba aún no se ha realizado, por lo que "
+            "este informe no presenta sus resultados."))
     d.tabla("t_metas_usabilidad", "Metas de la prueba de usabilidad del prototipo",
             ["Métrica", "Meta", "Requerimiento"],
             [["Tareas completadas sin ayuda", "≥ 5 de 6 tareas por participante", "RNF-11"],
@@ -848,7 +940,7 @@ CREATE TABLE categoria_nrus (
              ["RNF-03", "Motor de reglas con BigDecimal", "Diferencia < 2 % en el mes simulado", "Final"],
              ["RNF-04, RNF-05", "Imagen a 896 px; motor LiteRT-LM en GPU si existe", "≤ 20 s y ≤ 2 GB en el equipo de referencia", "APF3"],
              ["RNF-06, RNF-07", "Modelo como descarga separada; minSdk 26", "APK ≤ 60 MB; prueba en Android 8 y 13", "APF3"],
-             ["RNF-09 a RNF-11", "Recorrido cognitivo y heurísticas (Anexo S)", "Prueba con 3 titulares (Tabla {ref:t_metas_usabilidad})", "I3"],
+             ["RNF-09 a RNF-11", "Recorrido cognitivo y heurísticas (Anexo S)", "Prueba con 3 titulares (Tabla {ref:t_metas_usabilidad})", "I4 (sem. 11–12)"],
              ["RNF-12, RNF-14", "Arquitectura sin llamadas de red en el flujo principal", "Prueba en modo avión; inspección de tráfico", "APF3"],
              ["RNF-13", "Guardado en una transacción", "Prueba de cierre forzado durante el guardado", "APF3"],
              ["RNF-15, RNF-16", "SQLCipher, Keystore y PIN con hash; sin servidor; solo descarga del modelo por TLS", "Revisión con OWASP MASVS e inspección de tráfico", "Final"],
@@ -953,8 +1045,8 @@ def capitulo5_y_conclusiones(d):
             "se retiró el servidor de respaldo: ningún sistema externo recibe ni solicita datos de la app, y el titular exporta "
             "sus datos a archivos CSV y PDF cuando quiere analizarlos en una PC, lo que refuerza la privacidad."))
     d.add(p("Cuarta. El prototipo reduce el registro de una factura a tres toques desde la pantalla de inicio y presenta la "
-            "categoría y la cuota en lenguaje cotidiano; su validación con usuarios reales se realizará en la iteración I3 con "
-            "metas definidas."))
+            "categoría y la cuota en lenguaje cotidiano; su validación con tres titulares se realizará en las semanas 11 y 12 "
+            "(iteración I4) con metas definidas."))
     d.add(p("Quinta. La solución mantiene alrededor de 85 % de código Java y no tiene costo de operación mensual: la lectura se "
             "hace en el teléfono y no hay servidor que mantener."))
     d.add(p("Sexta. Los siguientes pasos, hacia APF3, son construir el front-end y el dominio a partir de la documentación "
@@ -980,6 +1072,8 @@ def anexos(d):
     # B
     d.add(h2("Anexo B: Project Charter", salto=True))
     d.e1(462, 464, reemplazos=[(TITULO_E1_CHARTER, TITULO),
+                               ("Desarrollar una app Android en Java que lea facturas con Gemma 4 ajustado ejecutado en el teléfono "
+                                "y calcule el total mensual y la categoría del NRUS.", OBJETIVO_GENERAL),
                                ("(detalle en A3.4)", "(detalle en el Anexo D)"),
                                ("instalación del modelo y respaldo opcional.", "instalación del modelo y exportación de datos.")])
     # C
@@ -1099,8 +1193,8 @@ def anexos(d):
             "consiste en subir el archivo al repositorio público y lanzar una versión de la app con el nuevo manifiesto, sin "
             "servidor propio; y en "
             "el teléfono la verificación de SHA-256 y la prueba con una factura de control protegen la versión instalada."))
-    d.figura("f_cierre", "bpmn_04_cierre.png", "Subproceso «Cierre mensual y declaración»")
-    d.figura("f_modelo", "bpmn_05_modelo.png", "Subproceso «Publicar y actualizar el modelo de IA»")
+    d.figura("f_cierre", "bpmn_04_cierre.png", "Subproceso «Cierre mensual y declaración»", nota=NOTA_BPMN)
+    d.figura("f_modelo", "bpmn_05_modelo.png", "Subproceso «Publicar y actualizar el modelo de IA»", nota=NOTA_BPMN)
     d.tabla("t_elementos_bpmn", "Elementos BPMN utilizados en cada diagrama",
             ["Diagrama", "Eventos", "Compuertas", "Otros elementos"],
             [["AS-IS", "Inicio, mensaje, temporizador (fin de mes), fin", "2 exclusivas y sus uniones", "3 pools, almacén de datos, anotaciones de error"],
@@ -1459,18 +1553,49 @@ SELECT f.fecha_emision, e.ruc, e.razon_social, f.serie, f.numero, f.moneda, f.im
 
 # ======================================================================
 def bibliografia(d):
-    d.e1(546, 546)
+    # Referencias que se agregan en orden alfabético después del bloque indicado del entregable 1 (546 es el título).
+    # Las añadidas por las observaciones del docente al APF2 se verificaron en la fuente (DOI, editorial o sitio oficial).
     nuevas = {
-        547: ["Elmasri, R., y Navathe, S. B. (2016). *Fundamentals of database systems* (7.ª ed.). Pearson."],
-        551: ["Google. (s. f.). *Material Design 3*. https://m3.material.io/"],
+        546: ["Brooke, J. (1996). SUS: A \"quick and dirty\" usability scale. En P. W. Jordan, B. Thomas, B. A. Weerdmeester "
+              "e I. L. McClelland (Eds.), *Usability evaluation in industry* (pp. 189–194). Taylor & Francis.",
+              "Chen, P. P.-S. (1976). The entity-relationship model—Toward a unified view of data. *ACM Transactions on "
+              "Database Systems, 1*(1), 9–36. https://doi.org/10.1145/320434.320440",
+              "Codd, E. F. (1970). A relational model of data for large shared data banks. *Communications of the ACM, 13*(6), "
+              "377–387. https://doi.org/10.1145/362384.362685"],
+        547: ["Dumas, M., La Rosa, M., Mendling, J., y Reijers, H. A. (2018). *Fundamentals of business process management* "
+              "(2.ª ed.). Springer. https://doi.org/10.1007/978-3-662-56509-4",
+              "Elmasri, R., y Navathe, S. B. (2016). *Fundamentals of database systems* (7.ª ed.). Pearson."],
+        551: ["Google. (s. f.-d). *Material Design 3*. https://m3.material.io/"],
+        555: ["Instituto Nacional de Estadística e Informática. (2018). *Población del Perú totalizó 31 millones 237 mil 385 "
+              "personas al 2017* (Nota de prensa N.° 108). https://www.inei.gob.pe/media/MenuRecursivo/noticias/"
+              "nota-de-prensa-no-108-2018-inei.pdf"],
         556: ["International Organization for Standardization. (2013). *ISO/IEC 19510:2013 — Information technology: Object Management Group Business Process Model and Notation*. ISO."],
+        557: ["International Organization for Standardization. (2019). *ISO 9241-210:2019 — Ergonomics of human-system "
+              "interaction: Part 210. Human-centred design for interactive systems*. ISO. https://www.iso.org/standard/77520.html",
+              "Loayza, N. (2008). Causas y consecuencias de la informalidad en el Perú. *Revista Estudios Económicos, 15*, "
+              "43–64. https://www.bcrp.gob.pe/docs/Publicaciones/Revista-Estudios-Economicos/15/Estudios-Economicos-15-3.pdf"],
         559: ["Nielsen, J. (1994). *Usability engineering*. Morgan Kaufmann.",
+              "Norman, D. A. (2013). *The design of everyday things* (Ed. revisada y ampliada). Basic Books.",
               "Object Management Group. (2014). *Business Process Model and Notation (BPMN), Version 2.0.2*. OMG."],
         561: ["OWASP Foundation. (s. f.). *OWASP Mobile Application Security Verification Standard (MASVS)*. https://mas.owasp.org/"],
+        563: ["Saltzer, J. H., y Schroeder, M. D. (1975). The protection of information in computer systems. *Proceedings of "
+              "the IEEE, 63*(9), 1278–1308. https://doi.org/10.1109/PROC.1975.9939",
+              "Silva Pérez, D. del P., y Soria Asencios, N. C. (2024). *Acceso a un crédito preferencial para enfrentar la baja "
+              "recaudación del Nuevo Régimen Único Simplificado desarrollado por la Superintendencia Nacional de Aduanas y "
+              "Administración Tributaria en el Perú* [Tesis de maestría, Pontificia Universidad Católica del Perú]. "
+              "Repositorio de Tesis PUCP. http://hdl.handle.net/20.500.12404/27946"],
         569: ["World Wide Web Consortium. (2018). *Web Content Accessibility Guidelines (WCAG) 2.1*. W3C. https://www.w3.org/TR/WCAG21/",
               "Zetetic. (s. f.). *SQLCipher for Android*. https://www.zetetic.net/sqlcipher/"],
     }
+    # APA 7: varias obras del mismo autor sin fecha se distinguen con s. f.-a, s. f.-b… (orden alfabético del título).
+    sufijos = {549: "a", 550: "b", 551: "c", 552: "e", 566: "a", 567: "b"}
+    d.e1(546)
+    for ref in nuevas[546]:
+        d.e1_texto(547, ref)
     for i in range(547, 570):
-        d.e1(i)
+        if i in sufijos:
+            d.e1(i, reemplazos=[("(s. f.)", f"(s. f.-{sufijos[i]})")])
+        else:
+            d.e1(i)
         for ref in nuevas.get(i, []):
             d.e1_texto(547, ref)
