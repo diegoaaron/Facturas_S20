@@ -8,3 +8,4 @@ Una línea por memoria: `- [Título](archivo.md) — gancho`. El contenido va en
 - [Observaciones docentes al APF2](006_14_10_26_feedback_observaciones_docente_apf2.md) — citas APA, tablas/figuras APA, sin formulación, objetivo = título, OE con indicador; corregido en scripts el 2026-10-24
 - [Etiquetado del dataset de ajuste fino](007_25_10_26_proyecto_etiquetado_dataset.md) — total con percepción, razón social impresa; `tunning_gemma4/datos/` fuera de git
 - [Entrenamiento local en WSL con 6 GB](008_25_10_26_proyecto_entrenamiento_local_wsl.md) — cabe dejando embed_tokens_per_layer en la CPU; venv ~/venvs/gemma
+- [El usuario decide todo](009_26_10_26_feedback_usuario_decide_todo.md) — no proponer consultar ni avisar decisiones al resto del equipo
