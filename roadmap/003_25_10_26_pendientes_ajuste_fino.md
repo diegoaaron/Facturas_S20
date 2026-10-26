@@ -41,7 +41,18 @@ Estado al 2026-10-25 (noche) y lo que falta, en orden. Complementa la documentac
    - **Híbrido con la visión oficial** (texto nuestro + codificador, adaptador y fin de visión del `.litertlm` oficial, `max_num_patches` 2520): armado en segundos con `litert-lm-peek --dump_files_dir` + `litert-lm-builder toml`; quedó en `modelos/lora_v1/hibrido/`. **Empeora:** el RUC entra en bucle (lo cortó el tope de 200 tokens a los 52 s). La visión queda descartada; el culpable es **el modelo de texto convertido**, casi seguro la cuantización `dynamic_wi4_afp32` (nuestro `prefill_decode` pesa 1.163 MB; el oficial, 818 MB con activaciones fp16, otra receta).
    - Comparación de secciones (con `litert-lm-peek`): el oficial trae además audio y `mtp_drafter` (decodificación especulativa), y marca `prefer_activation_type=fp16` en visión y texto.
    - Por cable la subida al teléfono tardó 64 s en la última prueba (antes 10 min; la conexión varía).
-   - Siguiente prueba: cuantizar el modelo de texto a 8 bits. En `modelos/base/litertlm/tmpy6m7opqh/` quedó el `model.tflite` en float32 (8,7 GB) del intento cortado: se puede cuantizar con `ai-edge-quantizer` y armar un híbrido sin repetir toda la conversión. Si a 8 bits lee bien, convertir el afinado igual.
+   - **Receta que funciona (2026-10-26), medida con el base y la factura de control:** se recuantizaron las partes en float32 que quedaron del intento cortado (`modelos/base/litertlm/tmpy6m7opqh/`), unos 4 min cada una:
+
+     | Variante del base | Lectura | Memoria | Tamaño |
+     |---|---|---|---|
+     | Todo a 4 bits | mal: RUC, razón social, serie, número, fecha | 1,9 GB | 2,54 GiB |
+     | Texto a 8 bits | RUC ✓, razón social parcial, serie y número vacíos | 3,2 GB | 3,6 GiB |
+     | Texto + embebedores a 8 bits | además razón social ✓ | 3,2 GB | 4,9 GiB |
+     | **Texto + embebedores a 8 bits + visión oficial** | **igual que el oficial salvo la fecha** (`2025-10-25`; la impresa es 25/10/2026) | 3,5 GB | 4,93 GiB |
+     | Texto a 8 bits + embebedores y visión oficiales | no sirve: los embebedores oficiales no son compatibles con nuestro texto | — | — |
+
+     Lee en 32–57 s (el oficial: 64–120 s). Queda en dos scripts: `convertir.py --solo-float` (exporta en float32, sin cuantizar ni empaquetar) y `empaquetar.py` (cuantiza a 8 bits texto y embebedores, toma la visión del oficial y arma `modelos/<nombre>/empaquetado/model.litertlm`). Probado con el base: el `.litertlm` que arma pasa `MedicionGemmaTest`.
+   - **Pendiente:** correr la receta con `lora_v1` y medirlo. Después, ver si alguna parte puede volver a 4 bits para achicar los 4,9 GiB (la descarga del oficial es de 2,4 GiB) y si los 3,5 GB de memoria caben en los teléfonos objetivo (RNF-05).
 7. **Publicar** (§6.6/§6.7): subir a Hugging Face en una revisión fija, calcular SHA-256, actualizar `assets/modelo.json` y sacar versión de la app.
 8. **Ampliar el dataset:** más emisores, más facturas (hoy casi todo son boletas) y alguna en USD si hay. Etiquetar con las reglas de `memorias/007_…`.
 9. **Ordenar después:** actualizar §6.7 (todavía dice 896 px y el cuaderno) y decidir si se retira `tunning_model_gemma4_6.ipynb` en favor de los scripts.
