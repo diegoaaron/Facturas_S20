@@ -13,3 +13,6 @@ __pycache__/
 
 # Fotos y etiquetas del ajuste fino (datos reales: RUC, nombres, montos)
 tunning_gemma4/datos/
+
+# Caché que genera Unsloth en la carpeta desde donde se ejecuta
+unsloth_compiled_cache/
