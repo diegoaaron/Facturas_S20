@@ -1,6 +1,6 @@
 # Pendientes del ajuste fino de Gemma 4 E2B (iteración I4)
 
-Estado al 2026-10-25 y lo que falta, en orden. Complementa la documentación técnica §6.2, §6.5 y §6.7 (`001_…`). El contexto que no está en el código vive en `memorias/007_…` (reglas de etiquetado) y `memorias/008_…` (entorno de WSL y truco de memoria).
+Estado al 2026-10-25 (noche) y lo que falta, en orden. Complementa la documentación técnica §6.2, §6.5 y §6.7 (`001_…`). El contexto que no está en el código vive en `memorias/007_…` (reglas de etiquetado) y `memorias/008_…` (entorno de WSL y truco de memoria).
 
 ## Hecho
 
@@ -11,14 +11,26 @@ Estado al 2026-10-25 y lo que falta, en orden. Complementa la documentación té
 ## Pendiente
 
 1. ~~Commit y push del cambio de formato~~ — hecho el 2026-10-25.
-2. **Probar la instrucción nueva en el teléfono** con el modelo base (`MedicionGemmaTest` / `LecturaGemmaTest`, `./gradlew :app:connectedDebugAndroidTest`): comprobar que responde en JSON plano y cómo cambia el tiempo frente a la tabla de §6.5.
+2. ~~Probar la instrucción nueva en el teléfono~~ — hecho el 2026-10-25 con `MedicionGemmaTest` a 512 px en el Moto G34. El **modelo base no obedece «sin espacios»**: responde el JSON plano pero con saltos de línea y dentro de ```` ```json ````. Tardó 120 s y 64 s (antes, con el esquema de `valor` + `confianza`: 53 s y 47 s); los 7 campos salen bien. Con el base no se gana tiempo: la ganancia tiene que venir del afinado.
 3. **Avisar a Coronel Obregón** de la decisión del formato (§6.7 decía que lo eligían ambos).
-4. **Script de entrenamiento completo** (`tunning_gemma4/entrenar.py`), partiendo de `prueba_memoria_gpu.py`:
-   - Respuesta = `json.dumps({7 campos}, ensure_ascii=False, separators=(',', ':'))`, con `null` para celdas vacías. La instrucción debe ser **idéntica** a `ParserRespuesta.INSTRUCCION` (copiarla tal cual).
-   - División entrenamiento / validación / prueba **por emisor (RUC)**, para no medir de más; `compr_021` y `compr_022` son la misma boleta y van juntas. Son 52 fotos de 15 emisores: la prueba saldrá chica, conviene anotarlo en los resultados.
-   - 512 px (lo que recibe el modelo en la app), LoRA r=16 con visión congelada, 3 épocas, reutilizando `EmbeddingEnCpu`.
-   - Guardar el LoRA en una carpeta ignorada por git (p. ej. `tunning_gemma4/modelos/`). Ejecutar con cwd en `/tmp` (Unsloth crea `unsloth_compiled_cache/`).
-5. **Evaluar por campo** el afinado contra el modelo base en el conjunto de prueba (coincidencia exacta tras normalizar como `ParserRespuesta`). Criterio §6.7: mejorar al base y ≥ 90 % por campo.
+4. ~~Script de entrenamiento~~ — hecho: `tunning_gemma4/entrenar.py` (lo común está en `comun.py`, que lee la instrucción directo de `ParserRespuesta.java`). Divide por emisor (semilla 42): 31 fotos / 7 emisores para entrenar, 9 / 1 (Gloria) para validar y 12 / 7 para la prueba. Entrena solo sobre la respuesta (`train_on_responses_only`), 3 épocas, se queda con la de menor pérdida de validación. Deja el LoRA, `division.json` y `entrenamiento.json` en `tunning_gemma4/modelos/<nombre>/` (ignorada por git). Se corre desde `/tmp`: `python /mnt/c/reposPersonal/Facturas_S20/tunning_gemma4/entrenar.py --nombre lora_v1`.
+5. **Evaluar por campo** — script hecho (`evaluar.py --nombre lora_v1`, deja `evaluacion_prueba.json` con cada respuesta). Resultado de `lora_v1` (5,7 min de entrenamiento, pico 4,22 GiB, mejor época 2) en las 12 fotos de prueba, a 512 px:
+
+   | Campo | Base | Afinado v1 |
+   |---|---|---|
+   | ruc | 50 % | 58 % |
+   | razon_social | 25 % | 50 % |
+   | serie | 8 % | 83 % |
+   | numero | 0 % | 50 % |
+   | fecha_emision | 25 % | 67 % |
+   | moneda | 83 % | 92 % |
+   | importe_total | 75 % | 75 % |
+   | comprobante completo | 0 % | 8 % |
+
+   **Mejora al base en todo, pero no llega al 90 %** (criterio §6.7). Lo que queda:
+   - El formato ya está aprendido (JSON compacto, serie y número separados, fecha ISO). Los errores restantes son **dígitos mal leídos** (RUC, número) a 512 px y **razón social** recortada (`CURTIS & CO.` en vez del nombre completo) o confundida con el nombre del cliente.
+   - **Bucle de repetición:** en `compr_001` (base y afinado) y `compr_052` (base) el modelo escribe ceros sin parar en `numero`. En la app eso dura hasta el tiempo límite, porque `objetoCompleto` nunca ve la llave de cierre: conviene cortar por número de tokens (unos 120 alcanzan para el JSON compacto) o detectar la repetición en el puente.
+   - Hay pocos datos: 31 fotos de 7 emisores para entrenar. Lo que más debería ayudar es ampliar el dataset (punto 8). También se puede probar más resolución para los dígitos, pero en el teléfono 896 px tarda 4–5 min.
 6. **Fusionar y convertir a `.litertlm`:**
    - Subir la RAM de WSL en `C:\Users\diego\.wslconfig` (hoy 11 GB; fusionar a 16 bits pide ~10 GB o más).
    - `litert-torch export_hf` (paquete `litert-torch-nightly`) con `--externalize_embedder`, `--jinja_chat_template_override=litert-community/gemma-4-E2B-it-litert-lm` (la plantilla original usa `map.get()` y falla en el teléfono), `cache_length` ≥ 1024 y cuantización `dynamic_wi4_afp32`.

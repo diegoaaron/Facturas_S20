@@ -16,3 +16,6 @@ tunning_gemma4/datos/
 
 # Caché que genera Unsloth en la carpeta desde donde se ejecuta
 unsloth_compiled_cache/
+
+# LoRA, checkpoints y resultados del ajuste fino (pesan y salen de datos reales)
+tunning_gemma4/modelos/
