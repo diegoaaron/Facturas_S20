@@ -151,6 +151,8 @@ En PowerShell o cmd se usa `gradlew.bat` en lugar de `./gradlew`.
 | El teléfono no aparece en *Devices* | Revisa el cable (algunos solo cargan), el aviso de depuración en el teléfono o el driver USB del fabricante |
 | `IOException: El nombre de archivo… sintaxis de la etiqueta del volumen no son correctos` al compilar | Ruta del SDK mal escrita en `android/local.properties`; ver el paso 9 |
 | El teléfono aparece dos veces | Depuración inalámbrica; elige uno (en terminal, `ANDROID_SERIAL`, ver el paso 9) |
+| `connectedDebugAndroidTest` dice *"Found 1 connected device(s), 0 of which were compatible"* | Por Wi-Fi, Gradle no alcanzó a leer las propiedades del teléfono a tiempo (en `--info` aparece `ShellCommandUnresponsiveException`). Reinicia adb (`adb kill-server` y `adb start-server`), vuelve a mirar el serial en `adb devices` y repite; o conecta el cable USB |
+| `connectedDebugAndroidTest` desinstala la app | Es lo normal: al terminar se borran la app y sus datos. Vuelve a instalarla con `./gradlew :app:installDebug` |
 | El menú *File* no aparece | En la bienvenida no existe; con el proyecto abierto está dentro de **☰** |
 
 Con la app abierta en el teléfono, el equipo está listo para empezar el desarrollo: la iteración **I3** de `001_27_09_26_documentacion_tecnica_y_roadmap.md` §13 (este documento es su paso 0).

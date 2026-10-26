@@ -64,6 +64,8 @@ junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
 androidx-test-espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
+# Respuesta simulada de la cámara (P06) en la prueba del flujo principal
+androidx-test-espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espresso" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTest" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidxTest" }
 

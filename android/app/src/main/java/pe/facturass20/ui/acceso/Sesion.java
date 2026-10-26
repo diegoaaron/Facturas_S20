@@ -33,6 +33,8 @@ public final class Sesion {
     private final MutableLiveData<Estado> estado = new MutableLiveData<>();
     private boolean comprobando;
     private long salida = -1;
+    /** Actividades de la app en pantalla; la app sale cuando llega a 0. */
+    private int visibles;
 
     /** @param hayPin consulta la base; se llama en {@code ejecutor} */
     public Sesion(Executor ejecutor, BooleanSupplier hayPin) {
@@ -63,13 +65,21 @@ public final class Sesion {
         estado.setValue(Estado.DESBLOQUEADA);
     }
 
-    /** La app pasó a segundo plano. */
+    /**
+     * Una actividad dejó de verse ({@code onStop}, también al girar). Solo cuenta como salir de la app si no
+     * queda otra a la vista: al abrir la cámara, {@code MainActivity} se detiene después de que
+     * {@code CapturaActivity} ya empezó.
+     */
     public void alSalir() {
-        salida = SystemClock.elapsedRealtime();
+        visibles = Math.max(0, visibles - 1);
+        if (visibles == 0) {
+            salida = SystemClock.elapsedRealtime();
+        }
     }
 
-    /** La app volvió al frente: si estuvo fuera demasiado tiempo, se bloquea. */
+    /** Una actividad se ve ({@code onStart}): si la app estuvo fuera demasiado tiempo, se bloquea. */
     public void alVolver() {
+        visibles++;
         if (desbloqueada() && salida >= 0
                 && SystemClock.elapsedRealtime() - salida >= BLOQUEO_EN_SEGUNDO_PLANO_MS) {
             estado.setValue(Estado.BLOQUEADA);

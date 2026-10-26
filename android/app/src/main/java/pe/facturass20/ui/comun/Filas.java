@@ -41,6 +41,10 @@ public final class Filas {
         fila.textoTitulo.setText(titulo);
         fila.textoDetalle.setText(detalle);
         fila.textoDetalle.setVisibility(detalle == null ? View.GONE : View.VISIBLE);
+        // Todas las filas comparten el id «interruptor»: si Android guardara su estado, al volver a la
+        // pantalla les pondría a todas el del último y el listener lo guardaría (p. ej. activaba la huella).
+        // El estado siempre sale de «activado».
+        fila.interruptor.setSaveEnabled(false);
         fila.interruptor.setChecked(activado);
         fila.interruptor.setContentDescription(titulo);
         fila.interruptor.setOnCheckedChangeListener((boton, marcado) -> alCambiar.accept(marcado));

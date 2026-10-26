@@ -806,7 +806,7 @@ Son iteraciones de dos semanas, alineadas con las entregas del curso.
 | I1 | 1–4 | Análisis del contexto, alternativas y SRS | APF1 | ✅ completo |
 | I2 | 5–8 | Diseño de procesos, datos, clases, prototipo y documentación técnica | APF2 | ✅ completo |
 | Paso 0 | 8 | Configuración del equipo y proyecto Android base | App "Hello World!" en el teléfono | ✅ completo (ver 13.3) |
-| I3 | 9–10 | Front-end navegable (P01–P20) sobre la base de datos cifrada, y dominio con motor de reglas probado | Incremento 1 | ⏳ en curso (pasos 1 a 4 hechos y probados en el teléfono; falta el paso 5, ver 13.4) |
+| I3 | 9–10 | Front-end navegable (P01–P20) sobre la base de datos cifrada, y dominio con motor de reglas probado | Incremento 1 | ✅ completo el 2026-10-25 (pasos 1 a 5, ver 13.4) |
 | I4 | 11–12 | Inferencia local con el modelo convertido, medición en el teléfono y prueba de usabilidad | APF3 | pendiente |
 | I5 | 13–14 | Reporte PDF, exportación de datos e historial | Incremento 3 | pendiente |
 | I6 | 15–18 | Pruebas, validación en mes simulado y sustentación | Informe final | pendiente |
@@ -857,7 +857,7 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
    - `ContenedorDependencias` crea la base y los repositorios la primera vez que se piden, y entrega los casos de uso.
    - Manifiesto: `allowBackup="false"` y reglas de copia y transferencia que excluyen todo.
    - El dominio se limitó a la biblioteca de Java 8 + `java.time` (`Stream.toList()`, `List.of`, `isBlank()`… no existen en Android 8 y lint no revisa `:dominio`; ver comentario en `dominio/build.gradle.kts`).
-   - Pruebas instrumentadas (`app/src/androidTest/.../datos/`): `RepositoriosRoomTest` (flujo real con los casos de uso, montos exactos, duplicados, reregistro de anulada, ventas NULL vs 0, cierre y **rollback de la transacción**), `CargadorParametrosNrusTest` y `CifradoTest` (Keystore, imágenes, PIN, y que el archivo `.db` no se abre sin la clave). **Compilan, pero no se han corrido:** no había teléfono conectado. Correr con `./gradlew :app:connectedDebugAndroidTest` con el teléfono por USB.
+   - Pruebas instrumentadas (`app/src/androidTest/.../datos/`): `RepositoriosRoomTest` (flujo real con los casos de uso, montos exactos, duplicados, reregistro de anulada, ventas NULL vs 0, cierre y **rollback de la transacción**), `CargadorParametrosNrusTest` y `CifradoTest` (Keystore, imágenes, PIN, y que el archivo `.db` no se abre sin la clave). Se corrieron por primera vez en el teléfono el 2026-10-25, todas en verde. Se corren con `./gradlew :app:connectedDebugAndroidTest`.
    - ~~Pendiente para el paso 4: destino inicial~~ — resuelto en el paso 4 (primer bloque).
 4. **Pantallas en el orden del flujo (FE, el 80 %)**, cada una con su Fragment, layout y ViewModel sobre los repositorios reales:
    - ✅ **Primer bloque (2026-09-28): P01, P02 y P04**, compilado y con pruebas unitarias; probado en el teléfono el 2026-10-25 (Moto G34 5G, Android 15).
@@ -893,7 +893,15 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
    - NRUS: P13 Ventas ✅, P14 Categoría y cuota ✅, P15 Vencimiento ✅.
    - Reportes: P16 Reporte (vista previa, sin PDF real) ✅, P17 Historial y cierre ✅.
    - Ajustes: P18 Ajustes ✅, P03 Preparar modelo ✅ y P20 Exportar datos ✅ (solo interfaz: sin descarga ni ZIP reales).
-5. **Cierre del incremento**: prueba Espresso del flujo principal (Escanear → disparar → Guardar, ≤ 3 toques); instalar en el teléfono y tomar capturas para el APF3.
+5. ✅ **Cierre del incremento** — hecho el 2026-10-25 en el Moto G34 5G (Android 15). Pasan las **18 pruebas instrumentadas**.
+   - Espresso-Intents (`espresso-intents` 3.7.0) y `testOptions.animationsDisabled`.
+   - `ui.FlujoPrincipalTest`: Escanear → disparar → Guardar en **3 toques** (RNF-09), con la guía P05 oculta, la base cifrada real y el `ExtractorFalso`. Comprueba que queda una factura nueva leída por IA, con su foto cifrada, sus 7 campos y `CapturaEnCurso` limpia. La cámara (P06) se simula con Espresso-Intents, porque una prueba no puede asegurar una foto nítida: la respuesta deja la foto en `CapturaEnCurso`, devuelve `RESULT_OK` y cuenta como el toque del disparador. Tarda unos 7 s.
+   - `ui.SesionDePrueba`: crea un negocio de prueba si falta, desbloquea la sesión y espera vistas que dependen de hilos de fondo.
+   - **Capturas para el APF3** en `documentos_teoricos/entregable3/entregable3_archivos/capturas/` (29 PNG, P01 a P20 con datos ficticios de «Bodega Rosita», RUC 10456789124). Las facturas se leyeron desde una imagen de ejemplo de la galería y con el registro manual. `p06_camara` apunta a una pared y no a una factura (conviene repetirla). En `p18b_ajustes_abajo`, la huella aparece activada por el primer error de abajo.
+   - Errores encontrados al recorrer la app, ya corregidos:
+     - **Interruptores que se encendían solos.** Las filas de `Filas.interruptor` comparten el id `interruptor`. Al volver a una pantalla, Android les restauraba a todas el estado del último interruptor, y el listener lo guardaba: en P18, ir a P03 y volver **activaba la huella**. Pasaba también en P14, P15 y P20. Ahora el interruptor no guarda su estado (`setSaveEnabled(false)`), porque siempre se toma de la preferencia. Lo cubre `ui.InterruptoresTest`, que falla sin la corrección.
+     - **La sesión se bloqueaba al volver de la cámara.** Al abrir P06, `MainActivity.onStop` ocurre después de `CapturaActivity.onStart`, así que `Sesion` creía que la app había salido. Con más de 5 min en la cámara, al volver pedía el PIN. Ahora `Sesion` cuenta las actividades a la vista y solo marca la salida cuando no queda ninguna. Los `onStop` ya no omiten `alSalir()` al girar, para que la cuenta quede pareja. Esta corrección **no se ha probado en el teléfono** (habría que esperar 5 min en la cámara).
+   - Para revisar en I4: con la cámara apuntando a una pared, la nitidez sale «buena»; esto confirma que hay que calibrar los umbrales (paso 4, segundo bloque). En P14, `scrollTo` deja la última fila bajo el botón central Escanear, que se monta sobre el contenido; un toque ahí abre P05.
 
 **I4 · semanas 11–12 — Persistencia e IA local (APF3)**
 5. ~~Room + SQLCipher~~ (se adelantó a I3, paso 3).
