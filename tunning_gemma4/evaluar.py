@@ -19,8 +19,8 @@ import torch
 from peft import PeftModel
 from unsloth import FastVisionModel
 
-from comun import (CAMPOS, CARPETA, INSTRUCCION, MODELOS, cargar_imagen, cargar_modelo_base,
-                   interpretar, leer_etiquetas, normalizar)
+from comun import CAMPOS, CARPETA, INSTRUCCION, MODELOS, cargar_imagen, interpretar, leer_etiquetas, normalizar
+from modelo_gpu import cargar_modelo_base
 
 UMBRAL = 0.9
 

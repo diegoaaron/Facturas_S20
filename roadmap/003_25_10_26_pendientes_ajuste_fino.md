@@ -57,7 +57,20 @@ Estado al 2026-10-25 (noche) y lo que falta, en orden. Complementa la documentac
      2. `convertir.py --nombre lora_v1` (entorno `~/venvs/litert`, terminal propia; ~1 h, pico ~20 GB): exporta a 8 bits en `modelos/<nombre>/litertlm/`.
      3. `empaquetar.py --nombre lora_v1` (segundos): cambia la visión por la oficial y deja `modelos/<nombre>/empaquetado/model.litertlm`.
    - **`lora_v1` convertido así (2026-10-26):** pasa `MedicionGemmaTest`. Lee bien RUC, razón social, serie (`F001`) y número (`004521`) ya separados, moneda e importe, en el JSON compacto que aprendió. Falla la fecha igual que el base (`2025-10-25`; la impresa es 25/10/2026). 31–44 s por lectura, 3,5 GB de memoria, 4,93 GiB. En el teléfono quedó como `modelo_afinado_v1.litertlm` (el oficial sigue en `modelo.litertlm`).
-   - **Pendiente:** evaluar el convertido en las 12 fotos de prueba (no solo en la factura de control), comparándolo con el oficial; ver si alguna parte puede volver a 4 bits para achicar los 4,9 GiB (la descarga del oficial es de 2,4 GiB); y ver si los 3,5 GB de memoria caben en los teléfonos objetivo (RNF-05).
+   - **Evaluación del `.litertlm` en las 12 fotos de prueba (2026-10-26)** con `evaluar_litertlm.py` (entorno `~/venvs/litertlm` con `litert-lm-api` 0.18.1; corre el archivo que va al teléfono en la CPU de la PC, ~7 s por foto, y lee la factura de control igual que el teléfono):
+
+     | Campo | Oficial | Base convertido | **Afinado v1 convertido** | (afinado v1 en PyTorch) |
+     |---|---|---|---|---|
+     | ruc | 50 % | 42 % | **67 %** | 58 % |
+     | razon_social | 17 % | 33 % | **58 %** | 50 % |
+     | serie | 0 % | 0 % | **75 %** | 83 % |
+     | numero | 8 % | 8 % | **42 %** | 50 % |
+     | fecha_emision | 17 % | 0 % | **25 %** | 67 % |
+     | moneda | 58 % | 100 % | **92 %** | 92 % |
+     | importe_total | 50 % | 83 % | **83 %** | 75 % |
+
+     El afinado convertido **supera al oficial en todos los campos** y la conversión no le quita lo aprendido (sube en unos campos y baja en otros frente a PyTorch; con 12 fotos, una foto son 8 puntos). No llega al 90 %. El oficial responde todo `null` en 5 de las 12 fotos reales. Los errores del afinado son casi todos un dígito mal leído o la fecha corrida unos días (límite de 512 px), y `compr_001` entra en bucle de ceros.
+   - **Pendiente:** ver si alguna parte puede volver a 4 bits para achicar los 4,9 GiB (la descarga del oficial es de 2,4 GiB); ver si los 3,5 GB de memoria caben en los teléfonos objetivo (RNF-05); medir 768 px en el teléfono con el afinado (los errores son de dígitos). `litert-lm-api` trae `LoraConfig`: LiteRT-LM podría aplicar el LoRA sobre el modelo oficial en tiempo de ejecución, sin convertir todo; vale la pena averiguarlo.
 7. **Publicar** (§6.6/§6.7): subir a Hugging Face en una revisión fija, calcular SHA-256, actualizar `assets/modelo.json` y sacar versión de la app.
 8. **Ampliar el dataset:** más emisores, más facturas (hoy casi todo son boletas) y alguna en USD si hay. Etiquetar con las reglas de `memorias/007_…`.
 9. **Ordenar después:** actualizar §6.7 (todavía dice 896 px y el cuaderno) y decidir si se retira `tunning_model_gemma4_6.ipynb` en favor de los scripts.

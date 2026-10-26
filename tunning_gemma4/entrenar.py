@@ -19,8 +19,8 @@ from trl import SFTConfig, SFTTrainer
 from unsloth import FastVisionModel
 from unsloth.trainer import UnslothVisionDataCollator
 
-from comun import (MARCA_MODELO, MARCA_USUARIO, MODELOS, a_ejemplo, cargar_modelo_base,
-                   dividir_por_emisor, gib, leer_etiquetas)
+from comun import MARCA_MODELO, MARCA_USUARIO, MODELOS, a_ejemplo, dividir_por_emisor, gib, leer_etiquetas
+from modelo_gpu import cargar_modelo_base
 
 
 def main():
