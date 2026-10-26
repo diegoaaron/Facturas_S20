@@ -11,13 +11,20 @@ import android.os.StatFs;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.work.WorkInfo;
 
+import java.util.List;
+
+import pe.facturass20.ContenedorDependencias;
+import pe.facturass20.datos.entidades.ModeloLocalEntity;
+import pe.facturass20.inferencia.GestorModeloLocal;
+import pe.facturass20.trabajos.DescargaModeloWorker;
 import pe.facturass20.ui.comun.BaseViewModel;
 
 /**
- * P03 Preparar lectura con IA (RF-20, documentación técnica §6.6, paso 1): comprueba si el teléfono puede
- * usar el modelo. La descarga (DescargaModeloWorker, SHA-256 y prueba) llega en la iteración I4, cuando el
- * modelo convertido esté publicado; mientras tanto la app usa el lector de prueba o el registro manual.
+ * P03 Preparar lectura con IA (RF-20, documentación técnica §6.6): comprueba si el teléfono puede usar el
+ * modelo, muestra cuál está instalado y lanza o cancela la descarga ({@link DescargaModeloWorker}). Mientras
+ * no hay modelo, la app usa el lector de prueba o el registro manual.
  */
 public final class PreparacionModeloViewModel extends BaseViewModel {
 
@@ -25,8 +32,10 @@ public final class PreparacionModeloViewModel extends BaseViewModel {
     static final long MEMORIA_MINIMA = 5_500L * 1024 * 1024;
     /** Dos veces el modelo mientras se conservan dos versiones (§6.6). */
     static final long ESPACIO_MINIMO = 3_000L * 1024 * 1024;
-    /** Tamaño aproximado del modelo Gemma 4 E2B convertido (§6.6). */
-    public static final long TAMANO_MODELO = 2_600L * 1024 * 1024;
+
+    /** El modelo del manifiesto frente al instalado. */
+    public record Modelo(GestorModeloLocal.Estado estado, String versionManifiesto, String versionActiva,
+                         long tamanoBytes) { }
 
     /** Lo que se mide del teléfono. */
     public record Equipo(long memoria, long espacioLibre, boolean wifi, String android) {
@@ -46,6 +55,7 @@ public final class PreparacionModeloViewModel extends BaseViewModel {
     }
 
     private final MutableLiveData<Equipo> equipo = new MutableLiveData<>();
+    private final MutableLiveData<Modelo> modelo = new MutableLiveData<>();
 
     public PreparacionModeloViewModel(@NonNull Application aplicacion) {
         super(aplicacion);
@@ -55,7 +65,36 @@ public final class PreparacionModeloViewModel extends BaseViewModel {
         return equipo;
     }
 
+    public LiveData<Modelo> modelo() {
+        return modelo;
+    }
+
+    /** La descarga en curso o la última, con su avance. */
+    public LiveData<List<WorkInfo>> descarga() {
+        return DescargaModeloWorker.estado(getApplication());
+    }
+
+    public void descargar() {
+        DescargaModeloWorker.encolar(getApplication());
+    }
+
+    public void cancelarDescarga() {
+        DescargaModeloWorker.cancelar(getApplication());
+    }
+
+    /** Vuelve a leer qué modelo está instalado (al abrir y al terminar una descarga). */
+    public void comprobarModelo() {
+        ContenedorDependencias c = contenedor();
+        enFondo(() -> {
+            GestorModeloLocal gestor = c.gestorModelo();
+            ModeloLocalEntity activo = gestor.activo();
+            return new Modelo(gestor.estado(), gestor.manifiesto().version(), activo == null ? null : activo.version,
+                    gestor.manifiesto().tamanoBytes());
+        }, modelo::setValue);
+    }
+
     public void comprobar() {
+        comprobarModelo();
         Context contexto = getApplication();
         enFondo(() -> {
             ActivityManager.MemoryInfo memoria = new ActivityManager.MemoryInfo();

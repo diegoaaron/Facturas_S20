@@ -19,6 +19,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import pe.facturass20.R;
 import pe.facturass20.databinding.DialogoCambiarPinBinding;
 import pe.facturass20.databinding.FragmentAjustesBinding;
+import pe.facturass20.databinding.ItemEnlaceBinding;
 import pe.facturass20.databinding.ItemInterruptorBinding;
 import pe.facturass20.dominio.modelo.ParametrosNrus;
 import pe.facturass20.ui.comun.Filas;
@@ -34,6 +35,7 @@ public class AjustesFragment extends Fragment {
 
     private FragmentAjustesBinding binding;
     private AjustesViewModel modelo;
+    private ItemEnlaceBinding filaModelo;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -57,8 +59,8 @@ public class AjustesFragment extends Fragment {
         Filas.interruptor(binding.seccionSeguridad, getString(R.string.ajustes_mostrar_guia),
                 getString(R.string.ajustes_mostrar_guia_detalle), modelo.mostrarGuia(), modelo::mostrarGuia);
 
-        Filas.enlace(binding.seccionLector, getString(R.string.ajustes_modelo), getString(R.string.ajustes_modelo_estado),
-                () -> navegar(R.id.ajustes_a_preparacionModelo));
+        filaModelo = Filas.enlace(binding.seccionLector, getString(R.string.ajustes_modelo),
+                getString(R.string.ajustes_modelo_estado), () -> navegar(R.id.ajustes_a_preparacionModelo));
         Filas.separador(binding.seccionLector);
         Filas.enlace(binding.seccionLector, getString(R.string.ajustes_modelo_nuevo),
                 getString(R.string.ajustes_modelo_nuevo_detalle), null);
@@ -80,6 +82,9 @@ public class AjustesFragment extends Fragment {
         Filas.enlace(binding.seccionNegocio, getString(R.string.ajustes_nombre), vista.contribuyente().nombre(), null);
         Filas.separador(binding.seccionNegocio);
         Filas.enlace(binding.seccionNegocio, getString(R.string.ajustes_titular), vista.contribuyente().titular(), null);
+
+        filaModelo.textoDetalle.setText(vista.versionModelo() == null ? getString(R.string.ajustes_modelo_estado)
+                : getString(R.string.ajustes_modelo_instalado, vista.versionModelo()));
 
         ParametrosNrus parametros = vista.parametros();
         binding.seccionParametros.removeAllViews();

@@ -15,6 +15,7 @@
     <string name="ajustes_mostrar_guia_detalle">Los consejos para tomar una buena foto</string>
     <string name="ajustes_modelo">Gemma 4 E2B facturas</string>
     <string name="ajustes_modelo_estado">Aún no instalado · se usa el lector de prueba</string>
+    <string name="ajustes_modelo_instalado">Instalado · versión %1$s</string>
     <string name="ajustes_modelo_nuevo">Modelo nuevo</string>
     <string name="ajustes_modelo_nuevo_detalle">Llega con cada actualización de la app</string>
     <string name="ajustes_parametros_version">Versión</string>
@@ -50,6 +51,21 @@
     <string name="modelo_descargar">Descargar modelo</string>
     <string name="modelo_a_mano">Registrar a mano mientras tanto</string>
     <string name="modelo_privacidad">Solo se descarga el modelo; sus datos no salen del teléfono</string>
+    <string name="modelo_para_descargar">Puede descargar el lector (versión %1$s). Mientras tanto, la app usa un lector de prueba con datos de ejemplo, o puede registrar sus facturas a mano.</string>
+    <string name="modelo_actualizacion">Hay una versión nueva del lector (%1$s). Mientras se descarga, se sigue usando la %2$s.</string>
+    <string name="modelo_instalado">Lector instalado (versión %1$s). Las facturas se leen en el teléfono, sin internet.</string>
+    <string name="modelo_incompatible">Este teléfono no puede usar el lector de IA (necesita un procesador de 64 bits). Puede registrar sus facturas a mano; se validan igual.</string>
+    <string name="modelo_esperando_wifi">La descarga empezará cuando el teléfono se conecte a una red Wi-Fi.</string>
+    <string name="modelo_avance" formatted="false">%1$s %2$d %% (%3$s de %4$s)</string>
+    <string name="modelo_copiando">Copiando el modelo…</string>
+    <string name="modelo_cancelar">Cancelar la descarga</string>
+    <string name="modelo_reintentar">Reintentar la descarga</string>
+    <string name="modelo_boton_instalado">Modelo instalado</string>
+    <string name="modelo_notificacion_titulo">Lector de facturas</string>
+    <string name="modelo_descargando">Descargando el modelo…</string>
+    <string name="modelo_verificando">Verificando el archivo…</string>
+    <string name="modelo_probando">Probando el modelo con una factura de ejemplo…</string>
+    <string name="modelo_error_descarga">No se pudo descargar el modelo. Revise el Wi-Fi y el espacio libre, y vuelva a intentarlo.</string>
 
     <!-- P20 -->
     <string name="exportar_subtitulo">Para revisar sus compras en una PC</string>

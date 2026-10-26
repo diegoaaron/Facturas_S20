@@ -27,7 +27,7 @@ import pe.facturass20.ui.comun.Formatos;
 
 /**
  * P07 Lectura (prototipo pantalla_07_lectura_en_el.png): muestra el avance mientras la IA lee la foto y
- * pasa a P08 cuando termina. Si falla o tarda más de 20 s, ofrece tomar otra foto o registrar a mano.
+ * pasa a P08 cuando termina. Si falla o se pasa del límite, ofrece tomar otra foto o registrar a mano.
  */
 public class LecturaFragment extends Fragment {
 
@@ -70,6 +70,8 @@ public class LecturaFragment extends Fragment {
         modelo.progreso().observe(getViewLifecycleOwner(), this::mostrarProgreso);
         modelo.segundosRestantes().observe(getViewLifecycleOwner(), segundos -> binding.textoRestante.setText(
                 segundos > 0 ? getString(R.string.lectura_restante, segundos) : getString(R.string.lectura_casi_listo)));
+        modelo.versionModelo().observe(getViewLifecycleOwner(), version -> binding.textoLector.setText(
+                version != null ? getString(R.string.lectura_modelo_gemma, version) : getString(R.string.lectura_modelo_prueba)));
         modelo.estado().observe(getViewLifecycleOwner(), estado -> {
             if (estado == LecturaViewModel.Estado.LISTA) {
                 navegar(R.id.lectura_a_verificacion, null);

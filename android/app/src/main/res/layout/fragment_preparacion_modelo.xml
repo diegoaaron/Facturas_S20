@@ -109,6 +109,16 @@
                             android:text="@string/modelo_no_publicado"
                             android:textAppearance="@style/Texto.FacturasS20.Dato"/>
 
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/progreso_descarga"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:max="100"
+                            android:visibility="gone"
+                            app:indicatorColor="@color/color_ok"
+                            app:trackCornerRadius="4dp"/>
+
                     <TextView
                             android:id="@+id/texto_descarga"
                             android:layout_width="match_parent"

@@ -27,6 +27,11 @@ sqlite = "2.7.1"
 sqlcipher = "4.17.0"
 camerax = "1.6.2"
 exifinterface = "1.4.2"
+# litertlm: no subir de 0.16.x mientras AGP sea 9.1 (su Kotlin 2.2 no lee las 0.17+, compiladas con Kotlin 2.4).
+litertlm = "0.16.1"
+# gson: la misma que trae litertlm-android 0.16.1.
+gson = "2.13.2"
+work = "2.12.0"
 
 [libraries]
 # UI
@@ -50,6 +55,14 @@ androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.r
 androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camerax" }
 androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "camerax" }
 androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
+
+# Lectura de facturas con Gemma 4 en el teléfono (documentación técnica §6)
+litertlm-android = { module = "com.google.ai.edge.litertlm:litertlm-android", version.ref = "litertlm" }
+# Descarga del modelo y, en I5, recordatorios (documentación técnica §4)
+androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "work" }
+
+# Lee el JSON que responde el modelo (ParserRespuesta)
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 
 # Base de datos: Room sobre SQLite cifrada con SQLCipher (documentación técnica §7)
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }

@@ -20,12 +20,13 @@ import pe.facturass20.R;
 import pe.facturass20.dominio.modelo.ReglaNegocioException;
 import pe.facturass20.dominio.modelo.ResultadoExtraccion;
 import pe.facturass20.dominio.puertos.ExtraccionException;
+import pe.facturass20.dominio.puertos.ExtractorFacturas;
 import pe.facturass20.ui.captura.FotoCapturada;
 import pe.facturass20.ui.comun.BaseViewModel;
 
 /**
  * P07 Lectura (RF-04): pasa la foto de {@code CapturaEnCurso} al extractor en el hilo de inferencia, con
- * un límite de 20 s, y deja el resultado en {@code CapturaEnCurso} para P08.
+ * un límite de 2 min, y deja el resultado en {@code CapturaEnCurso} para P08.
  *
  * <p>El extractor no informa su avance, así que el porcentaje es una estimación por tiempo que se detiene
  * en 95 % hasta que llega la respuesta.</p>
@@ -34,20 +35,24 @@ public final class LecturaViewModel extends BaseViewModel {
 
     public enum Estado { LEYENDO, LISTA, FALLO }
 
-    /** Límite de la lectura (documentación técnica §8.1, P07; RNF-04). */
-    static final long LIMITE_MS = 20_000;
-    /** Duración que se muestra; se ajustará con la medición de Gemma en el teléfono de referencia. */
-    static final long ESTIMADO_MS = 4_000;
+    /**
+     * Límite de toda la lectura, carga del modelo incluida (§8.1, P07). RNF-04 pide 20 s, pero Gemma tarda
+     * cerca de un minuto en el Moto G34 (§6.5); el extractor corta antes la generación, a los 90 s.
+     */
+    static final long LIMITE_MS = 120_000;
     private static final long INTERVALO_MS = 100;
 
     private final MutableLiveData<Estado> estado = new MutableLiveData<>();
     private final MutableLiveData<Integer> progreso = new MutableLiveData<>(0);
     private final MutableLiveData<Long> segundosRestantes = new MutableLiveData<>();
+    private final MutableLiveData<String> versionModelo = new MutableLiveData<>();
     private final Handler hiloUi = new Handler(Looper.getMainLooper());
     private final Runnable avanzar = this::avanzar;
     private String error;
     private Future<ResultadoExtraccion> tarea;
     private long inicio;
+    /** La duración que se muestra; se conoce al saber qué extractor lee (Gemma o el de prueba). */
+    private volatile long estimadoMs = 60_000;
     private boolean cancelada;
 
     public LecturaViewModel(@NonNull Application aplicacion) {
@@ -69,6 +74,11 @@ public final class LecturaViewModel extends BaseViewModel {
         return segundosRestantes;
     }
 
+    /** La versión de Gemma que lee la foto; null mientras no se sabe o si es el lector de prueba. */
+    public LiveData<String> versionModelo() {
+        return versionModelo;
+    }
+
     /** El motivo para el usuario cuando el estado es {@link Estado#FALLO}. */
     public String error() {
         return error;
@@ -88,7 +98,12 @@ public final class LecturaViewModel extends BaseViewModel {
         estado.setValue(Estado.LEYENDO);
         inicio = SystemClock.elapsedRealtime();
         hiloUi.post(avanzar);
-        tarea = c.ejecutorInferencia().submit(() -> c.extractor().extraer(foto.jpeg()));
+        tarea = c.ejecutorInferencia().submit(() -> {
+            ExtractorFacturas extractor = c.extractor();
+            estimadoMs = ContenedorDependencias.duracionEstimada(extractor);
+            versionModelo.postValue(ContenedorDependencias.versionModelo(extractor));
+            return extractor.extraer(foto.jpeg());
+        });
         Future<ResultadoExtraccion> enCurso = tarea;
         enFondo(() -> esperar(enCurso), resultado -> {
             if (resultado == null) {
@@ -137,8 +152,9 @@ public final class LecturaViewModel extends BaseViewModel {
 
     private void avanzar() {
         long transcurrido = SystemClock.elapsedRealtime() - inicio;
-        progreso.setValue((int) Math.min(95, transcurrido * 95 / ESTIMADO_MS));
-        segundosRestantes.setValue(Math.max(0, (ESTIMADO_MS - transcurrido + 999) / 1000));
+        long estimado = estimadoMs;
+        progreso.setValue((int) Math.min(95, transcurrido * 95 / estimado));
+        segundosRestantes.setValue(Math.max(0, (estimado - transcurrido + 999) / 1000));
         hiloUi.postDelayed(avanzar, INTERVALO_MS);
     }
 

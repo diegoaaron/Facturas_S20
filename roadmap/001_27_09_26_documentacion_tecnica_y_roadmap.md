@@ -346,6 +346,8 @@ static final String INSTRUCCION =
 
 > **La misma instrucción y el mismo esquema** deben usarse en el cuaderno de ajuste fino (etiquetas de entrenamiento) y en la app. Si cambian los campos, se actualizan a la vez: cuaderno, `INSTRUCCION`, `ParserRespuesta`, `CampoFactura` y la tabla `campo_extraido`.
 
+> Este esquema es el que usa hoy la app con el modelo base. Para el modelo afinado se pasará a una **salida compacta**, más rápida de generar (decidido el 2026-10-25; ver 6.7).
+
 ### 6.3 Reglas del parser (`ParserRespuesta`)
 
 - Extraer el **primer objeto JSON** de la respuesta (el modelo puede envolverlo en texto o en ```json).
@@ -356,7 +358,8 @@ static final String INSTRUCCION =
 
 ### 6.4 Preprocesado de la imagen
 
-- Recorte al marco de encuadre, corrección de orientación EXIF, redimensionado al lado mayor de **896 px**, JPEG calidad 90.
+- Recorte al marco de encuadre, corrección de orientación EXIF, redimensionado al lado mayor de **896 px**, JPEG calidad 90. Así se guarda la imagen de la factura.
+- **Al modelo le llega a 512 px** (`ReductorFoto`, desde el 2026-10-25). Con 896 px el modelo base tarda unas cinco veces más (2394 parches de visión) y no lee mejor: en la factura de control falla la fecha (y con GPU, también la serie y el número). Con 512 px acierta los 7 campos (ver 6.5, mediciones). El cuaderno de ajuste fino sigue entrenando a 896 px. Conviene probar el modelo afinado a 512 px y, si baja la exactitud, entrenarlo a esa resolución.
 - **Nitidez:** varianza del Laplaciano sobre la imagen en gris: umbral 50 en la vista previa para habilitar el disparador y 25 para la foto ya preparada (el JPEG y el escalado la suavizan). Se bajó del 100 inicial el 2026-09-29 porque rechazaba boletas bien enfocadas; falta calibrarlo con el equipo de referencia (el valor de cada foto sale en `adb logcat -s FacturasS20`). **Luz:** media de luminancia entre 60 y 200.
 
 ### 6.5 Puente Kotlin (único archivo Kotlin)
@@ -400,7 +403,24 @@ class LiteRtLmPuente : MotorInferencia {
 
 - En `AndroidManifest.xml`, dentro de `<application>`, declarar las bibliotecas nativas que pide la guía para GPU: `<uses-native-library android:name="libOpenCL.so" android:required="false"/>` y `<uses-native-library android:name="libvndksupport.so" android:required="false"/>`.
 - Una sola instancia del motor en toda la app (`GestorModeloLocal`), inicializada al primer uso y cerrada en `onTrimMemory` crítico.
-- `timeoutMs = 20_000` (RNF-04). Al vencer, ofrecer reintentar o registrar a mano.
+- **Implementado el 2026-10-25** con LiteRT-LM 0.16.1. No se puede pasar a 0.17 o superior porque esas versiones están compiladas con Kotlin 2.4 y AGP 9.1 trae Kotlin 2.2. Diferencias con el boceto de arriba:
+  - La imagen va como `Content.ImageBytes`, para no escribirla sin cifrar.
+  - Se usa `SamplerConfig(topK = 1)`.
+  - La generación se corta en cuanto se cierra el primer objeto JSON (`ParserRespuesta.objetoCompleto`).
+- **Procesador por defecto:** CPU para el texto y GPU para la imagen. Si el teléfono no tiene GPU compatible, todo va en CPU (`LiteRtLmPuente.Modo.AUTOMATICO`). Usar la GPU para todo resultó lo más lento.
+- **Límite de la generación: 90 s** (`ExtractorGemma.LIMITE_MS`). P07 corta a los 120 s, carga incluida. El límite de 20 s de RNF-04 cortaba todas las lecturas del modelo base, así que se amplió y **RNF-04 y RNF-05 se reportan como no cumplidas en el APF3** con las cifras medidas, sin redondearlas. Al vencer, se ofrece tomar otra foto o registrar a mano.
+
+**Mediciones del 2026-10-25** con el modelo **base** `gemma-4-E2B-it.litertlm` (2,6 GB, sin afinar) en el Moto G34 5G (Android 15, 7,3 GB de RAM), con la factura de control y 2 lecturas por fila. Se hicieron con `MedicionGemmaTest` (ver la guía del equipo, paso 10).
+
+| Procesador | Foto | Carga | Lectura | Memoria (PSS) | Campos correctos |
+|---|---|---|---|---|---|
+| GPU | 896 px | 17–44 s | 153–208 s | 2,4 GB | 3 de 7 (sin serie ni número; fecha en 2025) |
+| GPU | 512 px | — | 192–229 s | 2,4 GB | 7 de 7 |
+| CPU | 512 px | 8 s | 62–68 s | 2,6–2,8 GB | 7 de 7 |
+| **CPU + imagen en GPU** | **512 px** | **1,4 s** | **47–53 s** | **2,7 GB** | **7 de 7** |
+| CPU + imagen en GPU | 896 px | — | 257–296 s | 2,7 GB | 6 de 7 (fecha 2025-01-25) |
+
+Con estas cifras **no se cumplen RNF-04 (≤ 20 s) ni RNF-05 (≤ 2 GB)**. LiteRT-LM no informa cuántos tokens genera ni a qué velocidad (`getBenchmarkInfo` sale vacío), así que no se sabe qué parte del tiempo es leer la imagen y qué parte es escribir la respuesta. Para el modelo afinado, ver la salida compacta en 6.7.
 
 ### 6.6 Gestión del modelo (`GestorModeloLocal`)
 
@@ -427,6 +447,8 @@ El modelo Gemma 4 E2B ajustado (`.litertlm`, ≈ 2,6 GB) se descarga **una sola 
 ### 6.7 Entrenamiento y conversión (fuera de la app)
 
 Partir de `tunning_gemma4/tunning_model_gemma4_6.ipynb`: etiquetar los 7 campos con el esquema 6.2, LoRA sobre `unsloth/gemma-4-E2B-it` en 4 bits, 896 px, 80/20 + conjunto de prueba separado, evaluar por campo contra el modelo base, **fusionar → cuantizar → convertir a `.litertlm`** y **evaluar de nuevo después de convertir**. Publicar solo si mejora al base y logra ≥ 90 % por campo (RNF-01/02). Publicar significa: subir el `.litertlm` al repositorio público de Hugging Face, calcular su SHA-256, actualizar `assets/modelo.json` y lanzar una nueva versión de la app. Referencia de formato: `litert-community/gemma-4-E2B-it-litert-lm` en Hugging Face.
+
+**Salida compacta (decidido el 2026-10-25).** El modelo base no cumple RNF-04 (ver 6.5). Para el afinado se le enseña a responder con un JSON más corto, con menos tokens que generar. Por ejemplo, un objeto plano con claves breves y la confianza en una sola lista, o sin confianza, que la app calcularía con las validaciones (RUC módulo 11, fecha y serie). El formato exacto lo eligen Damián Valdivia y Coronel Obregón antes de etiquetar. Al cambiarlo se actualizan **a la vez** el cuaderno (etiquetas), `ParserRespuesta.INSTRUCCION`, el parser y sus pruebas, y el esquema de 6.2. Después se mide con `MedicionGemmaTest` cuánto baja el tiempo.
 
 ---
 
@@ -807,7 +829,7 @@ Son iteraciones de dos semanas, alineadas con las entregas del curso.
 | I2 | 5–8 | Diseño de procesos, datos, clases, prototipo y documentación técnica | APF2 | ✅ completo |
 | Paso 0 | 8 | Configuración del equipo y proyecto Android base | App "Hello World!" en el teléfono | ✅ completo (ver 13.3) |
 | I3 | 9–10 | Front-end navegable (P01–P20) sobre la base de datos cifrada, y dominio con motor de reglas probado | Incremento 1 | ✅ completo el 2026-10-25 (pasos 1 a 5, ver 13.4) |
-| I4 | 11–12 | Inferencia local con el modelo convertido, medición en el teléfono y prueba de usabilidad | APF3 | pendiente |
+| I4 | 11–12 | Inferencia local con el modelo convertido, medición en el teléfono y prueba de usabilidad | APF3 | en curso (ver 13.4) |
 | I5 | 13–14 | Reporte PDF, exportación de datos e historial | Incremento 3 | pendiente |
 | I6 | 15–18 | Pruebas, validación en mes simulado y sustentación | Informe final | pendiente |
 
@@ -906,7 +928,26 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
 **I4 · semanas 11–12 — Persistencia e IA local (APF3)**
 5. ~~Room + SQLCipher~~ (se adelantó a I3, paso 3).
 6. `LiteRtLmPuente.kt`, `GestorModeloLocal` (comprobación, `assets/modelo.json`, descarga desde Hugging Face, SHA-256, prueba), P03.
+   - ✅ **Hecho y probado de punta a punta el 2026-10-25:**
+     - `MotorInferencia` y `LiteRtLmPuente`, con el modo CPU + imagen en GPU (6.5).
+     - `ParserRespuesta`, con `ParserRespuestaTest` (10 pruebas).
+     - `ExtractorGemma`, con la foto a 512 px y el límite de 90 s.
+     - `GestorModeloLocal`: verifica tamaño y SHA-256, prueba el modelo con `assets/factura_control.jpg`, lo activa y borra la versión anterior. `GestorModeloLocalTest` (4 pruebas con un motor falso) pasa en el teléfono y encontró que el archivo de la versión anterior no se borraba; ya está corregido.
+     - `DescargaModeloWorker`: WorkManager, solo Wi-Fi, reanudable con `Range`, en primer plano con notificación y 3 intentos.
+     - P03 con el avance de la descarga, y P18 con la versión instalada.
+     - Si no hay modelo, P07 sigue usando el `ExtractorFalso`. P07 indica qué lector usa.
+     - **Prueba en el teléfono.** Desde P03, «Descargar modelo» tomó la copia puesta por adb y la instaló en unos 60 s: copia, huella, prueba con la factura de control y activación. Después, `LecturaGemmaTest` (P05 → P07 → P08, sin cámara) leyó los 7 campos correctos en **53,7 s**, con la carga del modelo en 0,9 s.
+     - Capturas `p03b_modelo_instalado` y `p07b_lectura_gemma`.
+     - La descarga real desde Hugging Face por Wi-Fi todavía no se ha probado en la app.
+   - `assets/modelo.json` apunta por ahora al **modelo base** de `litert-community/gemma-4-E2B-it-litert-lm` (Apache 2.0, en una revisión fija), con la versión `0.1.0-base`. Se cambia cuando se publique el afinado.
+   - Falta:
+     - Leer una factura impresa real con la cámara (hasta ahora solo se probó la factura de control).
+     - Llamar a `precargar()` antes de P07.
+     - Pasar de P06 a P19 cuando no hay modelo o falta memoria (§8.2).
+     - Comprobar la RAM (≥ 5,5 GB) y el espacio libre en `telefonoCompatible()`, que hoy solo mira que sea arm64.
+     - Ajustar la estimación de avance de P07 con más lecturas.
 7. Medir tiempo y memoria en el teléfono de referencia con el modelo convertido.
+   - 🟡 **Medido con el modelo base el 2026-10-25** (tabla en 6.5): 47–53 s y 2,7 GB. No se cumplen RNF-04 ni RNF-05. Falta repetir la medición con el modelo afinado y con la salida compacta (6.7).
 8. Prueba de usabilidad con 3 titulares (protocolo del informe, Anexo S). **Decidido (2026-09-27): semanas 11–12.** El informe del APF2 también la menciona en I3 (§3.7.6 y conclusión cuarta); se corrige en el informe del APF3.
 
 **I5 · semanas 13–14 — Reportes, exportación de datos e historial**
@@ -953,7 +994,7 @@ No hay desviaciones respecto de la línea base (Anexo D del informe). La constru
 |---|---|---|
 | RNF-01, RNF-02 | Exactitud ≥ 90 % por campo (conjunto de prueba separado, comparado con el modelo base) | APF3 |
 | RNF-03 | Diferencia < 2 % en el mes simulado | Final |
-| RNF-04, RNF-05 | ≤ 20 s y ≤ 2 GB en el equipo de referencia (imagen a 896 px, GPU si existe) | APF3 |
+| RNF-04, RNF-05 | ≤ 20 s y ≤ 2 GB en el equipo de referencia. Con el modelo base (2026-10-25): 47–53 s y 2,7 GB, **no se cumplen** (imagen a 512 px, CPU + imagen en GPU; ver 6.5) | APF3 |
 | RNF-06, RNF-07 | APK ≤ 60 MB (modelo como descarga separada); pruebas en Android 8 y 13 (minSdk 26) | APF3 |
 | RNF-09 a RNF-11 | Prueba de usabilidad con 3 titulares (Anexo S) | Semanas 11–12, I4 (resultados en APF3) |
 | RNF-12, RNF-14 | Prueba en modo avión e inspección de tráfico | APF3 |

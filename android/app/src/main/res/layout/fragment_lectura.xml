@@ -111,6 +111,7 @@
                             android:textStyle="bold"/>
 
                     <TextView
+                            android:id="@+id/texto_lector"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/lectura_modelo_prueba"

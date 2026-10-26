@@ -19,6 +19,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+        // Solo teléfonos: LiteRT-LM trae x86_64 (25 MB, para emuladores) y el APK pasaba de 60 MB (RNF-06).
+        // En armeabi-v7a no hay LiteRT-LM; esos teléfonos usan el registro manual.
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+        }
+
         // Room guarda el esquema de cada versión de la base en app/schemas/ (migraciones explícitas, §7.1).
         javaCompileOptions {
             annotationProcessorOptions {
@@ -65,6 +71,9 @@ dependencies {
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.exifinterface)
+    implementation(libs.litertlm.android)
+    implementation(libs.gson)
+    implementation(libs.androidx.work.runtime)
 
     implementation(libs.androidx.room.runtime)
     annotationProcessor(libs.androidx.room.compiler)

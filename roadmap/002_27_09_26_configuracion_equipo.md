@@ -139,6 +139,33 @@ En PowerShell o cmd se usa `gradlew.bat` en lugar de `./gradlew`.
 - La primera compilación descarga sola **Build-Tools 36.0.0** si falta.
 - Si `adb devices` muestra el teléfono dos veces (depuración inalámbrica), `installDebug` y `connectedDebugAndroidTest` lo usarían dos veces. Limítalo a uno con `export ANDROID_SERIAL=<serial>` (el serial es la primera columna de `adb devices`), o instala directamente con `adb -s <serial> install -r app/build/outputs/apk/debug/app-debug.apk`. No uses `adb -t <id>`: el `transport_id` cambia cada vez que se reconecta. `adb` está en `<SDK>/platform-tools/adb.exe`.
 
+### Paso 10 · (Opcional) Probar el modelo de IA en el teléfono
+El modelo (`.litertlm`, ≈ 2,6 GB) no va en el APK. Para no descargarlo desde la app en cada prueba, se copia una vez con adb. La versión, la URL y la huella están en `android/app/src/main/assets/modelo.json`.
+```bash
+cd /c/reposPersonal/Facturas_S20/android
+export MSYS_NO_PATHCONV=1                          # Git Bash: que no cambie las rutas /sdcard/...
+curl -L -o modelo.litertlm "<url de modelo.json>"   # y compara: sha256sum modelo.litertlm
+./gradlew :app:installDebug :app:installDebugAndroidTest
+adb shell mkdir -p /sdcard/Android/data/pe.facturass20/files/modelos
+adb push modelo.litertlm /sdcard/Android/data/pe.facturass20/files/modelos/modelo.litertlm
+```
+- **En la app:** en Ajustes → *Gemma 4 E2B facturas* (P03), «Descargar modelo» encuentra esa copia y la instala sin descargar nada (verifica la huella y la prueba con la factura de control).
+- **Medición (RNF-04/05):** `MedicionGemmaTest` lee la factura de control y deja el tiempo, la memoria y la respuesta en `Android/data/pe.facturass20/files/medicion_gemma.txt`. Se corre con `am instrument`, porque `connectedDebugAndroidTest` desinstala la app y borra la copia del modelo:
+  ```bash
+  adb shell am instrument -w -e class pe.facturass20.inferencia.MedicionGemmaTest \
+      -e procesador AUTOMATICO -e lados 896,512 pe.facturass20.test/androidx.test.runner.AndroidJUnitRunner
+  adb shell cat /sdcard/Android/data/pe.facturass20/files/medicion_gemma.txt
+  ```
+  `procesador` puede ser:
+  - `AUTOMATICO`: CPU para el texto y GPU para la imagen y, si falla, solo CPU. Es lo que usa la app.
+  - `CPU`.
+  - `CPU_CON_VISION_GPU`.
+  - `GPU`: la GPU para todo.
+
+  Sin el modelo copiado, la prueba se salta.
+- **P07 con Gemma:** después de instalar el modelo desde P03, `LecturaGemmaTest` recorre P05 → P07 → P08 con la factura de control (sin cámara) y comprueba lo leído. Se corre igual: `adb shell am instrument -w -e class pe.facturass20.ui.LecturaGemmaTest pe.facturass20.test/androidx.test.runner.AndroidJUnitRunner`. El tiempo y los campos salen en `adb logcat -s FacturasS20`.
+- Desinstalar la app borra la copia. Con el teléfono por Wi-Fi, el `push` tarda unos 3 minutos.
+
 ### Si algo falla
 
 | Síntoma | Qué hacer |

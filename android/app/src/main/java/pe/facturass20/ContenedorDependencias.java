@@ -3,6 +3,8 @@ package pe.facturass20;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,6 +30,10 @@ import pe.facturass20.dominio.puertos.ParametrosRepositorio;
 import pe.facturass20.dominio.puertos.PeriodoRepositorio;
 import pe.facturass20.dominio.puertos.Reloj;
 import pe.facturass20.inferencia.ExtractorFalso;
+import pe.facturass20.inferencia.ExtractorGemma;
+import pe.facturass20.inferencia.GestorModeloLocal;
+import pe.facturass20.inferencia.ManifiestoModelo;
+import pe.facturass20.inferencia.litert.LiteRtLmPuente;
 import pe.facturass20.ui.acceso.PreferenciasAcceso;
 import pe.facturass20.ui.acceso.Sesion;
 import pe.facturass20.ui.captura.CapturaEnCurso;
@@ -41,8 +47,8 @@ import pe.facturass20.ui.mes.PreferenciasAvisos;
  * <p>La base de datos y sus repositorios se crean la primera vez que se piden (la clave sale del
  * Keystore), siempre desde un hilo de fondo; en ese momento también se cargan los parámetros del NRUS,
  * así ninguna pantalla los lee antes de tiempo. La primera en pedirlos es {@link Sesion#comprobar()}, al
- * abrir la app. El extractor de facturas es por ahora {@link ExtractorFalso} (en I4, Gemma en el
- * teléfono); falta agregar el exportador de datos (I5).</p>
+ * abrir la app. El extractor de facturas es Gemma en el teléfono ({@link ExtractorGemma}) cuando hay un
+ * modelo instalado y, mientras no, {@link ExtractorFalso}; falta agregar el exportador de datos (I5).</p>
  */
 public final class ContenedorDependencias {
 
@@ -56,7 +62,7 @@ public final class ContenedorDependencias {
     private final PreferenciasCaptura preferenciasCaptura;
     private final CapturaEnCurso capturaEnCurso = new CapturaEnCurso();
     private final PreferenciasAvisos preferenciasAvisos;
-    private final ExtractorFacturas extractor = new ExtractorFalso(reloj::hoy);
+    private final ExtractorFacturas extractorFalso = new ExtractorFalso(reloj::hoy);
     private Adaptadores adaptadores;
 
     ContenedorDependencias(Context contexto) {
@@ -77,9 +83,25 @@ public final class ContenedorDependencias {
         return ejecutorInferencia;
     }
 
-    /** Lee los 7 campos de la foto (P07). */
+    /** Lee los 7 campos de la foto (P07); se pide desde el hilo de inferencia (consulta la base). */
     public ExtractorFacturas extractor() {
-        return extractor;
+        ExtractorGemma gemma = gestorModelo().extractor();
+        return gemma != null ? gemma : extractorFalso;
+    }
+
+    /** La versión del modelo si {@code extractor} es Gemma, o null si es el lector de prueba (P07). */
+    public static String versionModelo(ExtractorFacturas extractor) {
+        return extractor instanceof ExtractorGemma gemma ? gemma.version() : null;
+    }
+
+    /** Lo que suele tardar {@code extractor} en leer una foto, para el avance de P07. */
+    public static long duracionEstimada(ExtractorFacturas extractor) {
+        return extractor instanceof ExtractorGemma ? ExtractorGemma.ESTIMADO_MS : ExtractorFalso.DEMORA_MS;
+    }
+
+    /** El modelo de IA del teléfono: versión activa, descarga e instalación (P03). */
+    public GestorModeloLocal gestorModelo() {
+        return adaptadores().gestorModelo;
     }
 
     public Reloj reloj() {
@@ -190,6 +212,7 @@ public final class ContenedorDependencias {
         final GestorPin pin;
         final CargadorParametrosNrus cargador;
         final DeterminarCategoria determinarCategoria;
+        final GestorModeloLocal gestorModelo;
 
         Adaptadores(Context contexto, Reloj reloj) {
             base = BaseDatosFacturas.abrir(contexto, GestorClaves.claveBaseDatos(contexto), BaseDatosFacturas.NOMBRE);
@@ -201,7 +224,19 @@ public final class ContenedorDependencias {
             pin = new GestorPin(base.contribuyenteDao());
             cargador = new CargadorParametrosNrus(contexto, base);
             determinarCategoria = new DeterminarCategoria(periodos, contribuyentes, parametros);
+            // El único motor de la app: cada lectura con Gemma ocupa ~2 GB.
+            gestorModelo = new GestorModeloLocal(contexto, base, reloj,
+                    new LiteRtLmPuente(contexto.getCacheDir().getAbsolutePath()), manifiestoModelo(contexto));
             cargarParametrosNrus();
+        }
+
+        private static ManifiestoModelo manifiestoModelo(Context contexto) {
+            try (InputStream entrada = contexto.getAssets().open(ManifiestoModelo.ARCHIVO)) {
+                return ManifiestoModelo.leer(entrada);
+            } catch (IOException e) {
+                // Viene dentro del APK: si falta o está mal, es un error al armar la app.
+                throw new IllegalStateException("Falta o está mal assets/" + ManifiestoModelo.ARCHIVO, e);
+            }
         }
 
         /** Carga los parámetros del NRUS si la versión de la app trae una nueva. */

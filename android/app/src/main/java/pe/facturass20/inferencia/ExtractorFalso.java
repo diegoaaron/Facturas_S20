@@ -25,7 +25,7 @@ public final class ExtractorFalso implements ExtractorFacturas {
 
     /** Va en {@code campo_extraido}; no hay fila en {@code modelo_local} con esta versión. */
     public static final String VERSION = "prueba";
-    static final long DEMORA_MS = 3_000;
+    public static final long DEMORA_MS = 3_000;
 
     private static final String[][] PROVEEDORES = {
             {"20601234565", "DISTRIBUIDORA ANDINA S.A.C."},

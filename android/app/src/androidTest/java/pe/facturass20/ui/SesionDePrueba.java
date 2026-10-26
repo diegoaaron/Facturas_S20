@@ -20,7 +20,7 @@ import pe.facturass20.dominio.modelo.Contribuyente;
 /** Lo que comparten las pruebas de pantallas: la app configurada y desbloqueada, y esperar a una vista. */
 final class SesionDePrueba {
 
-    /** P07 tarda 3 s con el extractor falso; el límite real de la lectura es 20 s. */
+    /** P07 tarda 3 s con el extractor falso (las pruebas de pantallas corren sin modelo instalado). */
     private static final long ESPERA_MS = 25_000;
     private static final String RUC_PRUEBA = "20100070970";
 
@@ -45,7 +45,12 @@ final class SesionDePrueba {
 
     /** Espera a que la vista aparezca: Espresso no sabe de los hilos de fondo de la base ni de la lectura. */
     static void esperar(Matcher<View> vista) {
-        long limite = SystemClock.elapsedRealtime() + ESPERA_MS;
+        esperar(vista, ESPERA_MS);
+    }
+
+    /** Igual, con otro tiempo de espera (la lectura con Gemma tarda cerca de un minuto). */
+    static void esperar(Matcher<View> vista, long esperaMs) {
+        long limite = SystemClock.elapsedRealtime() + esperaMs;
         while (true) {
             try {
                 onView(vista).check(matches(isDisplayed()));

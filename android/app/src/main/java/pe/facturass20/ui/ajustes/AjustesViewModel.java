@@ -11,6 +11,7 @@ import java.util.Arrays;
 import pe.facturass20.ContenedorDependencias;
 import pe.facturass20.R;
 import pe.facturass20.datos.cifrado.GestorPin;
+import pe.facturass20.datos.entidades.ModeloLocalEntity;
 import pe.facturass20.dominio.modelo.Contribuyente;
 import pe.facturass20.dominio.modelo.ParametrosNrus;
 import pe.facturass20.dominio.modelo.ReglaNegocioException;
@@ -22,7 +23,8 @@ import pe.facturass20.ui.comun.BaseViewModel;
  */
 public final class AjustesViewModel extends BaseViewModel {
 
-    public record Vista(Contribuyente contribuyente, ParametrosNrus parametros) { }
+    /** @param versionModelo la del modelo de IA activo; nula si se usa el lector de prueba */
+    public record Vista(Contribuyente contribuyente, ParametrosNrus parametros, String versionModelo) { }
 
     private final MutableLiveData<Vista> vista = new MutableLiveData<>();
 
@@ -38,7 +40,12 @@ public final class AjustesViewModel extends BaseViewModel {
         ContenedorDependencias c = contenedor();
         enFondo(() -> new Vista(c.contribuyentes().obtener()
                 .orElseThrow(() -> new ReglaNegocioException(texto(R.string.error_sin_configurar))),
-                c.parametros().vigentes()), vista::setValue);
+                c.parametros().vigentes(), versionModelo(c)), vista::setValue);
+    }
+
+    private static String versionModelo(ContenedorDependencias c) {
+        ModeloLocalEntity activo = c.gestorModelo().activo();
+        return activo == null ? null : activo.version;
     }
 
     public boolean huellaDisponible() {

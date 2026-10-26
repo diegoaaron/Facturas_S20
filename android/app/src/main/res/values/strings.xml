@@ -175,6 +175,8 @@
     <!-- Notificaciones -->
     <string name="canal_avisos_nombre">Avisos del NRUS</string>
     <string name="canal_avisos_descripcion">Límite de la categoría y fecha de vencimiento de la declaración</string>
+    <string name="canal_descarga_nombre">Descarga del lector de facturas</string>
+    <string name="canal_descarga_descripcion">Avance de la descarga única del modelo de IA</string>
 
     <!-- Textos clave (documentación técnica §8.4) -->
     <string name="guia_titulo">¡Hora de la foto!</string>
