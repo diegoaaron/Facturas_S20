@@ -24,7 +24,9 @@ import java.util.concurrent.TimeUnit
  * técnica §6.5).
  *
  * La respuesta llega por partes; en cuanto se cierra el primer objeto JSON se corta la generación, porque
- * lo que el modelo agregue después no se usa.
+ * lo que el modelo agregue después no se usa. También se corta si pasa de
+ * [ParserRespuesta.MAX_TOKENS_RESPUESTA] sin cerrarlo: a veces el modelo se queda repitiendo un carácter
+ * y, sin este corte, la lectura duraría hasta el tiempo límite.
  *
  * @param carpetaCache carpeta privada donde LiteRT-LM guarda lo que acelera las siguientes cargas
  * @param modo         qué procesador usar; [Modo.AUTOMATICO] salvo en las mediciones
@@ -114,15 +116,26 @@ class LiteRtLmPuente @JvmOverloads constructor(
         val texto = StringBuilder()
         val fin = CountDownLatch(1)
         var error: Throwable? = null
-        var jsonCompleto = false
+        // Se cortó a propósito (JSON completo o demasiado largo): el CANCELLED que llega después no es un error.
+        var cortado = false
+        var tokens = 0
         conversacion.sendMessageAsync(
             Contents.of(Content.ImageBytes(jpeg), Content.Text(instruccion)),
             object : MessageCallback {
                 override fun onMessage(message: Message) {
                     synchronized(texto) {
+                        if (cortado) {
+                            return
+                        }
                         message.contents.contents.filterIsInstance<Content.Text>().forEach { texto.append(it.text) }
-                        if (!jsonCompleto && ParserRespuesta.objetoCompleto(texto)) {
-                            jsonCompleto = true
+                        // Cada parte es un paso de generación, o sea un token.
+                        tokens++
+                        val completo = ParserRespuesta.objetoCompleto(texto)
+                        if (completo || tokens >= ParserRespuesta.MAX_TOKENS_RESPUESTA) {
+                            if (!completo) {
+                                Log.w(ETIQUETA, "Respuesta cortada a los $tokens tokens sin cerrar el JSON")
+                            }
+                            cortado = true
                             conversacion.cancelProcess()
                             fin.countDown()
                         }
@@ -132,9 +145,8 @@ class LiteRtLmPuente @JvmOverloads constructor(
                 override fun onDone() = fin.countDown()
 
                 override fun onError(throwable: Throwable) {
-                    // Al cortar la generación tras el JSON también llega aquí (CANCELLED); no es un error.
                     synchronized(texto) {
-                        if (!jsonCompleto) {
+                        if (!cortado) {
                             error = throwable
                         }
                     }

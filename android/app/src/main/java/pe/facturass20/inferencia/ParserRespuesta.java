@@ -41,6 +41,14 @@ public final class ParserRespuesta {
             + "decimales, incluida la percepción si la hay). Responde solo un objeto JSON plano, sin espacios, "
             + "con los valores como texto. Si un campo no se lee, usa null.";
 
+    /**
+     * Tope de tokens de la respuesta: el puente corta la generación al llegar aquí aunque el JSON no se haya
+     * cerrado, porque a veces el modelo se queda repitiendo un carácter ({@code "numero":"0000…"}). El JSON
+     * compacto del afinado ocupa unos 82 tokens y el del modelo base, con saltos de línea y {@code ```json},
+     * unos 100; 200 deja margen para razones sociales largas.
+     */
+    public static final int MAX_TOKENS_RESPUESTA = 200;
+
     /** Para el usuario cuando la respuesta no trae un JSON (§6.3). */
     static final String SIN_JSON = "No pudimos leer la factura. Tome otra foto con más luz.";
     /** Si el modelo no da la confianza y el valor pasa la validación: verde, sin pedir revisión. */

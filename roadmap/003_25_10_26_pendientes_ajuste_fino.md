@@ -29,7 +29,7 @@ Estado al 2026-10-25 (noche) y lo que falta, en orden. Complementa la documentac
 
    **Mejora al base en todo, pero no llega al 90 %** (criterio §6.7). Lo que queda:
    - El formato ya está aprendido (JSON compacto, serie y número separados, fecha ISO). Los errores restantes son **dígitos mal leídos** (RUC, número) a 512 px y **razón social** recortada (`CURTIS & CO.` en vez del nombre completo) o confundida con el nombre del cliente.
-   - **Bucle de repetición:** en `compr_001` (base y afinado) y `compr_052` (base) el modelo escribe ceros sin parar en `numero`. En la app eso dura hasta el tiempo límite, porque `objetoCompleto` nunca ve la llave de cierre: conviene cortar por número de tokens (unos 120 alcanzan para el JSON compacto) o detectar la repetición en el puente.
+   - **Bucle de repetición:** en `compr_001` (base y afinado) y `compr_052` (base) el modelo escribe ceros sin parar en `numero`. Sin la llave de cierre, en la app eso duraba hasta el tiempo límite. **Resuelto el 2026-10-26:** `LiteRtLmPuente` corta a los `ParserRespuesta.MAX_TOKENS_RESPUESTA` (200) tokens y la app pide otra foto. Con el modelo base y la factura de control no llega al tope (la medición sigue pasando); el corte en sí no se pudo ver en el teléfono porque esa factura no provoca el bucle.
    - Hay pocos datos: 31 fotos de 7 emisores para entrenar. Lo que más debería ayudar es ampliar el dataset (punto 8). También se puede probar más resolución para los dígitos, pero en el teléfono 896 px tarda 4–5 min.
 6. **Fusionar y convertir a `.litertlm`:**
    - Subir la RAM de WSL en `C:\Users\diego\.wslconfig` (hoy 11 GB; fusionar a 16 bits pide ~10 GB o más).
