@@ -13,29 +13,52 @@ import shutil
 import time
 from pathlib import Path
 
-from huggingface_hub import hf_hub_download
+from huggingface_hub import hf_hub_download, snapshot_download
 from litert_torch.generative.export_hf import export as export_hf
 
 MODELOS = Path(__file__).resolve().parent / 'modelos'
+MODELO_BASE = 'unsloth/gemma-4-E2B-it'
 REPO_OFICIAL = 'litert-community/gemma-4-E2B-it-litert-lm'
+
+
+def base_con_plantilla(plantilla):
+    """El modelo base sin afinar, con la plantilla oficial, para comparar la conversión con el `.litertlm` oficial.
+
+    Arma una carpeta con enlaces a los archivos del caché de Hugging Face (sin
+    copiar los 10 GB ni tocar el caché) y solo la plantilla copiada.
+    """
+    base = Path(snapshot_download(MODELO_BASE))
+    carpeta = Path.home() / '.cache' / 'facturas_s20' / 'base_con_plantilla'
+    carpeta.mkdir(parents=True, exist_ok=True)
+    for archivo in base.iterdir():
+        enlace = carpeta / archivo.name
+        if archivo.name != 'chat_template.jinja' and not enlace.exists():
+            enlace.symlink_to(archivo.resolve())
+    shutil.copy(plantilla, carpeta / 'chat_template.jinja')
+    return carpeta
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--nombre', default='lora_v1', help='carpeta dentro de modelos/ con el fusionado/')
+    ap.add_argument('--nombre', default='lora_v1',
+                    help='carpeta dentro de modelos/ con el fusionado/; «base» convierte el modelo sin afinar')
     ap.add_argument('--cuantizacion', default='dynamic_wi4_afp32', help='receta para el modelo de texto')
     ap.add_argument('--cache', type=int, default=1024, help='tokens de contexto (imagen + instrucción + respuesta)')
     args = ap.parse_args()
 
     carpeta = MODELOS / args.nombre
-    fusionado = carpeta / 'fusionado'
     salida = carpeta / 'litertlm'
-    salida.mkdir(exist_ok=True)
-    shutil.copy(hf_hub_download(REPO_OFICIAL, 'chat_template.jinja'), fusionado / 'chat_template.jinja')
+    salida.mkdir(parents=True, exist_ok=True)
+    plantilla = hf_hub_download(REPO_OFICIAL, 'chat_template.jinja')
+    if args.nombre == 'base':
+        origen = base_con_plantilla(plantilla)
+    else:
+        origen = carpeta / 'fusionado'
+        shutil.copy(plantilla, origen / 'chat_template.jinja')
 
     inicio = time.time()
     export_hf.export(
-        model=str(fusionado),
+        model=str(origen),
         output_dir=str(salida),
         task='image_text_to_text',
         cache_length=args.cache,
