@@ -10,3 +10,6 @@
 __pycache__/
 
 # El proyecto Android tiene su propio android/.gitignore
+
+# Fotos y etiquetas del ajuste fino (datos reales: RUC, nombres, montos)
+tunning_gemma4/datos/
