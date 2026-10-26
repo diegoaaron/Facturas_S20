@@ -51,8 +51,13 @@ Estado al 2026-10-25 (noche) y lo que falta, en orden. Complementa la documentac
      | **Texto + embebedores a 8 bits + visión oficial** | **igual que el oficial salvo la fecha** (`2025-10-25`; la impresa es 25/10/2026) | 3,5 GB | 4,93 GiB |
      | Texto a 8 bits + embebedores y visión oficiales | no sirve: los embebedores oficiales no son compatibles con nuestro texto | — | — |
 
-     Lee en 32–57 s (el oficial: 64–120 s). Queda en dos scripts: `convertir.py --solo-float` (exporta en float32, sin cuantizar ni empaquetar) y `empaquetar.py` (cuantiza a 8 bits texto y embebedores, toma la visión del oficial y arma `modelos/<nombre>/empaquetado/model.litertlm`). Probado con el base: el `.litertlm` que arma pasa `MedicionGemmaTest`.
-   - **Pendiente:** correr la receta con `lora_v1` y medirlo. Después, ver si alguna parte puede volver a 4 bits para achicar los 4,9 GiB (la descarga del oficial es de 2,4 GiB) y si los 3,5 GB de memoria caben en los teléfonos objetivo (RNF-05).
+     Lee en 32–57 s (el oficial: 64–120 s).
+   - **La receta por defecto de `litert-torch` ya es 8 bits** (`dynamic_wi8_afp32`; `quantization_recipe=None` significa «la de siempre»). El 4 bits salió del plan de este documento. Cadena final:
+     1. `fusionar.py --nombre lora_v1` (entorno `~/venvs/gemma`).
+     2. `convertir.py --nombre lora_v1` (entorno `~/venvs/litert`, terminal propia; ~1 h, pico ~20 GB): exporta a 8 bits en `modelos/<nombre>/litertlm/`.
+     3. `empaquetar.py --nombre lora_v1` (segundos): cambia la visión por la oficial y deja `modelos/<nombre>/empaquetado/model.litertlm`.
+   - **`lora_v1` convertido así (2026-10-26):** pasa `MedicionGemmaTest`. Lee bien RUC, razón social, serie (`F001`) y número (`004521`) ya separados, moneda e importe, en el JSON compacto que aprendió. Falla la fecha igual que el base (`2025-10-25`; la impresa es 25/10/2026). 31–44 s por lectura, 3,5 GB de memoria, 4,93 GiB. En el teléfono quedó como `modelo_afinado_v1.litertlm` (el oficial sigue en `modelo.litertlm`).
+   - **Pendiente:** evaluar el convertido en las 12 fotos de prueba (no solo en la factura de control), comparándolo con el oficial; ver si alguna parte puede volver a 4 bits para achicar los 4,9 GiB (la descarga del oficial es de 2,4 GiB); y ver si los 3,5 GB de memoria caben en los teléfonos objetivo (RNF-05).
 7. **Publicar** (§6.6/§6.7): subir a Hugging Face en una revisión fija, calcular SHA-256, actualizar `assets/modelo.json` y sacar versión de la app.
 8. **Ampliar el dataset:** más emisores, más facturas (hoy casi todo son boletas) y alguna en USD si hay. Etiquetar con las reglas de `memorias/007_…`.
 9. **Ordenar después:** actualizar §6.7 (todavía dice 896 px y el cuaderno) y decidir si se retira `tunning_model_gemma4_6.ipynb` en favor de los scripts.

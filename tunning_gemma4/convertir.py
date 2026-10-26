@@ -4,15 +4,15 @@ Antes de exportar reemplaza la plantilla de chat por la del `.litertlm` oficial
 (`litert-community/gemma-4-E2B-it-litert-lm`): la del modelo original usa
 `map.get()` y LiteRT-LM falla en el teléfono al aplicarla.
 
-Con la receta por defecto (todo a 4 bits, `dynamic_wi4_afp32`) el modelo lee
-mal en el teléfono, incluso el base sin afinar. Lo que funciona es
-`--solo-float` seguido de `empaquetar.py`: texto y embebedores a 8 bits y la
+Cuantiza a 8 bits (`dynamic_wi8_afp32`, lo que usa `litert-torch` por defecto).
+A 4 bits (`dynamic_wi4_afp32`) el modelo lee mal en el teléfono, incluso el base
+sin afinar. Después hay que pasar el resultado por `empaquetar.py`, que pone la
 visión del `.litertlm` oficial.
 
 Va en su propio entorno (`~/venvs/litert`, con `litert-torch-nightly`), porque
 pide otra versión de transformers que Unsloth. Se corre desde `/tmp` y desde una
 terminal propia (Claude Code corta los procesos en segundo plano si falta memoria):
-    python /mnt/c/reposPersonal/Facturas_S20/tunning_gemma4/convertir.py --nombre lora_v1 --solo-float
+    python /mnt/c/reposPersonal/Facturas_S20/tunning_gemma4/convertir.py --nombre lora_v1
 """
 import argparse
 import shutil
@@ -48,15 +48,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--nombre', default='lora_v1',
                     help='carpeta dentro de modelos/ con el fusionado/; «base» convierte el modelo sin afinar')
-    ap.add_argument('--cuantizacion', default='dynamic_wi4_afp32', help='receta para el modelo de texto')
+    ap.add_argument('--cuantizacion', default='dynamic_wi8_afp32', help='receta para texto, embebedores y visión')
     ap.add_argument('--cache', type=int, default=1024, help='tokens de contexto (imagen + instrucción + respuesta)')
-    ap.add_argument('--solo-float', action='store_true',
-                    help='deja las partes en float32 en modelos/<nombre>/float/, sin cuantizar ni empaquetar, '
-                         'para empaquetar.py (la receta que lee bien en el teléfono)')
     args = ap.parse_args()
 
     carpeta = MODELOS / args.nombre
-    salida = carpeta / ('float' if args.solo_float else 'litertlm')
+    salida = carpeta / 'litertlm'
     salida.mkdir(parents=True, exist_ok=True)
     plantilla = hf_hub_download(REPO_OFICIAL, 'chat_template.jinja')
     if args.nombre == 'base':
@@ -71,11 +68,10 @@ def main():
         output_dir=str(salida),
         task='image_text_to_text',
         cache_length=args.cache,
-        quantization_recipe=None if args.solo_float else args.cuantizacion,
+        quantization_recipe=args.cuantizacion,
         externalize_embedder=True,
         export_vision_encoder=True,
-        bundle_litert_lm=not args.solo_float,
-        keep_temporary_files=args.solo_float,
+        bundle_litert_lm=True,
         # En float32 (el valor por defecto): con model_dtype='bfloat16' falla al exportar el embebedor
         # («unsupported ScalarType BFloat16»). Ocupa ~20 GB de RAM; hace falta subirla en .wslconfig.
     )
