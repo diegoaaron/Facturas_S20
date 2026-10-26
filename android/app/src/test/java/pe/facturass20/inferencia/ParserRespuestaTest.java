@@ -25,8 +25,9 @@ public class ParserRespuestaTest {
             + "  \"importe_total\": { \"valor\": \"1450.00\", \"confianza\": 0.62 }\n"
             + "}";
 
+    /** Esquema anterior, con valor y confianza por campo: se sigue aceptando. */
     @Test
-    public void leeElEjemploDeLaDocumentacion() throws Exception {
+    public void leeElEsquemaAnteriorConConfianza() throws Exception {
         List<CampoExtraido> campos = ParserRespuesta.interpretar(EJEMPLO);
         assertEquals(7, campos.size());
         assertCampo(campos, CampoFactura.RUC, "20601234565", 0.98);
@@ -94,12 +95,46 @@ public class ParserRespuestaTest {
     }
 
     @Test
-    public void sinElEsquemaPedidoTomaElValorConConfianzaMedia() throws Exception {
-        String respuesta = "{\"ruc\": 20601234565, \"importe_total\": 1450.5, \"moneda\": {\"valor\": \"PEN\"}}";
+    public void leeElFormatoPlanoDelModeloAfinado() throws Exception {
+        String respuesta = "{\"ruc\":\"20611981202\",\"razon_social\":\"DINNO SUR E.I.R.L.\",\"serie\":\"B001\","
+                + "\"numero\":\"00308984\",\"fecha_emision\":\"2025-12-20\",\"moneda\":\"PEN\","
+                + "\"importe_total\":\"131.31\"}";
         List<CampoExtraido> campos = ParserRespuesta.interpretar(respuesta);
-        assertCampo(campos, CampoFactura.RUC, "20601234565", ParserRespuesta.CONFIANZA_SIN_DATO);
-        assertCampo(campos, CampoFactura.IMPORTE_TOTAL, "1450.50", ParserRespuesta.CONFIANZA_SIN_DATO);
-        assertCampo(campos, CampoFactura.MONEDA, "PEN", ParserRespuesta.CONFIANZA_SIN_DATO);
+        double validado = ParserRespuesta.CONFIANZA_VALIDADO;
+        assertCampo(campos, CampoFactura.RUC, "20611981202", validado);
+        assertCampo(campos, CampoFactura.RAZON_SOCIAL, "DINNO SUR E.I.R.L.", validado);
+        assertCampo(campos, CampoFactura.SERIE, "B001", validado);
+        assertCampo(campos, CampoFactura.NUMERO, "00308984", validado);
+        assertCampo(campos, CampoFactura.FECHA_EMISION, "2025-12-20", validado);
+        assertCampo(campos, CampoFactura.MONEDA, "PEN", validado);
+        assertCampo(campos, CampoFactura.IMPORTE_TOTAL, "131.31", validado);
+    }
+
+    @Test
+    public void sinConfianzaLaDeduceDeLaValidacion() throws Exception {
+        String respuesta = "{\"ruc\": 20601234565, \"importe_total\": 1450.5, \"moneda\": {\"valor\": \"PEN\"},"
+                + "\"serie\": \"F0001\", \"razon_social\": null}";
+        List<CampoExtraido> campos = ParserRespuesta.interpretar(respuesta);
+        assertCampo(campos, CampoFactura.RUC, "20601234565", ParserRespuesta.CONFIANZA_VALIDADO);
+        assertCampo(campos, CampoFactura.IMPORTE_TOTAL, "1450.50", ParserRespuesta.CONFIANZA_VALIDADO);
+        assertCampo(campos, CampoFactura.MONEDA, "PEN", ParserRespuesta.CONFIANZA_VALIDADO);
+        assertCampo(campos, CampoFactura.SERIE, "F0001", ParserRespuesta.CONFIANZA_SIN_VALIDAR);
+        assertCampo(campos, CampoFactura.RAZON_SOCIAL, null, 0);
+    }
+
+    @Test
+    public void unRucConDigitoVerificadorErradoQuedaParaRevisar() throws Exception {
+        List<CampoExtraido> campos = ParserRespuesta.interpretar("{\"ruc\":\"20601234566\",\"moneda\":\"USD\"}");
+        assertCampo(campos, CampoFactura.RUC, "20601234566", ParserRespuesta.CONFIANZA_SIN_VALIDAR);
+        // USD se lee bien, pero por ahora solo se registran compras en soles.
+        assertCampo(campos, CampoFactura.MONEDA, "USD", ParserRespuesta.CONFIANZA_SIN_VALIDAR);
+    }
+
+    @Test
+    public void enElFormatoPlanoSeparaLaSerieYValidaCadaParte() throws Exception {
+        List<CampoExtraido> campos = ParserRespuesta.interpretar("{\"numero\":\"F001-004521\"}");
+        assertCampo(campos, CampoFactura.SERIE, "F001", ParserRespuesta.CONFIANZA_VALIDADO);
+        assertCampo(campos, CampoFactura.NUMERO, "004521", ParserRespuesta.CONFIANZA_VALIDADO);
     }
 
     @Test

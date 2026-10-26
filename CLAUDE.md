@@ -70,6 +70,7 @@ Plan de trabajo del desarrollo. Todo lo que sea roadmap, cronograma, pendientes 
 Los archivos siguen la misma convención que las memorias: `<NNN>_<dd>_<mm>_<yy>_<nombre_descriptivo>.md`. El número es correlativo (el siguiente toma el más alto + 1) y la fecha es la de creación.
 
 - `001_27_09_26_documentacion_tecnica_y_roadmap.md` — **la base de todo lo que hay que hacer para completar el proyecto.** Referencia técnica de la app Android (arquitectura, contratos, esquema SQLite, pantallas, RF/RNF en §11) y roadmap en §13: entregas, iteraciones I1–I6, tareas, responsables, Gantt y mediciones comprometidas. El paso 0 (configuración del equipo) ya está hecho y remite a `002`. Si el código lo contradice, gana el documento, salvo que se decida cambiarlo. Si cambia el plan, conviene reflejarlo también en los scripts del entregable correspondiente.
+- `003_25_10_26_pendientes_ajuste_fino.md` — estado y pendientes del ajuste fino de Gemma (dataset, entrenamiento en WSL, formato de salida, conversión a `.litertlm`). **Leerlo al retomar el trabajo de IA.**
 - `002_27_09_26_configuracion_equipo.md` — paso 0 del roadmap. La Parte 1 es lo que se hizo en la primera computadora (errores incluidos); la Parte 2, los pasos para levantar el proyecto en otra computadora con IntelliJ recién instalado. Actualízalo si cambia algo del entorno.
 
 ## Documentos teóricos (`documentos_teoricos/`)

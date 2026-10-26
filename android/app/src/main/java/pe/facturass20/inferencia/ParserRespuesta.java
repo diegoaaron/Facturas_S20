@@ -17,11 +17,17 @@ import pe.facturass20.dominio.modelo.CampoExtraido;
 import pe.facturass20.dominio.modelo.CampoFactura;
 import pe.facturass20.dominio.puertos.ExtraccionException;
 import pe.facturass20.dominio.reglas.Montos;
+import pe.facturass20.dominio.reglas.ValidadorCampos;
 import pe.facturass20.dominio.reglas.ValidadorFecha;
 
 /**
  * La instrucción que recibe el modelo y la lectura de su respuesta (documentación técnica §6.2 y §6.3).
  * La misma instrucción y el mismo esquema se usan en el cuaderno de ajuste fino.
+ *
+ * <p>El modelo responde un JSON plano, sin confianza ({@code {"ruc":"20601234565","serie":"F001",...}}),
+ * porque escribir menos tokens acelera la lectura (decidido el 2026-10-25, §6.7). La confianza la pone la
+ * app según el valor pase o no la validación del dominio. Si el modelo trae el esquema anterior, con
+ * {@code valor} y {@code confianza} por campo, se usa la confianza que dio.</p>
  *
  * <p>Los valores quedan normalizados como los guarda la app: RUC solo dígitos, serie en mayúsculas, fecha
  * {@code 2026-09-22}, moneda {@code PEN} o {@code USD} e importe {@code 1450.00}. Un campo que falta o no
@@ -31,17 +37,22 @@ public final class ParserRespuesta {
 
     public static final String INSTRUCCION =
             "Extrae de esta factura peruana los campos ruc, razon_social, serie, numero, "
-            + "fecha_emision (YYYY-MM-DD), moneda (PEN o USD) e importe_total (numero con punto decimal). "
-            + "Responde solo un objeto JSON donde cada campo tenga 'valor' y 'confianza' entre 0 y 1. "
-            + "Si un campo no se lee, usa valor null y confianza 0.";
+            + "fecha_emision (YYYY-MM-DD), moneda (PEN o USD) e importe_total (con punto decimal y dos "
+            + "decimales, incluida la percepción si la hay). Responde solo un objeto JSON plano, sin espacios, "
+            + "con los valores como texto. Si un campo no se lee, usa null.";
 
     /** Para el usuario cuando la respuesta no trae un JSON (§6.3). */
     static final String SIN_JSON = "No pudimos leer la factura. Tome otra foto con más luz.";
+    /** Si el modelo no da la confianza y el valor pasa la validación: verde, sin pedir revisión. */
+    static final double CONFIANZA_VALIDADO = 0.9;
     /**
-     * Si el modelo da el valor sin su confianza (el modelo base suele hacerlo): queda por debajo de 0,80
-     * para que se muestre en ámbar y el usuario lo revise.
+     * Si el modelo no da la confianza y el valor no pasa la validación: queda por debajo de 0,80 para que
+     * se muestre en ámbar (o en rojo, por la validación) y el usuario lo revise.
      */
-    static final double CONFIANZA_SIN_DATO = 0.5;
+    static final double CONFIANZA_SIN_VALIDAR = 0.5;
+
+    /** El valor ya normalizado de un campo y la confianza que dio el modelo, si la dio. */
+    private record Lectura(String valor, Optional<Double> confianzaDada) { }
 
     private ParserRespuesta() { }
 
@@ -49,11 +60,16 @@ public final class ParserRespuesta {
     public static List<CampoExtraido> interpretar(String respuesta) throws ExtraccionException {
         JsonObject json = primerObjeto(respuesta)
                 .orElseThrow(() -> new ExtraccionException(SIN_JSON));
+        List<Lectura> lecturas = new ArrayList<>();
+        for (CampoFactura campo : CampoFactura.values()) {
+            lecturas.add(leer(json, campo));
+        }
+        separarSerieDelNumero(lecturas);
         List<CampoExtraido> campos = new ArrayList<>();
         for (CampoFactura campo : CampoFactura.values()) {
-            campos.add(leer(json, campo));
+            campos.add(conConfianza(campo, lecturas.get(campo.ordinal())));
         }
-        return separarSerieDelNumero(campos);
+        return campos;
     }
 
     /** El primer objeto JSON del texto, aunque venga dentro de {@code ```json} o con texto alrededor. */
@@ -111,21 +127,31 @@ public final class ParserRespuesta {
         return -1;
     }
 
-    private static CampoExtraido leer(JsonObject json, CampoFactura campo) {
+    private static Lectura leer(JsonObject json, CampoFactura campo) {
         JsonElement elemento = json.get(campo.clave());
         String texto;
-        double confianza;
+        JsonElement confianzaDada = null;
         if (elemento != null && elemento.isJsonObject()) {
+            // Esquema anterior: {"ruc": {"valor": "20601234565", "confianza": 0.98}}.
             JsonObject objeto = elemento.getAsJsonObject();
             texto = texto(objeto.get("valor"));
-            confianza = confianza(objeto.get("confianza"));
+            confianzaDada = objeto.get("confianza");
         } else {
-            // Sin el esquema pedido: {"ruc": "20601234565"}.
             texto = texto(elemento);
-            confianza = CONFIANZA_SIN_DATO;
         }
-        String valor = texto == null ? null : normalizar(campo, texto);
-        return CampoExtraido.leido(campo, valor, valor == null ? 0 : confianza);
+        return new Lectura(texto == null ? null : normalizar(campo, texto), confianza(confianzaDada));
+    }
+
+    /** Sin valor, confianza 0; si el modelo no dio la confianza, se deduce de la validación del dominio. */
+    private static CampoExtraido conConfianza(CampoFactura campo, Lectura lectura) {
+        String valor = lectura.valor();
+        if (valor == null) {
+            return CampoExtraido.leido(campo, null, 0);
+        }
+        double confianza = lectura.confianzaDada()
+                .orElseGet(() -> ValidadorCampos.error(campo, valor).isPresent()
+                        ? CONFIANZA_SIN_VALIDAR : CONFIANZA_VALIDADO);
+        return CampoExtraido.leido(campo, valor, confianza);
     }
 
     private static String texto(JsonElement elemento) {
@@ -136,17 +162,18 @@ public final class ParserRespuesta {
         return texto.isEmpty() || texto.equalsIgnoreCase("null") ? null : texto;
     }
 
-    private static double confianza(JsonElement elemento) {
+    /** La confianza que dio el modelo, entre 0 y 1; vacío si no la dio o no es un número. */
+    private static Optional<Double> confianza(JsonElement elemento) {
         if (elemento == null || !elemento.isJsonPrimitive()) {
-            return CONFIANZA_SIN_DATO;
+            return Optional.empty();
         }
         JsonPrimitive primitivo = elemento.getAsJsonPrimitive();
         try {
             double valor = primitivo.isNumber() ? primitivo.getAsDouble()
                     : Double.parseDouble(primitivo.getAsString().trim().replace(',', '.'));
-            return Double.isNaN(valor) ? CONFIANZA_SIN_DATO : Math.max(0, Math.min(1, valor));
+            return Double.isNaN(valor) ? Optional.empty() : Optional.of(Math.max(0, Math.min(1, valor)));
         } catch (NumberFormatException e) {
-            return CONFIANZA_SIN_DATO;
+            return Optional.empty();
         }
     }
 
@@ -192,20 +219,19 @@ public final class ParserRespuesta {
      * Si el modelo puso el comprobante entero en el número ({@code F001-004521}) y la serie falta o es la
      * misma, los separa.
      */
-    private static List<CampoExtraido> separarSerieDelNumero(List<CampoExtraido> campos) {
-        CampoExtraido serie = campos.get(CampoFactura.SERIE.ordinal());
-        CampoExtraido numero = campos.get(CampoFactura.NUMERO.ordinal());
-        String valor = numero.valorLeido();
+    private static void separarSerieDelNumero(List<Lectura> lecturas) {
+        Lectura serie = lecturas.get(CampoFactura.SERIE.ordinal());
+        Lectura numero = lecturas.get(CampoFactura.NUMERO.ordinal());
+        String valor = numero.valor();
         if (valor == null || !valor.matches("[A-Z0-9]{4}-\\d+")) {
-            return campos;
+            return;
         }
         String[] partes = valor.split("-");
-        if (serie.valorLeido() != null && !serie.valorLeido().equals(partes[0])) {
-            return campos;
+        if (serie.valor() != null && !serie.valor().equals(partes[0])) {
+            return;
         }
-        double confianzaSerie = serie.valorLeido() == null ? numero.confianza() : serie.confianza();
-        campos.set(CampoFactura.SERIE.ordinal(), CampoExtraido.leido(CampoFactura.SERIE, partes[0], confianzaSerie));
-        campos.set(CampoFactura.NUMERO.ordinal(), CampoExtraido.leido(CampoFactura.NUMERO, partes[1], numero.confianza()));
-        return campos;
+        Optional<Double> confianzaSerie = serie.valor() == null ? numero.confianzaDada() : serie.confianzaDada();
+        lecturas.set(CampoFactura.SERIE.ordinal(), new Lectura(partes[0], confianzaSerie));
+        lecturas.set(CampoFactura.NUMERO.ordinal(), new Lectura(partes[1], numero.confianzaDada()));
     }
 }

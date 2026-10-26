@@ -327,32 +327,29 @@ Los **7 campos**: `ruc`, `razon_social`, `serie`, `numero`, `fecha_emision` (YYY
 ```java
 static final String INSTRUCCION =
     "Extrae de esta factura peruana los campos ruc, razon_social, serie, numero, "
-  + "fecha_emision (YYYY-MM-DD), moneda (PEN o USD) e importe_total (numero con punto decimal). "
-  + "Responde solo un objeto JSON donde cada campo tenga 'valor' y 'confianza' entre 0 y 1. "
-  + "Si un campo no se lee, usa valor null y confianza 0.";
+  + "fecha_emision (YYYY-MM-DD), moneda (PEN o USD) e importe_total (con punto decimal y dos "
+  + "decimales, incluida la percepción si la hay). Responde solo un objeto JSON plano, sin espacios, "
+  + "con los valores como texto. Si un campo no se lee, usa null.";
 ```
+
+**Salida: JSON plano, sin espacios y sin confianza** (decidido el 2026-10-25; ver 6.7). Los valores van como texto, y `null` si no se leen:
 
 ```json
-{
-  "ruc":           { "valor": "20601234565", "confianza": 0.98 },
-  "razon_social":  { "valor": "DISTRIBUIDORA ANDINA S.A.C.", "confianza": 0.95 },
-  "serie":         { "valor": "F001", "confianza": 0.99 },
-  "numero":        { "valor": "004821", "confianza": 0.97 },
-  "fecha_emision": { "valor": "2026-09-22", "confianza": 0.96 },
-  "moneda":        { "valor": "PEN", "confianza": 0.99 },
-  "importe_total": { "valor": "1450.00", "confianza": 0.62 }
-}
+{"ruc":"20601234565","razon_social":"DISTRIBUIDORA ANDINA S.A.C.","serie":"F001","numero":"004821","fecha_emision":"2026-09-22","moneda":"PEN","importe_total":"1450.00"}
 ```
 
-> **La misma instrucción y el mismo esquema** deben usarse en el cuaderno de ajuste fino (etiquetas de entrenamiento) y en la app. Si cambian los campos, se actualizan a la vez: cuaderno, `INSTRUCCION`, `ParserRespuesta`, `CampoFactura` y la tabla `campo_extraido`.
+- `importe_total` es el monto que se paga, **con la percepción** si el comprobante la trae («Monto total», «Total a pagar con», «Total pagar»), no el «Importe total» sin ella.
+- La **confianza la calcula la app**: 0,9 si el valor pasa `ValidadorCampos` (verde) y 0,5 si no (ámbar o rojo). Un campo vacío queda con 0. El modelo no da confianzas calibradas y escribirlas duplicaba los tokens de la respuesta.
+- El parser sigue aceptando el **esquema anterior** (`{"ruc": {"valor": "…", "confianza": 0.98}, …}`) y, en ese caso, usa la confianza que dio el modelo.
 
-> Este esquema es el que usa hoy la app con el modelo base. Para el modelo afinado se pasará a una **salida compacta**, más rápida de generar (decidido el 2026-10-25; ver 6.7).
+> **La misma instrucción y el mismo esquema** deben usarse en el script de ajuste fino (etiquetas de entrenamiento) y en la app. Si cambian los campos, se actualizan a la vez: script de entrenamiento, `INSTRUCCION`, `ParserRespuesta`, `CampoFactura` y la tabla `campo_extraido`.
 
 ### 6.3 Reglas del parser (`ParserRespuesta`)
 
 - Extraer el **primer objeto JSON** de la respuesta (el modelo puede envolverlo en texto o en ```json).
 - Normalizar: `ruc` solo dígitos; `serie` en mayúsculas; `numero` sin ceros de relleno para comparar pero se guarda tal cual; `importe_total` acepta `1 450,00`, `1,450.00`, `1450` → `BigDecimal("1450.00")`; `fecha_emision` acepta `dd/MM/yyyy` y la convierte.
 - Campo faltante o no parseable → `valor = null`, `confianza = 0`, requiere revisión.
+- Sin confianza del modelo (formato plano) → 0,9 si el valor pasa `ValidadorCampos`, 0,5 si no. Si el comprobante entero viene en `numero` (`F001-004521`), primero se separa la serie y luego se valida cada parte.
 - Si la **confianza global** (mínima de los campos clave RUC, serie, número, fecha, importe) < 0,5 → sugerir otra foto.
 - Si no hay JSON válido → `ExtraccionException` con mensaje para el usuario: «No pudimos leer la factura. Tome otra foto con más luz.»
 
@@ -448,7 +445,17 @@ El modelo Gemma 4 E2B ajustado (`.litertlm`, ≈ 2,6 GB) se descarga **una sola 
 
 Partir de `tunning_gemma4/tunning_model_gemma4_6.ipynb`: etiquetar los 7 campos con el esquema 6.2, LoRA sobre `unsloth/gemma-4-E2B-it` en 4 bits, 896 px, 80/20 + conjunto de prueba separado, evaluar por campo contra el modelo base, **fusionar → cuantizar → convertir a `.litertlm`** y **evaluar de nuevo después de convertir**. Publicar solo si mejora al base y logra ≥ 90 % por campo (RNF-01/02). Publicar significa: subir el `.litertlm` al repositorio público de Hugging Face, calcular su SHA-256, actualizar `assets/modelo.json` y lanzar una nueva versión de la app. Referencia de formato: `litert-community/gemma-4-E2B-it-litert-lm` en Hugging Face.
 
-**Salida compacta (decidido el 2026-10-25).** El modelo base no cumple RNF-04 (ver 6.5). Para el afinado se le enseña a responder con un JSON más corto, con menos tokens que generar. Por ejemplo, un objeto plano con claves breves y la confianza en una sola lista, o sin confianza, que la app calcularía con las validaciones (RUC módulo 11, fecha y serie). El formato exacto lo eligen Damián Valdivia y Coronel Obregón antes de etiquetar. Al cambiarlo se actualizan **a la vez** el cuaderno (etiquetas), `ParserRespuesta.INSTRUCCION`, el parser y sus pruebas, y el esquema de 6.2. Después se mide con `MedicionGemmaTest` cuánto baja el tiempo.
+**Salida compacta (decidido el 2026-10-25).** El modelo base no cumple RNF-04 (ver 6.5). Para el afinado se le enseña a responder con un JSON más corto, con menos tokens que generar. Se eligió el **JSON plano, sin espacios y sin confianza**, con las mismas claves de siempre (esquema en 6.2); la app calcula la confianza con `ValidadorCampos`. Se descartaron las claves de 1–2 letras (solo 9 tokens menos y el parser necesitaría una tabla de claves) y la línea con `|` (la más corta, pero si el modelo omite un valor se corren todos los demás). Medido con el tokenizador de Gemma 4 sobre una boleta real:
+
+| Formato | Tokens |
+|---|---|
+| Anterior (`valor` + `confianza` por campo) | 185 |
+| **JSON plano sin espacios (elegido)** | **82 (−56 %)** |
+| JSON plano con espacios | 94 |
+| Claves cortas | 73 |
+| Línea con `\|` | 56 |
+
+Ya se actualizaron `ParserRespuesta.INSTRUCCION`, el parser, sus pruebas y el esquema de 6.2; el script de entrenamiento (pendiente) debe generar las respuestas en este formato desde `tunning_gemma4/datos/etiquetas.csv`, con la misma `INSTRUCCION`. Falta medir con `MedicionGemmaTest` cuánto baja el tiempo con el modelo afinado: la lectura de la imagen no cambia, así que la reducción será menor que la de los tokens.
 
 ---
 
