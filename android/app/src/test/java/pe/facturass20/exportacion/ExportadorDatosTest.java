@@ -126,16 +126,16 @@ public class ExportadorDatosTest {
                 + "estado;motivo_anulacion;fecha_registro;archivo_imagen", facturas[0]);
         // Por fecha y, el mismo día, por orden de registro.
         assertEquals("2026;9;2026-09-22;20601234565;\"DISTRIBUIDORA ANDINA; S.A.C.\";F001;004821;PEN;1450.00;IA;"
-                + "VIGENTE;;2026-09-22T10:01:00;imagenes/2026-09_20601234565_F001-004821.jpg", facturas[1]);
+                + "VIGENTE;;2026-09-22 10:01:00;imagenes/2026-09_20601234565_F001-004821.jpg", facturas[1]);
         assertTrue(facturas[2].contains(";ANULADA;Duplicada;"));
-        assertTrue(facturas[3].endsWith(";200.10;IA;VIGENTE;;2026-09-22T10:02:00;"));
+        assertTrue(facturas[3].endsWith(";200.10;IA;VIGENTE;;2026-09-22 10:02:00;"));
         assertEquals(4, facturas.length);
 
         assertEquals("anio;mes;estado;total_ventas;total_adquisiciones;facturas_vigentes;facturas_anuladas\r\n"
                 + "2026;9;CERRADO;3000.00;1650.10;2;1\r\n", texto(zip.get("periodos.csv")));
         assertEquals("anio;mes;total_adquisiciones;monto_determinante;categoria;cuota;fecha_vencimiento;"
                 + "nivel_alerta;version_parametros;fecha_calculo\r\n"
-                + "2026;9;1650.10;3000.00;1;20.00;2026-10-15;NINGUNA;2026.1;2026-10-01T09:30:00\r\n",
+                + "2026;9;1650.10;3000.00;1;20.00;2026-10-15;NINGUNA;2026.1;2026-10-01 09:30:00\r\n",
                 texto(zip.get("determinaciones.csv")));
 
         assertEquals(3, resumen.facturas());

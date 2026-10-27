@@ -640,7 +640,7 @@ facturas-s20_2026-09.zip
 | `origen` | `IA` / `MANUAL` | `IA` |
 | `estado` | `VIGENTE` / `ANULADA` | `VIGENTE` |
 | `motivo_anulacion` | vacío si VIGENTE | |
-| `fecha_registro` | `factura_compra.fecha_registro` | `2026-09-22T10:41:05` |
+| `fecha_registro` | `factura_compra.fecha_registro` | `2026-09-22 10:41:05` |
 | `archivo_imagen` | ruta dentro del ZIP o vacío | `imagenes/2026-09_20601234565_F001-004821.jpg` |
 
 **`periodos.csv`** — una fila por mes exportado (`periodo` + suma calculada): `anio`, `mes`, `estado` (ABIERTO/CERRADO), `total_ventas`, `total_adquisiciones` (suma de VIGENTE), `facturas_vigentes`, `facturas_anuladas`.
@@ -654,8 +654,9 @@ No se exportan `contribuyente.pin_hash`/`pin_sal`, claves, ni `campo_extraido` (
 - **Codificación UTF-8 con BOM** (`EF BB BF`) para que Excel muestre bien tildes y «ñ»; fin de línea `\r\n`.
 - **Separador `;`**. Campos entre comillas dobles solo si contienen `;`, comillas o saltos de línea; las comillas internas se duplican (RFC 4180). Primera fila: nombres de columna en minúsculas y sin tildes.
 - **Montos con punto decimal, sin separador de miles y siempre con dos decimales** (`1450.00`, `BigDecimal.setScale(2).toPlainString()`). Motivo: la configuración regional de Windows para Perú (`es-PE`) usa el **punto** como símbolo decimal, así que Excel reconoce `1450.00` como número y lo suma sin conversión; además es el mismo formato del modelo (6.2) y de `BigDecimal`, y no choca con ningún separador. Si una PC está configurada con coma decimal (p. ej. `es-ES`), se usa *Datos → Desde texto/CSV* y se elige la configuración regional «Español (Perú)» o «Inglés»; LibreOffice pregunta el separador y la configuración regional al abrir.
-- Fechas en ISO (`AAAA-MM-DD`), que Excel y LibreOffice reconocen en cualquier configuración regional.
-- El RUC y el número se escriben como texto; si Excel los muestra en notación científica, se importan con *Datos → Desde texto/CSV* y tipo «Texto». Para que el doble clic abra las columnas separadas en una PC cuyo separador de listas sea `,`, también se usa *Datos → Desde texto/CSV* (detecta `;`).
+- Fechas en ISO (`AAAA-MM-DD`), que Excel y LibreOffice reconocen en cualquier configuración regional. La fecha con hora va con un espacio (`2026-09-22 10:41:05`) y no con la «T» de ISO, porque con la «T» Excel la deja como texto (decidido el 2026-10-27).
+- El RUC y el número se escriben como texto. Al abrirlos con doble clic, Excel los convierte en números: el número pierde los ceros a la izquierda (`02655698` → `2655698`) y el RUC se ve en notación científica si la columna es angosta. Para conservarlos se importa con *Datos → Desde texto/CSV* y tipo «Texto». Se decidió el 2026-10-27 no forzarlos con `="…"`, para que el CSV siga siendo estándar. Para que el doble clic abra las columnas separadas en una PC cuyo separador de listas sea `,`, también se usa *Datos → Desde texto/CSV* (detecta `;`).
+- En LibreOffice Calc, para que la fecha con hora se lea como fecha, hay que marcar «Detectar números especiales» al importar.
 - Las imágenes se descifran con `AlmacenImagenes` en flujo (sin archivos temporales en claro) y se escriben tal cual como JPEG dentro del ZIP.
 
 ### 9.4 Clases
@@ -738,7 +739,7 @@ try (OutputStream destino = contentResolver.openOutputStream(uri);
 - **P20:** «Guardar en el teléfono» abre el selector del sistema (`CreateDocument("application/zip")`) y escribe el ZIP directo en el `Uri`. «Compartir» lo escribe en `cacheDir/exportaciones/` (agregada al `FileProvider`) y abre `ACTION_SEND`. Los ZIP temporales se borran antes de cada exportación y al iniciar la app (no al volver, porque la app que lo recibe puede seguir leyéndolo). Al terminar de guardar se muestra «Listo: se exportaron N facturas de <período>».
 - **Pruebas:** `ExportarDatosTest` (dominio, 3), `EscritorCsvTest` (5) y `ExportadorDatosTest` (2: contenido del ZIP con y sin fotos y PDF, y suma de las vigentes = acumulado, criterio 9.5).
 - **Probado en el Moto G34** con las 9 facturas de octubre, con fotos y PDF: «Guardar» en Descargas y «Compartir» por WhatsApp funcionan. El ZIP (3,1 MB) trae las 9 fotos (JPEG válidos), el PDF y los tres CSV con BOM y `
-`; `facturas.csv` suma 583.90, igual que `periodos.csv` y la determinación. Falta abrirlo en Excel y LibreOffice (paso 12).
+`; `facturas.csv` suma 583.90, igual que `periodos.csv` y la determinación. Se abrió en Excel y LibreOffice el mismo día (paso 12, ver abajo).
 
 ---
 
@@ -854,7 +855,7 @@ Son iteraciones de dos semanas, alineadas con las entregas del curso.
 | Paso 0 | 8 | Configuración del equipo y proyecto Android base | App "Hello World!" en el teléfono | ✅ completo (ver 13.3) |
 | I3 | 9–10 | Front-end navegable (P01–P20) sobre la base de datos cifrada, y dominio con motor de reglas probado | Incremento 1 | ✅ completo el 2026-10-25 (pasos 1 a 5, ver 13.4) |
 | I4 | 11–12 | Inferencia local con el modelo convertido, medición en el teléfono (la prueba de usabilidad se retiró el 2026-10-27) | APF3 | en curso (ver 13.4) |
-| I5 | 13–14 | Reporte PDF, exportación de datos e historial | Incremento 3 | ✅ completo el 2026-10-27 (PDF, exportación a ZIP y avisos; falta abrir el ZIP en Excel y LibreOffice, paso 12) |
+| I5 | 13–14 | Reporte PDF, exportación de datos e historial | Incremento 3 | ✅ completo el 2026-10-27 (PDF, exportación a ZIP probada en Excel y LibreOffice, y avisos) |
 | I6 | 15–18 | Pruebas, validación en mes simulado y sustentación | Informe final | pendiente |
 
 ### 13.3 Paso 0 · Configuración del equipo ✅ (hecho)
@@ -986,7 +987,9 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
    - **Permiso (Android 13+):** `ui.comun.PermisoNotificaciones`. P04 lo pide una sola vez; P14 y P15 lo piden al activar un aviso y, si se niega, explican que los avisos no llegarán.
    - **Pruebas:** `RevisarAvisosTest` (dominio, 7), `RecordatorioWorkerTest` (hora de la revisión) y `trabajos.NotificacionesAvisosTest` (instrumentada: muestra una notificación de cada tipo con datos de ejemplo; no toca la base).
 11. ~~Exportación de datos (sección 9): `ExportarDatos`, `ExportadorDatos`, `EscritorCsv`, P20 con SAF y compartir por `FileProvider`~~ (hecho el 2026-10-27, ver §9.6).
-12. Pruebas de exportación y verificación del criterio 9.5 en Excel y LibreOffice.
+12. ~~Pruebas de exportación y verificación del criterio 9.5 en Excel y LibreOffice~~ (hecho el 2026-10-27, con el ZIP de octubre del Moto G34; PC con Windows en `es-PE`, Excel 16 y LibreOffice instalado con winget):
+   - **Excel (doble clic):** columnas bien separadas en los tres CSV, tildes y «&» sin caracteres raros, montos y fechas reconocidos, y `importe_total` suma 583.9, igual que `periodos.csv` (criterio 9.5). El número pierde los ceros a la izquierda y el RUC se ve en notación científica si la columna es angosta: se deja así y se importa como texto si hace falta (§9.3). La fecha con hora con «T» quedaba como texto: desde entonces se escribe con un espacio (`2026-10-27 06:07:05`) y Excel la reconoce.
+   - **LibreOffice Calc** (importación con `;` y UTF-8): mismo resultado, suma 583.90. La fecha con hora con espacio solo se reconoce si se marca «Detectar números especiales» en el diálogo de importación; sin esa casilla queda como texto.
 
 **I6 · semanas 15–18 — Pruebas y validación**
 13. Pruebas de integración y de seguridad (lista 10), modo avión, cierre forzado.

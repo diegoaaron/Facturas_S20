@@ -13,12 +13,13 @@ import java.time.format.DateTimeFormatter;
 /**
  * CSV para Excel y LibreOffice (documentación técnica §9.3): UTF-8 con BOM, separador {@code ;}, fin de
  * línea {@code \r\n}, comillas solo cuando hacen falta (RFC 4180), montos con punto y dos decimales y
- * fechas ISO. No cierra el flujo: escribe dentro de una entrada del ZIP.
+ * fechas ISO. La fecha con hora va con un espacio ({@code 2026-09-22 10:41:05}): con la «T» de ISO, Excel
+ * la deja como texto. No cierra el flujo: escribe dentro de una entrada del ZIP.
  */
 public final class EscritorCsv {
 
     private static final char SEPARADOR = ';';
-    private static final DateTimeFormatter FECHA_HORA = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private static final DateTimeFormatter FECHA_HORA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private final Writer salida;
 
@@ -51,7 +52,7 @@ public final class EscritorCsv {
         if (valor instanceof BigDecimal monto) {
             texto = monto.setScale(2, RoundingMode.HALF_UP).toPlainString();   // 1450.00
         } else if (valor instanceof LocalDateTime fechaHora) {
-            texto = FECHA_HORA.format(fechaHora);                              // 2026-09-22T10:41:05
+            texto = FECHA_HORA.format(fechaHora);                              // 2026-09-22 10:41:05
         } else {
             texto = valor.toString();                                          // LocalDate → ISO
         }

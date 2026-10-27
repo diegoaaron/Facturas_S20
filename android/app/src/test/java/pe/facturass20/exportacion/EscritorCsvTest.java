@@ -39,9 +39,9 @@ public class EscritorCsvTest {
 
     @Test
     public void fechasEnIso() throws IOException {
-        assertEquals("2026-09-22;2026-09-22T10:41:05\r\n",
+        assertEquals("2026-09-22;2026-09-22 10:41:05\r\n",
                 escribir(LocalDate.of(2026, 9, 22), LocalDateTime.of(2026, 9, 22, 10, 41, 5, 123_000_000)));
-        assertEquals("2026-09-22T10:41:00\r\n", escribir(LocalDateTime.of(2026, 9, 22, 10, 41)));
+        assertEquals("2026-09-22 10:41:00\r\n", escribir(LocalDateTime.of(2026, 9, 22, 10, 41)));
     }
 
     @Test
