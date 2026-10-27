@@ -128,8 +128,14 @@ public final class LecturaViewModel extends BaseViewModel {
         }, this::fallar);
     }
 
-    /** El usuario tocó Cancelar o Atrás; la foto se conserva por si quiere registrarla a mano. */
-    public void cancelar() {
+    /**
+     * El usuario tocó Cancelar o Atrás, o se cerró la pantalla; la foto se conserva por si quiere registrarla
+     * a mano. {@code motivo} va al logcat para saber qué detuvo una lectura.
+     */
+    public void cancelar(String motivo) {
+        if (tarea != null && !tarea.isDone()) {
+            Log.i("FacturasS20", "Lectura cancelada: " + motivo);
+        }
         cancelada = true;
         hiloUi.removeCallbacks(avanzar);
         if (tarea != null) {
@@ -173,6 +179,6 @@ public final class LecturaViewModel extends BaseViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-        cancelar();
+        cancelar("se cerró la pantalla de lectura");
     }
 }

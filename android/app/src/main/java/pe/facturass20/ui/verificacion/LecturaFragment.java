@@ -57,13 +57,13 @@ public class LecturaFragment extends Fragment {
             pasos.add(fila);
         }
 
-        binding.barra.setNavigationOnClickListener(v -> cancelar());
-        binding.botonCancelar.setOnClickListener(v -> cancelar());
+        binding.barra.setNavigationOnClickListener(v -> cancelar("flecha de la barra"));
+        binding.botonCancelar.setOnClickListener(v -> cancelar("botón Cancelar"));
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(),
                 new OnBackPressedCallback(true) {
                     @Override
                     public void handleOnBackPressed() {
-                        cancelar();
+                        cancelar("Atrás del sistema");
                     }
                 });
 
@@ -117,8 +117,8 @@ public class LecturaFragment extends Fragment {
         }
     }
 
-    private void cancelar() {
-        modelo.cancelar();
+    private void cancelar(String motivo) {
+        modelo.cancelar(motivo);
         NavHostFragment.findNavController(this).navigateUp();
     }
 

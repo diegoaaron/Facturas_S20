@@ -137,6 +137,22 @@ Estado al 2026-10-25 (noche) y lo que falta, en orden. Complementa la documentac
 
       El base también mejora con las recortadas (RUC 53 % frente a 34 %). No cumple el 90 %; lo más flojo es la razón social con proveedor nuevo y el importe.
       **Sin recorte, `lora_v3` no sirve:** en las mismas 32 fotos de prueba, originales, saca ruc 44 %, razón social 16 %, serie 66 %, número 41 %, fecha 28 %, moneda 94 %, importe 22 % (completos 6 %), al nivel de `lora_v2_768` o peor (`evaluacion_prueba_originales.json`). Por eso la app tiene que recortar.
+      **La mejora es del recorte, no del reentrenamiento** (2026-10-27, PyTorch, 768 px, sin base):
+
+      | campo | nuevo: `lora_v2_768` recortadas | nuevo: `lora_v3` automáticas | conocido: `lora_v2_768` recortadas | conocido: `lora_v3` automáticas |
+      |---|---|---|---|---|
+      | ruc | 78 % | 81 % | 100 % | 100 % |
+      | razon_social | 41 % | 41 % | 89 % | 100 % |
+      | serie | 84 % | 84 % | 100 % | 100 % |
+      | numero | 75 % | 78 % | 89 % | 78 % |
+      | fecha_emision | 66 % | 56 % | 44 % | 56 % |
+      | moneda | 100 % | 100 % | 100 % | 100 % |
+      | importe_total | 56 % | 56 % | 56 % | 67 % |
+      | completos | 6 % | 9 % | 33 % | 44 % |
+
+      «automáticas» = `recortar.py generar --automatico` (esquinas detectadas sin corregir, como `RecortadorComprobante` en la app). `lora_v2_768` con fotos recortadas queda igual que `lora_v3` (diferencias de 1–2 fotos), y `lora_v3` lee igual con el recorte automático que con el corregido a mano: el recorte de la app sirve. Resultados en `modelos/<nombre>/evaluacion_<grupo>_<fotos>.json`.
+      **El usuario eligió seguir con `lora_v2_768` (ya convertido) y no convertir `lora_v3` por ahora.** Su `.litertlm` con el recorte automático, en la PC (`evaluacion_litertlm_<grupo>_automaticas.json`; entre paréntesis, con las fotos originales): nuevo ruc 78 % (59), razón social 22 % (16), serie 72 % (72), número 66 % (44), fecha 50 % (34), moneda 100 % (97), importe 38 % (25), completos 3 % (3); conocido ruc 100 % (78), razón social 67 % (89), serie 100 % (100), número 78 % (67), fecha 56 % (0), importe 67 % (33), completos 22 % (0). La conversión le quita algo frente a PyTorch (razón social e importe), pero la mejora del recorte se mantiene.
+      - `assets/modelo.json` pasó a `0.2.0-lora-v2-768` con el SHA-256 y el tamaño de `modelos/lora_v2_768/empaquetado/model.litertlm` (5.294.460.128 bytes). **La `url` sigue apuntando al oficial** hasta publicar (pendiente 7): por ahora solo se instala con la copia por adb en `Android/data/pe.facturass20/files/modelos/modelo.litertlm` (P03 → «Descargar modelo»); una descarga real fallaría la verificación.
     - **Falta:** cadena de `lora_v3` (fusionar → convertir → empaquetar → evaluar el `.litertlm` → teléfono) si el usuario la aprueba. Ojo: la app lee con el modelo que instaló desde `assets/modelo.json` (hoy el oficial `0.1.0-base`), no con el `modelo.litertlm` que usa `MedicionGemmaTest`; para que la app use el afinado hay que publicarlo (pendiente 7). La caché de la app tenía 2,9 GB de cachés de LiteRT-LM (casi todo el `xnnpack_cache` de `lora_v2_768` para `MedicionGemmaTest`, 2,2 GB); el 2026-10-27 se dejó solo la del modelo de la app (757 MB). En `Android/data/.../files/modelos/` hay además 13 GB de modelos de prueba (`modelo_afinado_v1`, `modelo_oficial`, `modelo`).
     - **Fusión de `lora_v3`** hecha el 2026-10-27 (245 pesos LoRA, `modelos/lora_v3/fusionado/`). Sigue convertir (terminal del usuario). El primer intento se cayó al escribir `embedder.tflite` (> 2 GB) con `LLVM ERROR: IO failure on output stream: Cannot allocate memory`, mientras Claude compilaba con Gradle en Windows: **durante la conversión no correr nada más** (ni Gradle ni otro proceso en WSL).
 
