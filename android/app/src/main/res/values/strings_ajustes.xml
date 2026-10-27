@@ -93,5 +93,9 @@
     <string name="exportar_guardar">Guardar en el teléfono o la PC</string>
     <string name="exportar_compartir">Compartir</string>
     <string name="exportar_sin_servidor">La app no envía sus datos a ningún servidor</string>
-    <string name="exportar_pronto">La exportación del ZIP estará disponible en la próxima versión.</string>
+    <plurals name="exportar_listo">
+        <item quantity="one">Listo: se exportó %1$d factura de %2$s</item>
+        <item quantity="many">Listo: se exportaron %1$d facturas de %2$s</item>
+        <item quantity="other">Listo: se exportaron %1$d facturas de %2$s</item>
+    </plurals>
 </resources>

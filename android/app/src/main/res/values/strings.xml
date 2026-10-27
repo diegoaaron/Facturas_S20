@@ -195,7 +195,6 @@
     <string name="modelo_descarga">Se descargará una sola vez (%1$s) por Wi-Fi. No se envía ningún dato suyo.</string>
     <string name="exportar_titulo">Exportar datos</string>
     <string name="exportar_aviso_cifrado">El archivo no va cifrado. Guárdelo en un lugar seguro y compártalo solo con personas de confianza.</string>
-    <string name="exportar_listo">Listo: se exportaron %1$d facturas de %2$s</string>
     <string name="cierre_pdf_listo">Su reporte PDF del mes ya está listo para compartirlo con su contador.</string>
     <string name="cierre_ver_reporte">Ver reporte</string>
     <string name="cierre_sugerir_exportar">Mes cerrado. Le recomendamos exportar sus datos por si pierde el teléfono.</string>

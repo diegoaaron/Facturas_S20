@@ -20,6 +20,9 @@ public interface ParametrosDao {
     @Query("SELECT * FROM parametro_version WHERE version = :version")
     ParametroVersionEntity buscar(String version);
 
+    @Query("SELECT * FROM parametro_version WHERE id_parametro = :idParametro")
+    ParametroVersionEntity buscarPorId(long idParametro);
+
     @Query("UPDATE parametro_version SET activo = 0")
     void desactivarTodas();
 

@@ -14,6 +14,7 @@ import pe.facturass20.datos.cifrado.GestorClaves;
 import pe.facturass20.datos.cifrado.GestorPin;
 import pe.facturass20.datos.parametros.CargadorParametrosNrus;
 import pe.facturass20.datos.repositorios.ContribuyenteRepositorioRoom;
+import pe.facturass20.datos.repositorios.DetallesExportacionRoom;
 import pe.facturass20.datos.repositorios.FacturaRepositorioRoom;
 import pe.facturass20.datos.repositorios.ParametrosRepositorioRoom;
 import pe.facturass20.datos.repositorios.PeriodoRepositorioRoom;
@@ -21,10 +22,12 @@ import pe.facturass20.datos.repositorios.ReporteRepositorioRoom;
 import pe.facturass20.dominio.casosuso.AnularFactura;
 import pe.facturass20.dominio.casosuso.CerrarPeriodo;
 import pe.facturass20.dominio.casosuso.DeterminarCategoria;
+import pe.facturass20.dominio.casosuso.ExportarDatos;
 import pe.facturass20.dominio.casosuso.RegistrarFactura;
 import pe.facturass20.dominio.casosuso.RegistrarVentas;
 import pe.facturass20.dominio.casosuso.VerificarFactura;
 import pe.facturass20.dominio.puertos.ContribuyenteRepositorio;
+import pe.facturass20.dominio.puertos.ExportadorArchivos;
 import pe.facturass20.dominio.puertos.ExtraccionException;
 import pe.facturass20.dominio.puertos.ExtractorFacturas;
 import pe.facturass20.dominio.puertos.FacturaRepositorio;
@@ -230,6 +233,11 @@ public final class ContenedorDependencias {
         return adaptadores().reportes;
     }
 
+    /** Lo que la exportación (P20) lee de la base y el dominio no tiene. */
+    public DetallesExportacionRoom detallesExportacion() {
+        return adaptadores().detallesExportacion;
+    }
+
     public AlmacenImagenes almacenImagenes() {
         return adaptadores().imagenes;
     }
@@ -266,6 +274,10 @@ public final class ContenedorDependencias {
         return new CerrarPeriodo(periodos(), determinarCategoria());
     }
 
+    public ExportarDatos exportarDatos(ExportadorArchivos exportador) {
+        return new ExportarDatos(periodos(), exportador);
+    }
+
     Context contexto() {
         return contexto;
     }
@@ -288,6 +300,7 @@ public final class ContenedorDependencias {
         final FacturaRepositorioRoom facturas;
         final ParametrosRepositorioRoom parametros;
         final ReporteRepositorioRoom reportes;
+        final DetallesExportacionRoom detallesExportacion;
         final AlmacenImagenes imagenes;
         final GestorPin pin;
         final CargadorParametrosNrus cargador;
@@ -301,6 +314,7 @@ public final class ContenedorDependencias {
             facturas = new FacturaRepositorioRoom(base, periodos, reloj);
             parametros = new ParametrosRepositorioRoom(base);
             reportes = new ReporteRepositorioRoom(base, periodos);
+            detallesExportacion = new DetallesExportacionRoom(base, periodos);
             imagenes = new AlmacenImagenes(contexto);
             pin = new GestorPin(base.contribuyenteDao());
             cargador = new CargadorParametrosNrus(contexto, base);

@@ -728,6 +728,18 @@ try (OutputStream destino = contentResolver.openOutputStream(uri);
 - Antes de generar se muestra el aviso «El archivo no va cifrado».
 - La exportación funciona en modo avión («Guardar en el teléfono»).
 
+### 9.6 Implementación
+
+**Hecho el 2026-10-27** (I5, paso 11):
+- **Dominio:** `ExportarDatos` reúne los meses pedidos que tienen facturas o ventas (del más antiguo al más reciente) y sus determinaciones en un `DatosExportacion`, y se los pasa al puerto `ExportadorArchivos`, que devuelve un `ResumenExportacion` (facturas, fotos, PDF y total vigente). Si el período no tiene datos, lanza «No hay facturas ni ventas registradas en ese período.».
+- **`exportacion.ExportadorDatos`:** escribe primero las fotos (`imagenes/`, descifradas de una en una) y los PDF (`reportes/`), y después los tres CSV. Así sabe qué poner en `archivo_imagen` sin tener todas las fotos en memoria. Lo que el dominio no tiene (fecha de registro, versión de parámetros y fecha de cálculo, fotos y PDF) lo pide a `ExportadorDatos.Complementos`. Las facturas van por fecha de emisión y, el mismo día, por orden de registro. `total_ventas` queda vacío si las ventas del mes no se registraron. Si dos fotos tendrían el mismo nombre (una anulada y otra con el mismo número), a la segunda se le agrega el id.
+- **Datos:** `DetallesExportacionRoom` lee la fecha de registro de cada factura y la versión de parámetros y la fecha de cálculo de cada mes (`ParametrosDao.buscarPorId`).
+- **PDF:** de cada mes se usa el generado al cerrarlo, si sigue intacto; si no, se genera uno nuevo con los datos del momento (`GeneradorReporte.delMes`, lo mismo que P16). Si el PDF de un mes falla, el ZIP sale sin él.
+- **P20:** «Guardar en el teléfono» abre el selector del sistema (`CreateDocument("application/zip")`) y escribe el ZIP directo en el `Uri`. «Compartir» lo escribe en `cacheDir/exportaciones/` (agregada al `FileProvider`) y abre `ACTION_SEND`. Los ZIP temporales se borran antes de cada exportación y al iniciar la app (no al volver, porque la app que lo recibe puede seguir leyéndolo). Al terminar de guardar se muestra «Listo: se exportaron N facturas de <período>».
+- **Pruebas:** `ExportarDatosTest` (dominio, 3), `EscritorCsvTest` (5) y `ExportadorDatosTest` (2: contenido del ZIP con y sin fotos y PDF, y suma de las vigentes = acumulado, criterio 9.5).
+- **Probado en el Moto G34** con las 9 facturas de octubre, con fotos y PDF: «Guardar» en Descargas y «Compartir» por WhatsApp funcionan. El ZIP (3,1 MB) trae las 9 fotos (JPEG válidos), el PDF y los tres CSV con BOM y `
+`; `facturas.csv` suma 583.90, igual que `periodos.csv` y la determinación. Falta abrirlo en Excel y LibreOffice (paso 12).
+
 ---
 
 ## 10. Seguridad
@@ -842,7 +854,7 @@ Son iteraciones de dos semanas, alineadas con las entregas del curso.
 | Paso 0 | 8 | Configuración del equipo y proyecto Android base | App "Hello World!" en el teléfono | ✅ completo (ver 13.3) |
 | I3 | 9–10 | Front-end navegable (P01–P20) sobre la base de datos cifrada, y dominio con motor de reglas probado | Incremento 1 | ✅ completo el 2026-10-25 (pasos 1 a 5, ver 13.4) |
 | I4 | 11–12 | Inferencia local con el modelo convertido, medición en el teléfono (la prueba de usabilidad se retiró el 2026-10-27) | APF3 | en curso (ver 13.4) |
-| I5 | 13–14 | Reporte PDF, exportación de datos e historial | Incremento 3 | en curso (PDF hecho el 2026-10-27) |
+| I5 | 13–14 | Reporte PDF, exportación de datos e historial | Incremento 3 | en curso (PDF y exportación a ZIP hechos el 2026-10-27; faltan los recordatorios) |
 | I6 | 15–18 | Pruebas, validación en mes simulado y sustentación | Informe final | pendiente |
 
 ### 13.3 Paso 0 · Configuración del equipo ✅ (hecho)
@@ -965,7 +977,7 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
 **I5 · semanas 13–14 — Reportes, exportación de datos e historial**
 9. ~~Reporte PDF (8.5) y compartir~~ (hecho el 2026-10-27, ver §8.5); cierre de mes e historial (P17) con la sugerencia de exportar (hechos en I3). ~~Pendiente: que `CerrarPeriodo` genere el PDF al cerrar el mes~~ — hecho el 2026-10-27: P17 cierra el mes y genera su PDF en la misma tarea (`GeneradorReporte`); si el PDF falla, el mes queda cerrado y P16 lo genera al compartirlo. No se probó con un cierre real en el teléfono (cerrar es irreversible).
 10. WorkManager: recordatorios y avisos.
-11. Exportación de datos (sección 9): `ExportarDatos`, `ExportadorDatos`, `EscritorCsv`, P20 con SAF y compartir por `FileProvider`.
+11. ~~Exportación de datos (sección 9): `ExportarDatos`, `ExportadorDatos`, `EscritorCsv`, P20 con SAF y compartir por `FileProvider`~~ (hecho el 2026-10-27, ver §9.6).
 12. Pruebas de exportación y verificación del criterio 9.5 en Excel y LibreOffice.
 
 **I6 · semanas 15–18 — Pruebas y validación**

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Lo único que la app comparte con otras apps (documentación técnica §10): los PDF del mes. La exportación
-     a ZIP (I5) agregará cacheDir/exportaciones/. -->
+<!-- Lo único que la app comparte con otras apps (documentación técnica §10): los PDF del mes y los ZIP
+     temporales de la exportación (P20), que se borran antes de cada exportación y al iniciar la app. -->
 <paths>
     <files-path name="reportes" path="reportes/"/>
+    <cache-path name="exportaciones" path="exportaciones/"/>
 </paths>

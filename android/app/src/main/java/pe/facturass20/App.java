@@ -4,6 +4,8 @@ import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 
+import pe.facturass20.ui.exportacion.ExportarDatosViewModel;
+
 /**
  * Punto de entrada de la app: crea el contenedor de dependencias y los canales de notificación. La base
  * se abre (y se cargan los parámetros del NRUS) cuando {@code MainActivity} consulta la sesión.
@@ -22,6 +24,8 @@ public class App extends Application {
         super.onCreate();
         contenedor = new ContenedorDependencias(this);
         crearCanales();
+        // Los ZIP que quedaron de compartir no van cifrados (§9.1).
+        contenedor.ejecutor().execute(() -> ExportarDatosViewModel.borrarTemporales(this));
     }
 
     public ContenedorDependencias contenedor() {

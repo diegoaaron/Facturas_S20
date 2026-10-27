@@ -24,10 +24,10 @@ import pe.facturass20.inferencia.Huella;
 
 /**
  * Arma los datos del reporte de un mes y escribe su PDF (§8.5). Lo usan P16 (vista previa, compartir y
- * guardar) y P17, que genera el PDF al cerrar el mes. Se llama desde un hilo de fondo: lee la base y las
- * fotos cifradas.
+ * guardar), P17, que genera el PDF al cerrar el mes, y P20, que lo mete en el ZIP. Se llama desde un hilo
+ * de fondo: lee la base y las fotos cifradas.
  */
-final class GeneradorReporte {
+public final class GeneradorReporte {
 
     /** Carpeta privada de los PDF; el {@code FileProvider} solo da acceso a esta (§10). */
     static final String CARPETA = "reportes";
@@ -67,6 +67,17 @@ final class GeneradorReporte {
         new ReportePdf(contexto).escribir(datos, ahora, factura -> foto(c, factura), pdf);
         c.reportes().registrar(datos.periodo().periodo(), pdf.getAbsolutePath(), Huella.sha256(pdf, null), ahora);
         return pdf;
+    }
+
+    /**
+     * El PDF que se comparte de un mes: el del cierre si el mes está cerrado y sigue intacto; si no, uno
+     * nuevo con los datos del momento (lo mismo que hace P16).
+     */
+    public static File delMes(Context contexto, ContenedorDependencias c, YearMonth mes, String sinConfigurar)
+            throws IOException {
+        ReporteViewModel.Vista datos = datos(c, mes, sinConfigurar);
+        File pdf = delCierre(c, datos.periodo());
+        return pdf != null ? pdf : generar(contexto, c, datos);
     }
 
     /**
