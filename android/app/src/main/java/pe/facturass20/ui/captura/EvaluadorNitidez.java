@@ -11,8 +11,10 @@ package pe.facturass20.ui.captura;
 public final class EvaluadorNitidez {
 
     /**
-     * Umbral de la vista previa para habilitar el disparador. §6.4 partía de 100, pero con boletas (mucho
-     * papel blanco) rechazaba fotos bien enfocadas; sigue pendiente calibrarlo con el teléfono de referencia.
+     * Umbral de la vista previa para habilitar el disparador. Medido en el Moto G34 el 2026-10-27 (marco de
+     * 885 × 630): factura enfocada 190–440 sin linterna y 1300–2150 con ella; desenfocada de cerca, con poca
+     * luz o una pared lisa, 10–23. 50 queda entre ambos grupos. No distingue una superficie con textura (una
+     * mesa da 60–250): eso no es nitidez, sino que no hay comprobante en el marco.
      */
     public static final double UMBRAL_NITIDEZ = 50;
     /**
@@ -21,7 +23,11 @@ public final class EvaluadorNitidez {
      * comprobó el enfoque; aquí solo se descartan las fotos claramente movidas.
      */
     public static final double UMBRAL_NITIDEZ_FOTO = 25;
-    public static final double LUZ_MINIMA = 60;
+    /**
+     * Medido en el Moto G34 el 2026-10-27: con poca luz la media fue 76–97 y con luz normal 125–140 (con
+     * linterna, 177–184). Con 60, la poca luz pasaba por «buena» y la linterna no se encendía sola.
+     */
+    public static final double LUZ_MINIMA = 100;
     public static final double LUZ_MAXIMA = 200;
 
     private EvaluadorNitidez() {

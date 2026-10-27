@@ -68,6 +68,11 @@ public class CapturaActivity extends AppCompatActivity {
     /** Cada cuánto se mide un fotograma; más seguido no aporta y gasta batería. */
     private static final long INTERVALO_ANALISIS_MS = 200;
     /**
+     * Fotogramas legibles seguidos (~0,6 s) para habilitar el disparador: moviendo el teléfono, la nitidez
+     * salta de un fotograma a otro (22 → 445 → 117 en el Moto G34) y uno solo nítido no basta.
+     */
+    private static final int LEGIBLES_SEGUIDOS = 3;
+    /**
      * Con poca luz durante este tiempo se enciende la linterna (luz continua, no flash: el destello deja
      * una mancha blanca sobre el papel que puede tapar los dígitos o el QR).
      */
@@ -95,9 +100,13 @@ public class CapturaActivity extends AppCompatActivity {
     private long inicioPocaLuz;
     private boolean disparando;
     private EvaluadorNitidez.Evaluacion evaluacion;
+    /** Cuántas evaluaciones legibles van seguidas; se pone en 0 con la primera que no lo es. */
+    private int legiblesSeguidas;
     /** Lo escribe el hilo de UI al medir la vista y lo lee el hilo de análisis. */
     private volatile MarcoEncuadre marco = MarcoEncuadre.completo();
     private long ultimoAnalisis;
+    /** Para calibrar los umbrales con el teléfono: la vista previa se registra una vez por segundo. */
+    private long ultimoRegistro;
     private byte[] luma = new byte[0];
 
     private final ActivityResultLauncher<String> pedirPermiso =
@@ -325,6 +334,12 @@ public class CapturaActivity extends AppCompatActivity {
             int filas = Math.min(imagen.getHeight(), (luma.length + paso - imagen.getWidth()) / paso);
             EvaluadorNitidez.Evaluacion resultado = EvaluadorNitidez.evaluar(luma, paso,
                     Math.max(0, r[0]), Math.max(0, r[1]), Math.min(imagen.getWidth(), r[2]), Math.min(filas, r[3]));
+            if (ahora - ultimoRegistro >= 1000) {
+                ultimoRegistro = ahora;
+                // Para calibrar los umbrales: adb logcat -s FacturasS20
+                Log.d(ETIQUETA, String.format(java.util.Locale.ROOT, "Vista previa: nitidez %.1f, luz %.1f (%d x %d)",
+                        resultado.nitidez(), resultado.luz(), r[2] - r[0], r[3] - r[1]));
+            }
             runOnUiThread(() -> mostrarEvaluacion(resultado));
         } catch (RuntimeException e) {
             Log.w(ETIQUETA, "Fotograma no evaluado: " + e.getClass().getName());
@@ -401,6 +416,7 @@ public class CapturaActivity extends AppCompatActivity {
     /** {@code null} mientras no llega el primer fotograma. */
     private void mostrarEvaluacion(EvaluadorNitidez.Evaluacion nueva) {
         evaluacion = nueva;
+        legiblesSeguidas = nueva != null && nueva.legible() ? legiblesSeguidas + 1 : 0;
         @ColorRes int fondo;
         @ColorRes int colorTexto;
         String estado;
@@ -411,7 +427,7 @@ public class CapturaActivity extends AppCompatActivity {
             estado = getString(R.string.captura_enfocando);
             ayuda = R.string.camara_acercar;
         } else {
-            boolean legible = nueva.legible();
+            boolean legible = estable();
             fondo = legible ? R.color.color_ok : R.color.color_alerta;
             colorTexto = legible ? R.color.color_superficie : R.color.color_texto;
             estado = getString(R.string.captura_estado,
@@ -419,7 +435,7 @@ public class CapturaActivity extends AppCompatActivity {
                     getString(textoLuz(nueva.nivelLuz())));
             ayuda = ayuda(nueva);
         }
-        binding.marco.setBueno(nueva != null && nueva.legible());
+        binding.marco.setBueno(estable());
         if (!estado.contentEquals(binding.etiquetaEstado.getText())) {
             binding.etiquetaEstado.setText(estado);
         }
@@ -473,9 +489,14 @@ public class CapturaActivity extends AppCompatActivity {
         }
     }
 
+    /** Nitidez y luz buenas en los últimos {@link #LEGIBLES_SEGUIDOS} fotogramas: se puede disparar. */
+    private boolean estable() {
+        return evaluacion != null && legiblesSeguidas >= LEGIBLES_SEGUIDOS;
+    }
+
     private void actualizarDisparador() {
         boolean ocupado = Boolean.TRUE.equals(modelo.ocupado().getValue()) || disparando;
-        boolean activo = captura != null && tienePermiso() && evaluacion != null && evaluacion.legible() && !ocupado;
+        boolean activo = captura != null && tienePermiso() && estable() && !ocupado;
         binding.botonDisparar.setEnabled(activo);
         binding.progreso.setVisibility(ocupado ? View.VISIBLE : View.GONE);
         binding.botonGaleria.setEnabled(!ocupado);

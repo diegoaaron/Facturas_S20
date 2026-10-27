@@ -99,7 +99,9 @@ public class EvaluadorNitidezTest {
     @Test
     public void luzSeClasificaPorLaMedia() {
         assertEquals(EvaluadorNitidez.Luz.BAJA, EvaluadorNitidez.evaluar(uniforme(30), ANCHO, ALTO).nivelLuz());
-        assertEquals(EvaluadorNitidez.Luz.BUENA, EvaluadorNitidez.evaluar(uniforme(60), ANCHO, ALTO).nivelLuz());
+        // Poca luz medida en el Moto G34: 76–97.
+        assertEquals(EvaluadorNitidez.Luz.BAJA, EvaluadorNitidez.evaluar(uniforme(90), ANCHO, ALTO).nivelLuz());
+        assertEquals(EvaluadorNitidez.Luz.BUENA, EvaluadorNitidez.evaluar(uniforme(100), ANCHO, ALTO).nivelLuz());
         assertEquals(EvaluadorNitidez.Luz.BUENA, EvaluadorNitidez.evaluar(uniforme(200), ANCHO, ALTO).nivelLuz());
         assertEquals(EvaluadorNitidez.Luz.EXCESIVA, EvaluadorNitidez.evaluar(uniforme(230), ANCHO, ALTO).nivelLuz());
     }
