@@ -61,13 +61,13 @@
 
 ```
 android/              proyecto Gradle de la app (módulos :app y :dominio) — paso 0 hecho
-tunning_gemma4/       tunning_model_gemma4_6.ipynb: entrenamiento y conversión del modelo
+tunning_gemma4/       scripts de ajuste fino y conversión del modelo (§6.7)
 roadmap/              este documento (001) y la configuración del equipo (002)
 documentos_teoricos/  entregables del curso (informes, sustentaciones y figuras)
 memorias/             memoria de Claude Code compartida entre computadoras
 ```
 
-- `tunning_gemma4/tunning_model_gemma4_6.ipynb`: cuaderno de ajuste fino (Unsloth + TRL, 896 px, 80/20). Hoy extrae 4 campos (`ruc`, `fecha_emision`, `numero_factura`, `monto_total`); debe pasar a los **7 campos** de la sección 6.2 y agregar la exportación a `.litertlm`.
+- `tunning_gemma4/`: scripts de Python que entrenan, evalúan, fusionan y convierten el modelo a `.litertlm` en WSL (§6.7). El cuaderno `tunning_model_gemma4_6.ipynb` (Colab, 4 campos, 896 px) es del prototipo previo y queda solo como referencia histórica (decidido el 2026-10-27).
 - La referencia visual es el prototipo P01–P20 del APF2 (sección 15).
 
 ---
@@ -120,7 +120,7 @@ Cuatro capas dentro del teléfono (presentación, dominio, inferencia local, dat
 | `:dominio` | `java-library` | modelo, casos de uso, reglas, puertos | nada (solo JDK) |
 | `:app` | `com.android.application` | ui, inferencia, datos, trabajos, exportación | `:dominio` |
 
-No hay otros proyectos de producción: el único código fuera de la app es el cuaderno de entrenamiento (`tunning_gemma4/`).
+No hay otros proyectos de producción: el único código fuera de la app son los scripts de entrenamiento (`tunning_gemma4/`).
 
 ### 3.3 Paquetes de la app
 
@@ -446,7 +446,15 @@ El modelo Gemma 4 E2B ajustado (`.litertlm`, ≈ 2,6 GB) se descarga **una sola 
 
 ### 6.7 Entrenamiento y conversión (fuera de la app)
 
-Partir de `tunning_gemma4/tunning_model_gemma4_6.ipynb`: etiquetar los 7 campos con el esquema 6.2, LoRA sobre `unsloth/gemma-4-E2B-it` en 4 bits, 896 px, 80/20 + conjunto de prueba separado, evaluar por campo contra el modelo base, **fusionar → cuantizar → convertir a `.litertlm`** y **evaluar de nuevo después de convertir**. Publicar solo si mejora al base y logra ≥ 90 % por campo (RNF-01/02). Publicar significa: subir el `.litertlm` al repositorio público de Hugging Face, calcular su SHA-256, actualizar `assets/modelo.json` y lanzar una nueva versión de la app. Referencia de formato: `litert-community/gemma-4-E2B-it-litert-lm` en Hugging Face.
+Se hace en local, dentro de WSL, con los scripts de `tunning_gemma4/` (los comandos, el estado y los resultados están en `roadmap/003_…`):
+
+1. **Datos:** etiquetar los 7 campos con el esquema 6.2 (`datos/etiquetas.csv`, fuera de git; `validar_etiquetas.py`) y recortar y enderezar las fotos (`recortar.py`).
+2. **Entrenar** (`entrenar.py`): LoRA sobre `unsloth/gemma-4-E2B-it` en 4 bits con Unsloth y TRL, visión congelada, a 768 px. Las fotos se dividen por emisor en entrenamiento, validación y prueba (proveedor nuevo y proveedor conocido).
+3. **Evaluar por campo contra el modelo base** (`evaluar.py`).
+4. **Fusionar, convertir y empaquetar** (`fusionar.py`, `convertir.py` a 8 bits y `empaquetar.py`, que pone la visión del `.litertlm` oficial).
+5. **Evaluar de nuevo después de convertir** (`evaluar_litertlm.py`, con el archivo que va al teléfono) y medir en el teléfono con `MedicionGemmaTest`.
+
+El cuaderno `tunning_model_gemma4_6.ipynb` (Colab, 4 campos, 896 px) es del prototipo previo: queda solo como referencia histórica y no produce el `.litertlm`. Publicar solo si mejora al base y logra ≥ 90 % por campo (RNF-01/02). Publicar significa: subir el `.litertlm` al repositorio público de Hugging Face, calcular su SHA-256, actualizar `assets/modelo.json` y lanzar una nueva versión de la app. Referencia de formato: `litert-community/gemma-4-E2B-it-litert-lm` en Hugging Face.
 
 **Salida compacta (decidido el 2026-10-25).** El modelo base no cumple RNF-04 (ver 6.5). Para el afinado se le enseña a responder con un JSON más corto, con menos tokens que generar. Se eligió el **JSON plano, sin espacios y sin confianza**, con las mismas claves de siempre (esquema en 6.2); la app calcula la confianza con `ValidadorCampos`. Se descartaron las claves de 1–2 letras (solo 9 tokens menos y el parser necesitaría una tabla de claves) y la línea con `|` (la más corta, pero si el modelo omite un valor se corren todos los demás). Medido con el tokenizador de Gemma 4 sobre una boleta real:
 
@@ -1070,6 +1078,7 @@ En `documentos_teoricos/` del repositorio `Facturas_S20`:
 | `entregable2_archivos/bpmn_0X_*.png` | Procesos AS-IS, TO-BE, registro, cierre mensual, publicación del modelo |
 | `entregable2_archivos/clases_*.png`, `der_local.png` | Diagramas de clases y entidad-relación de la base local |
 | `../entregable1/entregable1_documento.docx` | Informe APF1 (contexto, SRS original) |
-| `../tunning_gemma4/tunning_model_gemma4_6.ipynb` | Cuaderno de ajuste fino del prototipo previo |
+| `../tunning_gemma4/*.py` | Scripts de ajuste fino y conversión a `.litertlm` (§6.7) |
+| `../tunning_gemma4/tunning_model_gemma4_6.ipynb` | Cuaderno de ajuste fino del prototipo previo (solo referencia histórica) |
 
 Documentación externa: guía de LiteRT-LM para Android (developers.google.com/edge/litert-lm/android), Room, CameraX, WorkManager, SQLCipher for Android, Storage Access Framework y `FileProvider` (developer.android.com), repositorios de modelos de Hugging Face, OWASP MASVS.

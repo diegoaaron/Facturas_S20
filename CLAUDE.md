@@ -87,8 +87,13 @@ El entregable 1 corresponde al APF1 y el 2 al APF2. Al añadir nuevos entregable
 
 **Entregable 2:** el Word **no se edita a mano**: `entregable2/entregable2_archivos/scripts/construir_documento.py` lo arma sobre `entregable1/entregable1_documento.docx` (reutiliza sus bloques por índice de elemento del cuerpo y añade el contenido de `contenido_documento.py`), y `actualizar_indice.ps1` regenera el índice con Word (`-Docx` elige el archivo). `construir_documento_solo.py` genera `solo_entregable2_documento.docx` (solo los apartados del APF2) a partir del informe completo; `generar_todo.py` corre todo. Requiere Python de Windows (`C:\Users\diego\AppData\Local\Python\bin\python.exe`, con `lxml`, `Pillow`, `python-pptx`, `pymupdf`), Chrome (SVG → PNG) y Word/PowerPoint (COM) para revisar en PDF; LibreOffice y pandoc no están instalados.
 
-## Notebooks de fine-tuning (`tunning_gemma4/`)
+## Ajuste fino de Gemma (`tunning_gemma4/`)
 
-Solo queda **`tunning_model_gemma4_6.ipynb`** (las iteraciones `_1` a `_5` se borraron el 2026-09-28; están en el historial de git). Pasos: instalar Unsloth/TRL/transformers 5.5 → montar Google Drive (`/MyDrive/dataset_facturas/` con `data.json` + `imagenes/`) → cargar el LoRA existente o crear uno nuevo sobre el modelo base en 4 bits → entrenar con `SFTTrainer` (resolución 896, 3 épocas, 80/20 train/val) → guardar el LoRA en Drive → evaluar por campo con validación de RUC/fecha → levantar FastAPI en el puerto 8000 → exponerlo con `cloudflared tunnel`. Requiere GPU de Colab; no se puede ejecutar localmente.
+El modelo se entrena **en local, dentro de WSL**, con scripts de Python (documentación técnica §6.7; estado, comandos y resultados en `roadmap/003_…`; entorno en `memorias/008_…`). El dataset (`datos/`) y los modelos (`modelos/`) están fuera de git. La cadena:
 
-La parte final (FastAPI + túnel) era para la PWA y **ya no se usa**. Para la app Android, el notebook debe terminar fusionando el LoRA y convirtiendo el modelo a `.litertlm` (documentación técnica §6.7, iteración I4).
+- `validar_etiquetas.py` y `recortar.py` (Python de Windows): validan `datos/etiquetas.csv` y recortan y enderezan las fotos.
+- `entrenar.py` → `evaluar.py` (venv `~/venvs/gemma`): LoRA sobre Gemma 4 E2B en 4 bits con Unsloth, a 768 px, dividido por emisor, y evaluación por campo en PyTorch. Lo común está en `comun.py` (lee la instrucción de `ParserRespuesta.java`) y `modelo_gpu.py`.
+- `fusionar.py` → `convertir.py` (venv `~/venvs/litert`, ~1 h y ~20 GB de RAM) → `empaquetar.py`: fusiona el LoRA, convierte a `.litertlm` a 8 bits y cambia la visión por la del modelo oficial.
+- `evaluar_litertlm.py` (venv `~/venvs/litertlm`): evalúa el `.litertlm` que va al teléfono, en la CPU de la PC.
+
+**`tunning_model_gemma4_6.ipynb` es obsoleto y queda solo como referencia histórica** (decidido el 2026-10-27; las iteraciones `_1` a `_5` se borraron el 2026-09-28 y están en el historial de git). Es el cuaderno de Colab con el que se entrenó el modelo de la PWA: 4 campos, 896 px, y termina levantando FastAPI con un túnel de Cloudflare. No produce el `.litertlm` de la app; no se usa ni se actualiza.
