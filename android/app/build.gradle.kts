@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.exifinterface)
     implementation(libs.litertlm.android)
+    implementation(libs.mlkit.barcode.scanning)
     implementation(libs.gson)
     implementation(libs.androidx.work.runtime)
 

@@ -32,6 +32,8 @@ litertlm = "0.16.1"
 # gson: la misma que trae litertlm-android 0.16.1.
 gson = "2.13.2"
 work = "2.12.0"
+# ML Kit con el lector de QR dentro del APK: no pide Google Play ni conexión.
+mlkitBarcode = "17.3.0"
 
 [libraries]
 # UI
@@ -58,6 +60,8 @@ androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", vers
 
 # Lectura de facturas con Gemma 4 en el teléfono (documentación técnica §6)
 litertlm-android = { module = "com.google.ai.edge.litertlm:litertlm-android", version.ref = "litertlm" }
+# QR del comprobante, leído antes de reducir la foto (ui.captura.LectorQr)
+mlkit-barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "mlkitBarcode" }
 # Descarga del modelo y, en I5, recordatorios (documentación técnica §4)
 androidx-work-runtime = { module = "androidx.work:work-runtime", version.ref = "work" }
 

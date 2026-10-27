@@ -69,8 +69,11 @@ public class CapturaActivity extends AppCompatActivity {
     private static final long INTERVALO_ANALISIS_MS = 200;
     /** Lado mayor ~900 px dentro del marco, como la foto final (§6.4), para que la nitidez sea comparable. */
     private static final Size RESOLUCION_ANALISIS = new Size(1280, 960);
-    /** Suficiente para recortar el marco y reducirlo a 896 px sin decodificar fotos enormes. */
-    private static final Size RESOLUCION_FOTO = new Size(1920, 1440);
+    /**
+     * La de las fotos del dataset (12 MP en el Moto G34): la foto se reduce a 896 px, pero antes se busca
+     * el QR en el marco a resolución completa, y a 1920 px se leía en muchas menos fotos (§6.4).
+     */
+    private static final Size RESOLUCION_FOTO = new Size(4080, 3072);
 
     private ActivityCapturaBinding binding;
     private CapturaViewModel modelo;

@@ -80,7 +80,7 @@ public class FlujoPrincipalTest {
         intending(hasComponent(CapturaActivity.class.getName())).respondWithFunction(intent -> {
             toques++; // el disparador de P06
             contenedor.capturaEnCurso().poner(new FotoCapturada(fotoDePrueba(),
-                    new EvaluadorNitidez.Evaluacion(120, 150), LocalDateTime.now(), false));
+                    new EvaluadorNitidez.Evaluacion(120, 150), LocalDateTime.now(), false, null));
             return new Instrumentation.ActivityResult(Activity.RESULT_OK, null);
         });
     }

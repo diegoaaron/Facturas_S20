@@ -21,12 +21,14 @@ import pe.facturass20.dominio.modelo.ReglaNegocioException;
 import pe.facturass20.dominio.modelo.ResultadoExtraccion;
 import pe.facturass20.dominio.puertos.ExtraccionException;
 import pe.facturass20.dominio.puertos.ExtractorFacturas;
+import pe.facturass20.dominio.reglas.QrSunat;
 import pe.facturass20.ui.captura.FotoCapturada;
 import pe.facturass20.ui.comun.BaseViewModel;
 
 /**
  * P07 Lectura (RF-04): pasa la foto de {@code CapturaEnCurso} al extractor en el hilo de inferencia, con
- * un límite de 2 min, y deja el resultado en {@code CapturaEnCurso} para P08.
+ * un límite de 2 min, corrige con el QR del comprobante lo que este traiga y deja el resultado en
+ * {@code CapturaEnCurso} para P08.
  *
  * <p>El extractor no informa su avance, así que el porcentaje es una estimación por tiempo que se detiene
  * en 95 % hasta que llega la respuesta.</p>
@@ -102,7 +104,8 @@ public final class LecturaViewModel extends BaseViewModel {
             ExtractorFacturas extractor = c.extractor();
             estimadoMs = ContenedorDependencias.duracionEstimada(extractor);
             versionModelo.postValue(ContenedorDependencias.versionModelo(extractor));
-            return extractor.extraer(foto.jpeg());
+            ResultadoExtraccion leido = extractor.extraer(foto.jpeg());
+            return foto.qr() == null ? leido : QrSunat.completar(leido, foto.qr());
         });
         Future<ResultadoExtraccion> enCurso = tarea;
         enFondo(() -> esperar(enCurso), resultado -> {

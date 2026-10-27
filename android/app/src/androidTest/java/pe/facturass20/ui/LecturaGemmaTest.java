@@ -72,7 +72,7 @@ public class LecturaGemmaTest {
         Intents.init();
         intending(hasComponent(CapturaActivity.class.getName())).respondWithFunction(intent -> {
             contenedor.capturaEnCurso().poner(new FotoCapturada(factura,
-                    new EvaluadorNitidez.Evaluacion(120, 150), LocalDateTime.now(), false));
+                    new EvaluadorNitidez.Evaluacion(120, 150), LocalDateTime.now(), false, null));
             return new Instrumentation.ActivityResult(Activity.RESULT_OK, null);
         });
     }

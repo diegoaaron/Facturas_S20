@@ -3,9 +3,11 @@ package pe.facturass20.ui.captura;
 import android.content.ContentResolver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapRegionDecoder;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.os.Build;
 
 import androidx.exifinterface.media.ExifInterface;
 
@@ -15,10 +17,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 
+import pe.facturass20.dominio.modelo.DatosQr;
+
 /**
  * Preprocesado de §6.4: recorta la foto al marco de encuadre, la pone derecha (giro de la cámara o EXIF
  * de la galería), reduce el lado mayor a {@value #LADO_MAYOR} px y la comprime en JPEG calidad
- * {@value #CALIDAD_JPEG}. Luego mide su nitidez y luz con {@link EvaluadorNitidez}.
+ * {@value #CALIDAD_JPEG}. Luego mide su nitidez y luz con {@link EvaluadorNitidez}. Antes de reducirla
+ * busca el QR del comprobante con {@link LectorQr}, que a 896 px casi nunca se lee.
  *
  * <p>Todo en memoria y en un hilo de fondo; no escribe archivos.</p>
  */
@@ -51,6 +56,7 @@ final class PreparadorFoto {
                 (int) Math.round(visible.left * escalaX), (int) Math.round(visible.top * escalaY),
                 (int) Math.round(visible.width() * escalaX), (int) Math.round(visible.height() * escalaY));
         int ladoRecorte = Math.max(recorte[2] - recorte[0], recorte[3] - recorte[1]);
+        DatosQr qr = buscarQr(jpeg, new Rect(recorte[0], recorte[1], recorte[2], recorte[3]));
 
         BitmapFactory.Options opciones = new BitmapFactory.Options();
         opciones.inSampleSize = submuestreo(ladoRecorte);
@@ -61,19 +67,20 @@ final class PreparadorFoto {
         int derecha = limitar(recorte[2] / m, original.getWidth());
         int abajo = limitar(recorte[3] / m, original.getHeight());
         Bitmap lista = transformar(original, izquierda, arriba, derecha - izquierda, abajo - arriba, giro);
-        return terminar(lista, fecha, false);
+        return terminar(lista, fecha, false, qr);
     }
 
     /** Foto elegida de la galería (RF-03): pasa por el mismo preprocesado, sin recorte. */
     static FotoCapturada desdeGaleria(ContentResolver contenido, Uri uri, LocalDateTime fecha) throws IOException {
         byte[] datos = leer(contenido, uri);
         BitmapFactory.Options limites = limites(datos);
+        DatosQr qr = buscarQr(datos, null);
         BitmapFactory.Options opciones = new BitmapFactory.Options();
         opciones.inSampleSize = submuestreo(Math.max(limites.outWidth, limites.outHeight));
         Bitmap original = decodificar(datos, opciones);
         int giro = new ExifInterface(new ByteArrayInputStream(datos)).getRotationDegrees();
         Bitmap lista = transformar(original, 0, 0, original.getWidth(), original.getHeight(), giro);
-        return terminar(lista, fecha, true);
+        return terminar(lista, fecha, true, qr);
     }
 
     /** Mayor potencia de 2 que deja el lado mayor en al menos {@link #LADO_MAYOR} px (ahorra memoria). */
@@ -83,6 +90,42 @@ final class PreparadorFoto {
             muestra *= 2;
         }
         return muestra;
+    }
+
+    /**
+     * El QR de {@code region} de la imagen (toda si es nula), sin reducirla más que a
+     * {@link LectorQr#LADO_MAXIMO} px; el giro no importa. Nulo si no hay o no se puede decodificar.
+     */
+    @SuppressWarnings("deprecation") // newInstance(byte[], int, int, boolean) es la única hasta Android 12
+    static DatosQr buscarQr(byte[] imagen, Rect region) {
+        Bitmap foto;
+        try {
+            BitmapRegionDecoder decodificador = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                    ? BitmapRegionDecoder.newInstance(imagen, 0, imagen.length)
+                    : BitmapRegionDecoder.newInstance(imagen, 0, imagen.length, false);
+            try {
+                Rect zona = region != null ? region
+                        : new Rect(0, 0, decodificador.getWidth(), decodificador.getHeight());
+                if (zona.isEmpty()) {
+                    return null;
+                }
+                BitmapFactory.Options opciones = new BitmapFactory.Options();
+                opciones.inSampleSize = LectorQr.submuestreo(Math.max(zona.width(), zona.height()));
+                foto = decodificador.decodeRegion(zona, opciones);
+            } finally {
+                decodificador.recycle();
+            }
+        } catch (IOException | IllegalArgumentException e) {
+            return null;
+        }
+        if (foto == null) {
+            return null;
+        }
+        try {
+            return LectorQr.leer(foto);
+        } finally {
+            foto.recycle();
+        }
     }
 
     private static Bitmap transformar(Bitmap original, int x, int y, int ancho, int alto, int giro) {
@@ -97,13 +140,13 @@ final class PreparadorFoto {
         return resultado;
     }
 
-    private static FotoCapturada terminar(Bitmap foto, LocalDateTime fecha, boolean deGaleria) {
+    private static FotoCapturada terminar(Bitmap foto, LocalDateTime fecha, boolean deGaleria, DatosQr qr) {
         try {
             EvaluadorNitidez.Evaluacion evaluacion =
                     EvaluadorNitidez.evaluar(luminancia(foto), foto.getWidth(), foto.getHeight());
             ByteArrayOutputStream salida = new ByteArrayOutputStream();
             foto.compress(Bitmap.CompressFormat.JPEG, CALIDAD_JPEG, salida);
-            return new FotoCapturada(salida.toByteArray(), evaluacion, fecha, deGaleria);
+            return new FotoCapturada(salida.toByteArray(), evaluacion, fecha, deGaleria, qr);
         } finally {
             foto.recycle();
         }
