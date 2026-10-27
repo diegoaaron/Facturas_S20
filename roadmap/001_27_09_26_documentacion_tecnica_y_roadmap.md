@@ -948,7 +948,7 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
      - Si no hay modelo, P07 sigue usando el `ExtractorFalso`. P07 indica qué lector usa.
      - **Prueba en el teléfono.** Desde P03, «Descargar modelo» tomó la copia puesta por adb y la instaló en unos 60 s: copia, huella, prueba con la factura de control y activación. Después, `LecturaGemmaTest` (P05 → P07 → P08, sin cámara) leyó los 7 campos correctos en **53,7 s**, con la carga del modelo en 0,9 s.
      - Capturas `p03b_modelo_instalado` y `p07b_lectura_gemma`.
-     - La descarga real desde Hugging Face por Wi-Fi todavía no se ha probado en la app.
+     - Descarga real desde Hugging Face por Wi-Fi probada el 2026-10-27 con el afinado: 5,3 GB y activo en 5 min 35 s (ver `003_…`, pendiente 7).
    - `assets/modelo.json` apunta desde el 2026-10-27 al **afinado** `0.2.0-lora-v2-768`, publicado en `diegodamian/facturas-s20-gemma-4-e2b-litertlm` (público, Apache 2.0) en la revisión fija `3e9a9a7781b4da805f84aaacb7d4f4ff1716dcfa`. Antes apuntaba al modelo base de `litert-community/gemma-4-E2B-it-litert-lm` (`0.1.0-base`).
    - Falta:
      - Leer una factura impresa real con la cámara (hasta ahora solo se probó la factura de control).
