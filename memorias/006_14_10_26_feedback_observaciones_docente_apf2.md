@@ -14,7 +14,7 @@ Observaciones: (1) citar autores en 1.1.1 a); (2) nota APA en tablas (Tabla 1 y 
 - Tablas y figuras: «Tabla/Figura N» en negrita en su línea, título en cursiva debajo y nota debajo; las tablas sin nota reciben «Nota. Elaboración propia.» o la de `NOTAS_TABLAS`. Se hace al construir (`leyendas_apa`, `notas_tablas`), también sobre los bloques del entregable 1.
 - Formulación del problema retirada (el docente escribió que no va); «Impacto del problema» pasa a ser 1.1.1 c).
 - Objetivo general = texto que dictó el docente (coincide con el título de la portada). Tabla 10 «Objetivos específicos e indicadores de medición»: OE más cortos y un indicador sin metas; los valores se miden al final del proyecto. El Charter usa el mismo objetivo.
-- Prueba de usabilidad con 3 titulares: semanas 11–12, iteración I4 (3.6.9, Tabla de verificación de RNF, conclusión cuarta y PPT); sin resultados.
+- Prueba de usabilidad con 3 titulares: semanas 11–12, iteración I4 (3.6.9, Tabla de verificación de RNF, conclusión cuarta y PPT); sin resultados. Retirada el 2026-10-27: en el APF3 hay que quitarla de esos apartados.
 
 Pendiente o por decidir: los diagramas (Figura 1 y BPMN) aún llevan su título dentro de la imagen; no se quitó porque implica rehacer los SVG. Las metas cuantitativas siguen en los RNF, el Charter (criterio de éxito) y la tabla de indicadores del capítulo 5. Confirmar con el docente si el formato APA del «pdf semana 4, 13» pide algo más.
 

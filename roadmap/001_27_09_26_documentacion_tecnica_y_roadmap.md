@@ -788,7 +788,7 @@ No hay servidor, cuentas ni sincronización: la superficie de ataque es el telé
 | RNF-08 | Reporte en PDF (objetivo PDF/A) |
 | RNF-09 | ≤ 3 toques para registrar desde Inicio |
 | RNF-10 | Objetivos ≥ 48 dp; texto de datos ≥ 16 sp |
-| RNF-11 | Prueba con 3 titulares sin formación contable (≥ 5/6 tareas sin ayuda; SUS ≥ 70) |
+| RNF-11 | ~~Prueba con 3 titulares sin formación contable (≥ 5/6 tareas sin ayuda; SUS ≥ 70)~~ — retirado el 2026-10-27: no se hará prueba de usabilidad; la app se prueba solo en un teléfono (el de referencia) |
 | RNF-12 | 100 % de funciones principales sin red |
 | RNF-13 | Escrituras transaccionales; ningún registro perdido ante cierre forzado |
 | RNF-14 | (Seguridad) Las imágenes y los datos tributarios no salen del teléfono salvo que el usuario los exporte o comparta. Métrica: cero envíos de imágenes para inferencia |
@@ -841,7 +841,7 @@ Son iteraciones de dos semanas, alineadas con las entregas del curso.
 | I2 | 5–8 | Diseño de procesos, datos, clases, prototipo y documentación técnica | APF2 | ✅ completo |
 | Paso 0 | 8 | Configuración del equipo y proyecto Android base | App "Hello World!" en el teléfono | ✅ completo (ver 13.3) |
 | I3 | 9–10 | Front-end navegable (P01–P20) sobre la base de datos cifrada, y dominio con motor de reglas probado | Incremento 1 | ✅ completo el 2026-10-25 (pasos 1 a 5, ver 13.4) |
-| I4 | 11–12 | Inferencia local con el modelo convertido, medición en el teléfono y prueba de usabilidad | APF3 | en curso (ver 13.4) |
+| I4 | 11–12 | Inferencia local con el modelo convertido, medición en el teléfono (la prueba de usabilidad se retiró el 2026-10-27) | APF3 | en curso (ver 13.4) |
 | I5 | 13–14 | Reporte PDF, exportación de datos e historial | Incremento 3 | en curso (PDF hecho el 2026-10-27) |
 | I6 | 15–18 | Pruebas, validación en mes simulado y sustentación | Informe final | pendiente |
 
@@ -960,7 +960,7 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
      - ~~Ajustar la estimación de avance de P07 con más lecturas~~ — hecho el 2026-10-27. Antes era fija en 55 s. Ahora `TiemposLectura` (preferencias privadas) estima aparte la primera lectura tras cargar el modelo (46 s de partida) y las siguientes (32 s), medidas en el Moto G34 con `lora_v2_768`, y después de cada lectura con Gemma que termina bien promedia la estimación con lo que tardó P07 (incluida la espera si el modelo aún se estaba cargando). Así, en otro teléfono el porcentaje se ajusta solo en dos o tres lecturas. `ExtractorGemma.calentado()` dice si ya leyó desde la última carga; como el modelo se libera al salir de la app, la primera lectura de cada sesión es la lenta. Con `TiemposLecturaTest`.
 7. Medir tiempo y memoria en el teléfono de referencia con el modelo convertido.
    - 🟡 **Medido con el modelo base el 2026-10-25** (tabla en 6.5): 47–53 s y 2,7 GB. No se cumplen RNF-04 ni RNF-05. Falta repetir la medición con el modelo afinado y con la salida compacta (6.7).
-8. Prueba de usabilidad con 3 titulares (protocolo del informe, Anexo S). **Decidido (2026-09-27): semanas 11–12.** El informe del APF2 también la menciona en I3 (§3.7.6 y conclusión cuarta); se corrige en el informe del APF3.
+8. ~~Prueba de usabilidad con 3 titulares (protocolo del informe, Anexo S)~~ — **retirada el 2026-10-27:** no se hará; la app se prueba solo en un teléfono (el de referencia). El informe del APF2 la menciona (§3.6.9, §3.7.6, Anexo S y conclusión cuarta); se corrige en el informe del APF3.
 
 **I5 · semanas 13–14 — Reportes, exportación de datos e historial**
 9. ~~Reporte PDF (8.5) y compartir~~ (hecho el 2026-10-27, ver §8.5); cierre de mes e historial (P17) con la sugerencia de exportar (hechos en I3). ~~Pendiente: que `CerrarPeriodo` genere el PDF al cerrar el mes~~ — hecho el 2026-10-27: P17 cierra el mes y genera su PDF en la misma tarea (`GeneradorReporte`); si el PDF falla, el mes queda cerrado y P16 lo genera al compartirlo. No se probó con un cierre real en el teléfono (cerrar es irreversible).
@@ -979,7 +979,6 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
 | 9–10 | Front-end navegable (P01–P20) y dominio con pruebas unitarias del motor NRUS | Coronel Obregón | Incremento 1 |
 | 9–12 | Ajuste fino, evaluación, conversión a `.litertlm` y pruebas en el teléfono | Damián Valdivia | Modelo v1 convertido |
 | 11–12 | Room con SQLCipher, repositorios e integración del puente LiteRT-LM | Coronel Obregón | APF3 |
-| 11–12 | Prueba de usabilidad del prototipo con tres titulares | Gonzales Maco | Informe de usabilidad |
 | 13–14 | Reporte PDF, exportación de datos e historial | Coronel Obregón, Mateo Velásquez | Incremento 3 |
 | 12–16 | Pruebas de integración y validación en mes simulado | Gonzales Maco | Resultados de validación |
 | 17–18 | Informe final y sustentación | Mateo Velásquez | Informe final |
@@ -1008,7 +1007,7 @@ No hay desviaciones respecto de la línea base (Anexo D del informe). La constru
 | RNF-03 | Diferencia < 2 % en el mes simulado | Final |
 | RNF-04, RNF-05 | ≤ 20 s y ≤ 2 GB en el equipo de referencia. Con el modelo base (2026-10-25): 47–53 s y 2,7 GB, **no se cumplen** (imagen a 512 px, CPU + imagen en GPU; ver 6.5) | APF3 |
 | RNF-06, RNF-07 | APK ≤ 60 MB (modelo como descarga separada); pruebas en Android 8 y 13 (minSdk 26) | APF3 |
-| RNF-09 a RNF-11 | Prueba de usabilidad con 3 titulares (Anexo S) | Semanas 11–12, I4 (resultados en APF3) |
+| RNF-09, RNF-10 | Revisión en el teléfono de referencia (3 toques con `FlujoPrincipalTest`; tamaños de objetivos y texto). RNF-11 retirado el 2026-10-27 | I4 (APF3) |
 | RNF-12, RNF-14 | Prueba en modo avión e inspección de tráfico | APF3 |
 | RNF-13 | Prueba de cierre forzado durante el guardado | APF3 |
 | RNF-15, RNF-16 | Revisión con OWASP MASVS e inspección de tráfico | Final |
@@ -1019,7 +1018,7 @@ No hay desviaciones respecto de la línea base (Anexo D del informe). La constru
 1. Construir el front-end y el dominio a partir de este documento (I3).
 2. Hacer el ajuste fino y la conversión a `.litertlm`.
 3. Medir la exactitud y el tiempo de lectura en el teléfono de referencia.
-4. Hacer la prueba de usabilidad con tres titulares. Los resultados se reportan en el APF3 y **no se inventan cifras**.
+4. ~~Hacer la prueba de usabilidad con tres titulares~~ (retirada el 2026-10-27; solo se prueba en un teléfono). En el APF3 **no se inventan cifras**.
 
 ---
 

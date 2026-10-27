@@ -19,5 +19,5 @@ Ese mismo día se quitó el servidor de todo el diseño (ver [[004_26_09_26_proy
 **How to apply:**
 - El usuario confirmó (2026-09-27) que no hay observaciones que corregir del APF1 y que no hizo otros cambios manuales al Word.
 - El prototipo son mockups SVG propios; se entregará al docente la carpeta `entregable2/entregable2_archivos` como evidencia, tras la revisión del usuario.
-- La prueba de usabilidad con 3 titulares está **planificada** para las semanas 11–12 (I4; decidido el 2026-09-27, ver §13 de `roadmap/001_27_09_26_documentacion_tecnica_y_roadmap.md`), no realizada; no presentar resultados inventados.
+- La prueba de usabilidad con 3 titulares está **planificada** para las semanas 11–12 (I4; decidido el 2026-09-27, ver §13 de `roadmap/001_27_09_26_documentacion_tecnica_y_roadmap.md`), no realizada; no presentar resultados inventados. **Retirada el 2026-10-27:** no se hará; la app se prueba solo en un teléfono (RNF-11 retirado en el roadmap).
 - Para regenerar todo: `python documentos_teoricos/entregable2/entregable2_archivos/scripts/generar_todo.py` (Python con lxml, Pillow y python-pptx; Chrome; Word). No editar los .docx a mano: se sobrescriben. Ver [[001_26_09_26_usuario_dos_computadoras]] para sincronizar.
