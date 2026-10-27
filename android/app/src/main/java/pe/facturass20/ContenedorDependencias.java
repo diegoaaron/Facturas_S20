@@ -40,6 +40,7 @@ import pe.facturass20.ui.acceso.Sesion;
 import pe.facturass20.ui.captura.CapturaEnCurso;
 import pe.facturass20.ui.captura.PreferenciasCaptura;
 import pe.facturass20.ui.mes.PreferenciasAvisos;
+import pe.facturass20.ui.verificacion.TiemposLectura;
 
 /**
  * Inyección de dependencias manual (documentación técnica §3.1): crea una sola vez los adaptadores
@@ -64,6 +65,7 @@ public final class ContenedorDependencias {
     private final PreferenciasCaptura preferenciasCaptura;
     private final CapturaEnCurso capturaEnCurso = new CapturaEnCurso();
     private final PreferenciasAvisos preferenciasAvisos;
+    private final TiemposLectura tiemposLectura;
     private final ExtractorFacturas extractorFalso = new ExtractorFalso(reloj::hoy);
     /** Solo en pruebas: null = el modelo instalado, true = {@link ExtractorFalso}, false = sin lector. */
     private volatile Boolean lectorDePrueba;
@@ -75,6 +77,7 @@ public final class ContenedorDependencias {
         sesion = new Sesion(ejecutor, () -> gestorPin().tienePin());
         preferenciasCaptura = new PreferenciasCaptura(this.contexto);
         preferenciasAvisos = new PreferenciasAvisos(this.contexto);
+        tiemposLectura = new TiemposLectura(this.contexto);
     }
 
     /** Hilos de fondo para la base de datos, la inferencia, el PDF y la exportación; nunca el hilo de UI. */
@@ -149,9 +152,24 @@ public final class ContenedorDependencias {
         return extractor instanceof ExtractorGemma gemma ? gemma.version() : null;
     }
 
-    /** Lo que suele tardar {@code extractor} en leer una foto, para el avance de P07. */
-    public static long duracionEstimada(ExtractorFacturas extractor) {
-        return extractor instanceof ExtractorGemma ? ExtractorGemma.ESTIMADO_MS : ExtractorFalso.DEMORA_MS;
+    /**
+     * Si la lectura con {@code extractor} será la primera desde que se cargó el modelo (la más lenta). Se
+     * pregunta en el hilo de inferencia, justo antes de leer.
+     */
+    public static boolean primeraLectura(ExtractorFacturas extractor) {
+        return extractor instanceof ExtractorGemma gemma && !gemma.calentado();
+    }
+
+    /** Lo que suele tardar {@code extractor} en leer una foto en este teléfono, para el avance de P07. */
+    public long duracionEstimada(ExtractorFacturas extractor, boolean primera) {
+        return extractor instanceof ExtractorGemma ? tiemposLectura.estimado(primera) : ExtractorFalso.DEMORA_MS;
+    }
+
+    /** Ajusta la estimación de P07 con lo que tardó una lectura con Gemma que terminó bien. */
+    public void registrarDuracion(ExtractorFacturas extractor, boolean primera, long medidoMs) {
+        if (extractor instanceof ExtractorGemma) {
+            tiemposLectura.registrar(primera, medidoMs);
+        }
     }
 
     /** El modelo de IA del teléfono: versión activa, descarga e instalación (P03). */

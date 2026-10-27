@@ -55,8 +55,11 @@ public final class LecturaViewModel extends BaseViewModel {
     private String error;
     private Future<ResultadoExtraccion> tarea;
     private long inicio;
-    /** La duración que se muestra; se conoce al saber qué extractor lee (Gemma o el de prueba). */
-    private volatile long estimadoMs = 60_000;
+    /**
+     * La duración que se muestra; se conoce al saber qué extractor lee (Gemma o el de prueba) y si es la
+     * primera lectura desde que se cargó el modelo ({@link TiemposLectura}).
+     */
+    private volatile long estimadoMs = 45_000;
     private boolean cancelada;
 
     public LecturaViewModel(@NonNull Application aplicacion) {
@@ -108,9 +111,12 @@ public final class LecturaViewModel extends BaseViewModel {
                 // P05 ya manda a P19 sin modelo; esto cubre que el modelo se haya borrado entre tanto.
                 throw new ExtraccionException(texto(R.string.lectura_sin_modelo));
             }
-            estimadoMs = ContenedorDependencias.duracionEstimada(extractor);
+            boolean primera = ContenedorDependencias.primeraLectura(extractor);
+            estimadoMs = c.duracionEstimada(extractor, primera);
             versionModelo.postValue(ContenedorDependencias.versionModelo(extractor));
             ResultadoExtraccion leido = extractor.extraer(foto.jpeg());
+            // Lo que vio el usuario en P07, incluida la espera si el modelo todavía se estaba cargando.
+            c.registrarDuracion(extractor, primera, SystemClock.elapsedRealtime() - inicio);
             ResultadoExtraccion resultado = foto.qr() == null ? leido : QrSunat.completar(leido, foto.qr());
             // Para las pruebas en el teléfono (adb logcat -s FacturasS20). Sin los valores: son datos del usuario.
             StringBuilder confianzas = new StringBuilder(foto.qr() == null ? "Sin QR:" : "Con QR:");

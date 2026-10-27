@@ -23,12 +23,12 @@ public final class ExtractorGemma implements ExtractorFacturas {
      * (§6.5): se deja margen para no cortar lecturas que sí terminan, y la RNF se reporta como no cumplida.
      */
     public static final long LIMITE_MS = 90_000;
-    /** Lo que suele tardar una lectura, para el avance de P07. */
-    public static final long ESTIMADO_MS = 55_000;
 
     private final MotorInferencia motor;
     private final String rutaModelo;
     private final String version;
+    /** Ya leyó una foto desde que se cargó el modelo: la primera lectura es más lenta (P07 lo estima aparte). */
+    private boolean calentado;
 
     /**
      * @param rutaModelo el archivo {@code .litertlm} ya verificado
@@ -44,11 +44,17 @@ public final class ExtractorGemma implements ExtractorFacturas {
         return version;
     }
 
+    /** Si ya leyó una foto desde la última carga del modelo. */
+    public boolean calentado() {
+        return calentado && motor.inicializado();
+    }
+
     /** Carga el modelo si todavía no está cargado; tarda unos segundos. */
     public void precargar() throws ExtraccionException {
         if (motor.inicializado()) {
             return;
         }
+        calentado = false;
         long inicio = SystemClock.elapsedRealtime();
         try {
             motor.inicializar(rutaModelo);
@@ -74,7 +80,8 @@ public final class ExtractorGemma implements ExtractorFacturas {
                     : ParserRespuesta.SIN_JSON, e);
         }
         long ms = SystemClock.elapsedRealtime() - inicio;
-        Log.i(ETIQUETA, "Lectura en " + ms + " ms");
+        Log.i(ETIQUETA, "Lectura en " + ms + " ms" + (calentado ? "" : " (primera tras cargar)"));
+        calentado = true;
         return new ResultadoExtraccion(version, ms, ParserRespuesta.interpretar(respuesta));
     }
 
