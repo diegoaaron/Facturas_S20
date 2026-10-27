@@ -6,13 +6,15 @@ import android.graphics.BitmapFactory;
 import java.io.ByteArrayOutputStream;
 
 /**
- * Achica la foto antes de pasarla al modelo. La foto se guarda a 896 px (§6.4), pero Gemma tarda unas
- * cinco veces más con ese tamaño que con 512 px y no lee mejor (medición del 2026-10-25, §6.5).
+ * Achica la foto antes de pasarla al modelo. La foto se guarda a 896 px (§6.4). Gemma 4 lleva toda imagen
+ * a 280 tokens como máximo (unos 700 × 930 px), así que con 768 px aprovecha casi todo el detalle: el
+ * afinado {@code lora_v2_768} lee mejor que a 512 px y en el Moto G34 tarda lo mismo, ~32 s (medición
+ * del 2026-10-27).
  */
 final class ReductorFoto {
 
     /** Lado mayor de la imagen que recibe el modelo. */
-    static final int LADO_MODELO = 512;
+    static final int LADO_MODELO = 768;
     private static final int CALIDAD_JPEG = 90;
 
     private ReductorFoto() { }

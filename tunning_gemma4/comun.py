@@ -48,13 +48,36 @@ def respuesta_esperada(fila):
     return json.dumps({c: (fila[c].strip() or None) for c in CAMPOS}, ensure_ascii=False, separators=(',', ':'))
 
 
-def dividir_por_emisor(filas, semilla=42, prueba=0.2, validacion=0.15):
+def dividir_por_emisor(filas, semilla=42, prueba=0.2, validacion=0.15, minimo_conocidos=4):
     """Separa entrenamiento, validación y prueba sin repetir emisores (RUC) entre grupos.
 
     Así la prueba mide comprobantes de emisores que el modelo no vio, y no solo
     si memorizó el diseño de cada emisor. Los emisores se barajan con la semilla
     y se van llenando prueba y validación hasta su proporción; el resto entrena.
+
+    Aparte, `prueba_conocidos` mide el caso más común en la app: un comprobante
+    nuevo de un proveedor que sí se vio al entrenar. Se saca un comprobante de
+    cada emisor de entrenamiento con al menos `minimo_conocidos` fotos, con
+    todas sus fotos (hay comprobantes fotografiados dos veces).
     """
+    grupos = _dividir_emisores(filas, semilla, prueba, validacion)
+    azar = random.Random(semilla)
+    por_ruc = defaultdict(list)
+    for fila in grupos['entrenamiento']:
+        por_ruc[fila['ruc']].append(fila)
+    apartados = []
+    for ruc in sorted(por_ruc):
+        if len(por_ruc[ruc]) < minimo_conocidos:
+            continue
+        comprobantes = sorted({(f['serie'], f['numero']) for f in por_ruc[ruc]})
+        elegido = azar.choice(comprobantes)
+        apartados += [f for f in por_ruc[ruc] if (f['serie'], f['numero']) == elegido]
+    grupos['prueba_conocidos'] = apartados
+    grupos['entrenamiento'] = [f for f in grupos['entrenamiento'] if f not in apartados]
+    return grupos
+
+
+def _dividir_emisores(filas, semilla, prueba, validacion):
     por_ruc = defaultdict(list)
     for fila in filas:
         por_ruc[fila['ruc']].append(fila)

@@ -72,8 +72,46 @@ Estado al 2026-10-25 (noche) y lo que falta, en orden. Complementa la documentac
      El afinado convertido **supera al oficial en todos los campos** y la conversión no le quita lo aprendido (sube en unos campos y baja en otros frente a PyTorch; con 12 fotos, una foto son 8 puntos). No llega al 90 %. El oficial responde todo `null` en 5 de las 12 fotos reales. Los errores del afinado son casi todos un dígito mal leído o la fecha corrida unos días (límite de 512 px), y `compr_001` entra en bucle de ceros.
    - **Pendiente:** ver si alguna parte puede volver a 4 bits para achicar los 4,9 GiB (la descarga del oficial es de 2,4 GiB); ver si los 3,5 GB de memoria caben en los teléfonos objetivo (RNF-05); medir 768 px en el teléfono con el afinado (los errores son de dígitos). `litert-lm-api` trae `LoraConfig`: LiteRT-LM podría aplicar el LoRA sobre el modelo oficial en tiempo de ejecución, sin convertir todo; vale la pena averiguarlo.
 7. **Publicar** (§6.6/§6.7): subir a Hugging Face en una revisión fija, calcular SHA-256, actualizar `assets/modelo.json` y sacar versión de la app.
-8. **Ampliar el dataset:** más emisores, más facturas (hoy casi todo son boletas) y alguna en USD si hay. Etiquetar con las reglas de `memorias/007_…`.
+8. **Ampliar el dataset:** más emisores, más facturas (hoy casi todo son boletas) y alguna en USD si hay. Etiquetar con las reglas de `memorias/007_…`. El 2026-10-27 el usuario sumó 69 fotos y revisó las etiquetas dudosas (van 120 tras sacar una ilegible; 19 emisores, 28 facturas). `dividir_por_emisor` suma el grupo `prueba_conocidos` (un comprobante nuevo de cada proveedor de entrenamiento con 4 fotos o más) para medir aparte el caso de proveedor conocido. División (semilla 42): 58 fotos de entrenamiento, 21 de validación, 32 de prueba con proveedor nuevo (AC, CBC, Ecobesa, S&C) y 9 de proveedor conocido. Resultados en PyTorch (afinado; entre paréntesis el base):
+
+   | campo | `lora_v2` 512 px, nuevo | `lora_v2_768`, nuevo | `lora_v2` 512 px, conocido | `lora_v2_768`, conocido |
+   |---|---|---|---|---|
+   | ruc | 47 % (34) | 50 % (34) | 78 % (44) | 78 % (67) |
+   | razon_social | 25 % (3) | 28 % (3) | 78 % (33) | 89 % (56) |
+   | serie | 53 % (34) | 69 % (38) | 100 % (44) | 100 % (33) |
+   | numero | 47 % (28) | 41 % (28) | 67 % (33) | 78 % (22) |
+   | fecha_emision | 19 % (12) | 28 % (16) | 11 % (0) | 22 % (11) |
+   | moneda | 100 % | 97 % | 100 % | 100 % |
+   | importe_total | 22 % (22) | 25 % (19) | 22 % (33) | 56 % (33) |
+   | completos | 0 % | 3 % | 11 % | 22 % |
+
+   No son comparables con `lora_v1` (otra prueba, más grande y difícil). Errores típicos: dígitos inventados, fecha corrida a octubre (casi todo lo nuevo es de octubre), en Ecobesa el total sin percepción y «ECOBESA» antepuesto a la razón social. **Gemma 4 lleva toda imagen a 280 tokens como máximo (`max_soft_tokens`, unos 700 × 930 px)**: a 512 px se desperdicia detalle, a 768 px se usa casi todo y por encima de ~900 px no se gana nada. Subir a 560/1120 tokens exigiría exportar nuestra propia visión (el codificador oficial llega a 2520 parches = 280 tokens, y la visión exportada perdía serie/número). Las fotos nuevas muestran la hoja A4 entera con mesa alrededor, lo que achica los números. **El usuario eligió `lora_v2_768` como mejor modelo (2026-10-27)** y sigue la cadena (pasos de abajo).
+
+   **Cadena de `lora_v2_768` en curso** (retomar desde el primer paso sin hacer):
+   1. ~~Entrenar~~ (5,7 min, pico 4,22 GiB, pérdida val 0,120/0,114/0,120, mejor época 2) y ~~evaluar en PyTorch~~ (tabla de arriba).
+   2. ~~Fusionar~~: `fusionar.py --nombre lora_v2_768` (hecho el 2026-10-27; 245 pesos LoRA, deja `modelos/lora_v2_768/fusionado/`).
+   3. ~~Convertir~~ (51,1 min, `litertlm/model.litertlm` de 4,88 GiB) y ~~empaquetar~~ (`empaquetado/model.litertlm`, 4,93 GiB), hechos el 2026-10-27. Comando de conversión (~1 h, el usuario desde su terminal): `source ~/venvs/litert/bin/activate && cd /tmp && python /mnt/c/reposPersonal/Facturas_S20/tunning_gemma4/convertir.py --nombre lora_v2_768`.
+   4. Empaquetar: `empaquetar.py --nombre lora_v2_768` (venv litert, segundos).
+   5. ~~Evaluar el `.litertlm` en la PC~~ (hecho el 2026-10-27, ~7 s por foto). Afinado frente al oficial, a 768 px:
+
+      | campo | nuevo: oficial | nuevo: afinado | conocido: oficial | conocido: afinado |
+      |---|---|---|---|---|
+      | ruc | 31 % | 59 % | 33 % | 78 % |
+      | razon_social | 9 % | 16 % | 33 % | 89 % |
+      | serie | 34 % | 72 % | 33 % | 100 % |
+      | numero | 28 % | 44 % | 33 % | 67 % |
+      | fecha_emision | 12 % | 34 % | 22 % | 0 % |
+      | moneda | 81 % | 97 % | 78 % | 100 % |
+      | importe_total | 16 % | 25 % | 22 % | 33 % |
+      | completos | 0 % | 3 % | 0 % | 0 % |
+
+      Supera al oficial en todo salvo la fecha con proveedor conocido (9 fotos: una foto son 11 puntos). La conversión no le quita lo aprendido (parecido a PyTorch). No cumple el 90 %.
+   6. ~~Teléfono~~ (hecho el 2026-10-27): `MedicionGemmaTest` con `-e lados 768,512` en el Moto G34, modo automático (CPU + visión en GPU). Carga en 13,7 s; lee la factura de control **con los 7 campos bien, fecha incluida** (`lora_v1` erraba la fecha); **~32 s por lectura a 768 y a 512 px** (la primera, 46 s, calienta), memoria ~3,5 GB. Como a 768 px no cuesta más (la imagen siempre son 280 tokens), `ReductorFoto.LADO_MODELO` pasó a 768. En el teléfono, `modelo.litertlm` es ahora `lora_v2_768`; el oficial quedó como `modelo_oficial.litertlm` y sigue `modelo_afinado_v1.litertlm`.
+   Original del paso 5: evaluar el `.litertlm` en la PC a 768 px en `prueba` y `prueba_conocidos`, contra el oficial (venv litertlm). `evaluar_litertlm.py --nombre lora_v2_768 --grupo <g> --modelos oficial,afinado --resolucion 768` (logs en `~/evaluar_litertlm_v2_768_<g>.log`).
+   7. ~~Registrar resultados aquí~~; falta commit + push (lo hace el usuario o le da permiso a Claude). **Cadena de `lora_v2_768` terminada**: lo siguiente son los pendientes 10 (QR) y 11 (recorte).
 9. **Ordenar después:** actualizar §6.7 (todavía dice 896 px y el cuaderno) y decidir si se retira `tunning_model_gemma4_6.ipynb` en favor de los scripts.
+10. **Leer el QR de SUNAT (después de `lora_v2`):** probado el 2026-10-27 con `zxing-cpp` sobre las fotos a resolución completa: se lee en 37 de 121 y en las 37 coincide con las etiquetas. Trae RUC, tipo, serie, número, IGV, total **sin percepción** y fecha; no trae razón social ni moneda, y cada emisor lo arma distinto (Curtis sin RUC/serie/número; Gloria, AC y AyC con serie y número juntos, AC/AyC sin la «B»; Gloria con fecha `dd/mm/aaaa`). Usos: pre-etiquetar fotos nuevas y, en la app, leer el QR con ML Kit (sin conexión) sobre la foto original antes de reducirla, y dejar a Gemma solo lo que falte. **Recomendado por Claude y apuntado por el usuario el 2026-10-27, para después de la cadena de `lora_v2_768`.**
+11. **Recortar el comprobante antes del modelo (después de la cadena de `lora_v2_768`):** con el escáner de documentos de ML Kit (sin conexión) en la app, para que los 280 tokens de imagen se gasten en el papel y no en la mesa; recortar igual las fotos del dataset y reentrenar. Junto con el QR (pendiente 10), es lo que más debería subir la lectura de números y fecha. Apuntado por el usuario el 2026-10-27.
 
 ## Notas de entorno
 

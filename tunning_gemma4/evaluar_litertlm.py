@@ -2,7 +2,7 @@
 
 Es la evaluación «después de convertir» de la documentación técnica §6.7: mide el
 archivo que va al teléfono, no el modelo de PyTorch. La foto se reduce como en la
-app (`ReductorFoto`: lado mayor 512 px, JPEG al 90 %), la instrucción es la de
+app (`ReductorFoto`: lado mayor `--resolucion`, 512 px por defecto, JPEG al 90 %), la instrucción es la de
 `ParserRespuesta` y la respuesta se normaliza igual que en `evaluar.py`.
 
 Va en su propio entorno (`~/venvs/litertlm`, con `litert-lm-api` y Pillow) y deja
@@ -20,16 +20,15 @@ from huggingface_hub import hf_hub_download
 from comun import CAMPOS, CARPETA, INSTRUCCION, MODELOS, cargar_imagen, interpretar, leer_etiquetas, normalizar
 
 REPO_OFICIAL = 'litert-community/gemma-4-E2B-it-litert-lm'
-LADO_MODELO = 512
 CALIDAD_JPEG = 90
 # Mismo tope que ParserRespuesta.MAX_TOKENS_RESPUESTA.
 MAX_TOKENS = 200
 UMBRAL = 0.9
 
 
-def jpeg_como_la_app(ruta):
+def jpeg_como_la_app(ruta, lado):
     salida = io.BytesIO()
-    cargar_imagen(ruta, LADO_MODELO).save(salida, 'JPEG', quality=CALIDAD_JPEG)
+    cargar_imagen(ruta, lado).save(salida, 'JPEG', quality=CALIDAD_JPEG)
     return salida.getvalue()
 
 
@@ -44,12 +43,12 @@ def texto(mensaje):
     return str(mensaje)
 
 
-def evaluar(ruta_modelo, filas):
+def evaluar(ruta_modelo, filas, lado):
     motor = litert_lm.Engine(ruta_modelo, backend=litert_lm.Backend.CPU(), vision_backend=litert_lm.Backend.CPU())
     detalle = []
     try:
         for fila in filas:
-            jpeg = jpeg_como_la_app(CARPETA / 'imagenes' / fila['archivo'])
+            jpeg = jpeg_como_la_app(CARPETA / 'imagenes' / fila['archivo'], lado)
             # Siempre el token más probable, como la app.
             conversacion = motor.create_conversation(
                 sampler_config=litert_lm.SamplerConfig(top_k=1, top_p=1.0, temperature=1.0))
@@ -75,10 +74,12 @@ def evaluar(ruta_modelo, filas):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--nombre', default='lora_v1', help='carpeta dentro de modelos/ con division.json y empaquetado/')
-    ap.add_argument('--grupo', default='prueba', choices=['prueba', 'validacion', 'entrenamiento'])
+    ap.add_argument('--grupo', default='prueba', choices=['prueba', 'prueba_conocidos', 'validacion', 'entrenamiento'])
     ap.add_argument('--modelos', default='oficial,base,afinado',
                     help='cuáles evaluar: oficial, base (modelos/base/empaquetado) y afinado (modelos/<nombre>/empaquetado)')
     ap.add_argument('--limite', type=int, help='solo las primeras N fotos (para probar)')
+    ap.add_argument('--resolucion', type=int, default=512,
+                    help='lado mayor de la foto, como ReductorFoto.LADO_MODELO en la app')
     args = ap.parse_args()
 
     carpeta = MODELOS / args.nombre
@@ -94,7 +95,7 @@ def main():
     resultados = {}
     for nombre in args.modelos.split(','):
         print(f'Modelo {nombre}:', flush=True)
-        resultados[nombre] = evaluar(rutas[nombre](), filas)
+        resultados[nombre] = evaluar(rutas[nombre](), filas, args.resolucion)
 
     salida = carpeta / f'evaluacion_litertlm_{args.grupo}.json'
     salida.write_text(json.dumps(resultados, indent=2, ensure_ascii=False), encoding='utf-8')

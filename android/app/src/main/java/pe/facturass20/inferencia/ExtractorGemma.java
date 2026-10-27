@@ -9,7 +9,7 @@ import pe.facturass20.dominio.puertos.ExtractorFacturas;
 
 /**
  * Lee los 7 campos de la foto con Gemma 4 en el teléfono (RF-04): manda la foto y la instrucción al
- * {@link MotorInferencia} y arma el resultado con {@link ParserRespuesta}. La foto se achica a 512 px solo
+ * {@link MotorInferencia} y arma el resultado con {@link ParserRespuesta}. La foto se achica a 768 px solo
  * para el modelo ({@link ReductorFoto}).
  *
  * <p>El modelo se carga la primera vez que se usa, o antes con {@link #precargar()} para que la primera

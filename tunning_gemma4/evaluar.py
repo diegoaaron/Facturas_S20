@@ -56,7 +56,7 @@ def evaluar(model, tokenizer, filas, resolucion, max_tokens):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--nombre', default='lora_v1', help='carpeta dentro de modelos/ que dejó entrenar.py')
-    ap.add_argument('--grupo', default='prueba', choices=['prueba', 'validacion', 'entrenamiento'])
+    ap.add_argument('--grupo', default='prueba', choices=['prueba', 'prueba_conocidos', 'validacion', 'entrenamiento'])
     ap.add_argument('--resolucion', type=int, default=512)
     ap.add_argument('--max-tokens', type=int, default=256)
     ap.add_argument('--sin-base', action='store_true', help='no evaluar el modelo base (ya se midió)')
