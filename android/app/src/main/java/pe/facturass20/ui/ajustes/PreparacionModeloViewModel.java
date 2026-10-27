@@ -30,8 +30,8 @@ public final class PreparacionModeloViewModel extends BaseViewModel {
 
     /** Los teléfonos de «6 GB» reportan algo menos de memoria total (§6.6). */
     static final long MEMORIA_MINIMA = 5_500L * 1024 * 1024;
-    /** Dos veces el modelo mientras se conservan dos versiones (§6.6). */
-    static final long ESPACIO_MINIMO = 3_000L * 1024 * 1024;
+    /** El modelo afinado (4,9 GiB) más las cachés que LiteRT-LM crea al cargarlo (~2,3 GB) (§6.6). */
+    static final long ESPACIO_MINIMO = 8_000L * 1024 * 1024;
 
     /** El modelo del manifiesto frente al instalado. */
     public record Modelo(GestorModeloLocal.Estado estado, String versionManifiesto, String versionActiva,

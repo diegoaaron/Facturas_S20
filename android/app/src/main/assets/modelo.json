@@ -1,6 +1,6 @@
 {
   "version": "0.2.0-lora-v2-768",
-  "url": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/1caa527c1e88b55f046fcd8d2b4265606680663d/gemma-4-E2B-it.litertlm",
+  "url": "https://huggingface.co/diegodamian/facturas-s20-gemma-4-e2b-litertlm/resolve/3e9a9a7781b4da805f84aaacb7d4f4ff1716dcfa/model.litertlm",
   "sha256": "8859bdc56068c353ef45adcf333cd94041dea2ea58eba0f3adb145149aed4ab4",
   "tamanoBytes": 5294460128
 }
