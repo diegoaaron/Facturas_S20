@@ -28,6 +28,15 @@ public class App extends Application {
         return contenedor;
     }
 
+    /** Al dejar de verse la app, suelta el modelo: un proceso de ~3,5 GB en segundo plano es el primero que Android cierra. */
+    @Override
+    public void onTrimMemory(int nivel) {
+        super.onTrimMemory(nivel);
+        if (nivel >= TRIM_MEMORY_UI_HIDDEN) {
+            contenedor.liberarLector();
+        }
+    }
+
     private void crearCanales() {
         NotificationChannel avisos = new NotificationChannel(CANAL_AVISOS,
                 getString(R.string.canal_avisos_nombre), NotificationManager.IMPORTANCE_DEFAULT);

@@ -24,6 +24,7 @@ import pe.facturass20.dominio.casosuso.RegistrarFactura;
 import pe.facturass20.dominio.casosuso.RegistrarVentas;
 import pe.facturass20.dominio.casosuso.VerificarFactura;
 import pe.facturass20.dominio.puertos.ContribuyenteRepositorio;
+import pe.facturass20.dominio.puertos.ExtraccionException;
 import pe.facturass20.dominio.puertos.ExtractorFacturas;
 import pe.facturass20.dominio.puertos.FacturaRepositorio;
 import pe.facturass20.dominio.puertos.ParametrosRepositorio;
@@ -101,6 +102,38 @@ public final class ContenedorDependencias {
     /** Si hay lectura con IA; si no, P05 lleva la foto a P19 (registro manual). Desde un hilo de fondo. */
     public boolean hayLectorIa() {
         return extractor() != null;
+    }
+
+    /**
+     * Carga el modelo mientras el usuario toma la foto (P05/P06), para que P07 no sume los segundos de la carga.
+     * Va en el hilo de inferencia, así la lectura espera a que termine en lugar de cargarlo otra vez.
+     */
+    public void precargarLector() {
+        ejecutorInferencia.execute(() -> {
+            if (extractor() instanceof ExtractorGemma gemma) {
+                try {
+                    gemma.precargar();
+                } catch (ExtraccionException e) {
+                    // P07 lo vuelve a intentar y, si falla, ofrece registrar a mano.
+                    Log.w("FacturasS20", "No se pudo precargar el modelo");
+                }
+            }
+        });
+    }
+
+    /**
+     * Libera la memoria del modelo (~3,5 GB) cuando la app deja de verse; se vuelve a cargar al tomar la
+     * siguiente foto. Va en el hilo de inferencia para no cortar una lectura en curso, y no abre la base si
+     * todavía no se abrió.
+     */
+    public void liberarLector() {
+        Adaptadores abiertos;
+        synchronized (this) {
+            abiertos = adaptadores;
+        }
+        if (abiertos != null) {
+            ejecutorInferencia.execute(abiertos.gestorModelo::liberar);
+        }
     }
 
     /**

@@ -24,6 +24,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.google.android.material.snackbar.Snackbar;
 
 import pe.facturass20.App;
+import pe.facturass20.ContenedorDependencias;
 import pe.facturass20.R;
 import pe.facturass20.databinding.FragmentGuiaCapturaBinding;
 import pe.facturass20.databinding.ItemConsejoCapturaBinding;
@@ -59,7 +60,12 @@ public class GuiaCapturaFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        preferencias = ((App) requireActivity().getApplication()).contenedor().preferenciasCaptura();
+        ContenedorDependencias contenedor = ((App) requireActivity().getApplication()).contenedor();
+        preferencias = contenedor.preferenciasCaptura();
+        if (savedInstanceState == null) {
+            // Mientras el usuario encuadra la foto, para que P07 empiece a leer sin esperar la carga.
+            contenedor.precargarLector();
+        }
         camaraAbiertaSola = savedInstanceState != null && savedInstanceState.getBoolean(ESTADO_CAMARA_ABIERTA);
         if (!camaraAbiertaSola && preferencias.omitirGuia()) {
             camaraAbiertaSola = true;
