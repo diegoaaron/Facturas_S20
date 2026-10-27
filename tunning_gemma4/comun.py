@@ -19,6 +19,10 @@ from PIL import Image, ImageOps
 RAIZ = Path(__file__).resolve().parent
 CARPETA = RAIZ / 'datos'
 MODELOS = RAIZ / 'modelos'
+# Las recortadas las deja recortar.py: el comprobante sin la mesa y derecho, como el escáner de la app.
+# Las automaticas (recortar.py generar --automatico) son como las recorta la app, sin corrección a mano.
+FOTOS = {'recortadas': CARPETA / 'recortadas', 'automaticas': CARPETA / 'recortadas_auto',
+         'originales': CARPETA / 'imagenes'}
 MODELO_BASE = 'unsloth/gemma-4-E2B-it'
 CAMPOS = ['ruc', 'razon_social', 'serie', 'numero', 'fecha_emision', 'moneda', 'importe_total']
 PARSER_JAVA = (RAIZ.parent / 'android' / 'app' / 'src' / 'main' / 'java' / 'pe' / 'facturass20'
@@ -102,10 +106,10 @@ def cargar_imagen(ruta, resolucion):
     return img
 
 
-def a_ejemplo(fila, resolucion):
+def a_ejemplo(fila, resolucion, fotos):
     return {'messages': [
         {'role': 'user', 'content': [
-            {'type': 'image', 'image': cargar_imagen(CARPETA / 'imagenes' / fila['archivo'], resolucion)},
+            {'type': 'image', 'image': cargar_imagen(FOTOS[fotos] / fila['archivo'], resolucion)},
             {'type': 'text', 'text': INSTRUCCION},
         ]},
         {'role': 'assistant', 'content': [{'type': 'text', 'text': respuesta_esperada(fila)}]},

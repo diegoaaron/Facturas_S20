@@ -19,7 +19,7 @@ import torch
 from peft import PeftModel
 from unsloth import FastVisionModel
 
-from comun import CAMPOS, CARPETA, INSTRUCCION, MODELOS, cargar_imagen, interpretar, leer_etiquetas, normalizar
+from comun import CAMPOS, FOTOS, INSTRUCCION, MODELOS, cargar_imagen, interpretar, leer_etiquetas, normalizar
 from modelo_gpu import cargar_modelo_base
 
 UMBRAL = 0.9
@@ -34,10 +34,10 @@ def leer(model, tokenizer, imagen, max_tokens):
     return tokenizer.decode(salida[0][entradas['input_ids'].shape[1]:], skip_special_tokens=True)
 
 
-def evaluar(model, tokenizer, filas, resolucion, max_tokens):
+def evaluar(model, tokenizer, filas, resolucion, max_tokens, fotos):
     detalle = []
     for fila in filas:
-        imagen = cargar_imagen(CARPETA / 'imagenes' / fila['archivo'], resolucion)
+        imagen = cargar_imagen(FOTOS[fotos] / fila['archivo'], resolucion)
         inicio = time.time()
         respuesta = leer(model, tokenizer, imagen, max_tokens)
         segundos = time.time() - inicio
@@ -58,6 +58,8 @@ def main():
     ap.add_argument('--nombre', default='lora_v1', help='carpeta dentro de modelos/ que dejó entrenar.py')
     ap.add_argument('--grupo', default='prueba', choices=['prueba', 'prueba_conocidos', 'validacion', 'entrenamiento'])
     ap.add_argument('--resolucion', type=int, default=512)
+    ap.add_argument('--fotos', default='recortadas', choices=list(FOTOS),
+                    help='recortadas por recortar.py (como el escáner de la app) u originales')
     ap.add_argument('--max-tokens', type=int, default=256)
     ap.add_argument('--sin-base', action='store_true', help='no evaluar el modelo base (ya se midió)')
     args = ap.parse_args()
@@ -75,9 +77,9 @@ def main():
     if not args.sin_base:
         print('Modelo base:')
         with model.disable_adapter():
-            resultados['base'] = evaluar(model, tokenizer, filas, args.resolucion, args.max_tokens)
+            resultados['base'] = evaluar(model, tokenizer, filas, args.resolucion, args.max_tokens, args.fotos)
     print('Modelo afinado:')
-    resultados['afinado'] = evaluar(model, tokenizer, filas, args.resolucion, args.max_tokens)
+    resultados['afinado'] = evaluar(model, tokenizer, filas, args.resolucion, args.max_tokens, args.fotos)
 
     salida = carpeta / f'evaluacion_{args.grupo}.json'
     salida.write_text(json.dumps(resultados, indent=2, ensure_ascii=False), encoding='utf-8')

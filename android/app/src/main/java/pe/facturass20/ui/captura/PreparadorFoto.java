@@ -4,10 +4,13 @@ import android.content.ContentResolver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapRegionDecoder;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.exifinterface.media.ExifInterface;
 
@@ -21,7 +24,8 @@ import pe.facturass20.dominio.modelo.DatosQr;
 
 /**
  * Preprocesado de §6.4: recorta la foto al marco de encuadre, la pone derecha (giro de la cámara o EXIF
- * de la galería), reduce el lado mayor a {@value #LADO_MAYOR} px y la comprime en JPEG calidad
+ * de la galería), la recorta al comprobante con {@link RecortadorComprobante} (como las fotos del
+ * dataset), reduce el lado mayor a {@value #LADO_MAYOR} px y la comprime en JPEG calidad
  * {@value #CALIDAD_JPEG}. Luego mide su nitidez y luz con {@link EvaluadorNitidez}. Antes de reducirla
  * busca el QR del comprobante con {@link LectorQr}, que a 896 px casi nunca se lee.
  *
@@ -66,8 +70,8 @@ final class PreparadorFoto {
         int arriba = limitar(recorte[1] / m, original.getHeight());
         int derecha = limitar(recorte[2] / m, original.getWidth());
         int abajo = limitar(recorte[3] / m, original.getHeight());
-        Bitmap lista = transformar(original, izquierda, arriba, derecha - izquierda, abajo - arriba, giro);
-        return terminar(lista, fecha, false, qr);
+        Bitmap enderezada = transformar(original, izquierda, arriba, derecha - izquierda, abajo - arriba, giro);
+        return terminar(recortarAlComprobante(enderezada), fecha, false, qr);
     }
 
     /** Foto elegida de la galería (RF-03): pasa por el mismo preprocesado, sin recorte. */
@@ -79,8 +83,8 @@ final class PreparadorFoto {
         opciones.inSampleSize = submuestreo(Math.max(limites.outWidth, limites.outHeight));
         Bitmap original = decodificar(datos, opciones);
         int giro = new ExifInterface(new ByteArrayInputStream(datos)).getRotationDegrees();
-        Bitmap lista = transformar(original, 0, 0, original.getWidth(), original.getHeight(), giro);
-        return terminar(lista, fecha, true, qr);
+        Bitmap enderezada = transformar(original, 0, 0, original.getWidth(), original.getHeight(), giro);
+        return terminar(recortarAlComprobante(enderezada), fecha, true, qr);
     }
 
     /** Mayor potencia de 2 que deja el lado mayor en al menos {@link #LADO_MAYOR} px (ahorra memoria). */
@@ -128,15 +132,72 @@ final class PreparadorFoto {
         }
     }
 
+    /** Recorta y gira, sin reducir: el recorte al comprobante necesita el detalle. */
     private static Bitmap transformar(Bitmap original, int x, int y, int ancho, int alto, int giro) {
         Matrix matriz = new Matrix();
         matriz.postRotate(giro);
-        float escala = Math.min(1f, (float) LADO_MAYOR / Math.max(ancho, alto));
-        matriz.postScale(escala, escala);
         Bitmap resultado = Bitmap.createBitmap(original, x, y, ancho, alto, matriz, true);
         if (resultado != original) {
             original.recycle();
         }
+        return resultado;
+    }
+
+    /**
+     * Corrige la perspectiva del comprobante que encuentra {@link RecortadorComprobante} (en una copia de
+     * {@value RecortadorComprobante#LADO_DETECCION} px, como {@code recortar.py}) y deja el lado mayor en
+     * {@value #LADO_MAYOR} px. Si no lo encuentra, solo reduce la foto.
+     */
+    private static Bitmap recortarAlComprobante(Bitmap foto) {
+        int ancho = foto.getWidth();
+        int alto = foto.getHeight();
+        float escalaDeteccion = Math.min(1f, (float) RecortadorComprobante.LADO_DETECCION / Math.max(ancho, alto));
+        Bitmap chica = escalaDeteccion < 1
+                ? Bitmap.createScaledBitmap(foto, Math.max(3, Math.round(ancho * escalaDeteccion)),
+                        Math.max(3, Math.round(alto * escalaDeteccion)), true)
+                : foto;
+        double[] esquinas = RecortadorComprobante.esquinas(luminancia(chica), chica.getWidth(), chica.getHeight());
+        if (chica != foto) {
+            chica.recycle();
+        }
+        if (esquinas == null) {
+            Log.i("FacturasS20", "Recorte al comprobante: no se encontró, se usa la foto entera");
+            return reducir(foto);
+        }
+        float[] origen = new float[8];
+        for (int i = 0; i < 4; i++) {
+            origen[2 * i] = (float) (esquinas[2 * i] * (ancho - 1));
+            origen[2 * i + 1] = (float) (esquinas[2 * i + 1] * (alto - 1));
+        }
+        double anchoPapel = Math.max(distancia(origen, 0, 1), distancia(origen, 3, 2));
+        double altoPapel = Math.max(distancia(origen, 0, 3), distancia(origen, 1, 2));
+        double escala = Math.min(1, LADO_MAYOR / Math.max(anchoPapel, altoPapel));
+        int anchoFinal = Math.max(1, (int) Math.round(anchoPapel * escala));
+        int altoFinal = Math.max(1, (int) Math.round(altoPapel * escala));
+        float[] destino = {0, 0, anchoFinal, 0, anchoFinal, altoFinal, 0, altoFinal};
+        Matrix matriz = new Matrix();
+        if (!matriz.setPolyToPoly(origen, 0, destino, 0, 4)) {
+            return reducir(foto);
+        }
+        Bitmap resultado = Bitmap.createBitmap(anchoFinal, altoFinal, Bitmap.Config.ARGB_8888);
+        new Canvas(resultado).drawBitmap(foto, matriz, new Paint(Paint.FILTER_BITMAP_FLAG));
+        foto.recycle();
+        Log.i("FacturasS20", "Recorte al comprobante: " + ancho + "x" + alto + " -> " + anchoFinal + "x" + altoFinal);
+        return resultado;
+    }
+
+    private static double distancia(float[] puntos, int a, int b) {
+        return Math.hypot(puntos[2 * b] - puntos[2 * a], puntos[2 * b + 1] - puntos[2 * a + 1]);
+    }
+
+    private static Bitmap reducir(Bitmap foto) {
+        float escala = Math.min(1f, (float) LADO_MAYOR / Math.max(foto.getWidth(), foto.getHeight()));
+        if (escala >= 1) {
+            return foto;
+        }
+        Bitmap resultado = Bitmap.createScaledBitmap(foto, Math.round(foto.getWidth() * escala),
+                Math.round(foto.getHeight() * escala), true);
+        foto.recycle();
         return resultado;
     }
 

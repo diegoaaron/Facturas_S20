@@ -19,7 +19,7 @@ from trl import SFTConfig, SFTTrainer
 from unsloth import FastVisionModel
 from unsloth.trainer import UnslothVisionDataCollator
 
-from comun import MARCA_MODELO, MARCA_USUARIO, MODELOS, a_ejemplo, dividir_por_emisor, gib, leer_etiquetas
+from comun import FOTOS, MARCA_MODELO, MARCA_USUARIO, MODELOS, a_ejemplo, dividir_por_emisor, gib, leer_etiquetas
 from modelo_gpu import cargar_modelo_base
 
 
@@ -28,6 +28,8 @@ def main():
     ap.add_argument('--nombre', default='lora_v1', help='carpeta de salida dentro de modelos/')
     ap.add_argument('--epocas', type=float, default=3)
     ap.add_argument('--resolucion', type=int, default=512, help='lado mayor de la foto, como en la app')
+    ap.add_argument('--fotos', default='recortadas', choices=list(FOTOS),
+                    help='recortadas por recortar.py (como el escáner de la app) u originales')
     ap.add_argument('--rango', type=int, default=16, help='rango r del LoRA')
     ap.add_argument('--acumulacion', type=int, default=4, help='pasos de acumulación de gradiente')
     ap.add_argument('--tasa', type=float, default=2e-4, help='tasa de aprendizaje')
@@ -43,8 +45,8 @@ def main():
     for g, filas in grupos.items():
         print(f'{g}: {len(filas)} fotos de {len({f["ruc"] for f in filas})} emisores')
 
-    entrenamiento = [a_ejemplo(f, args.resolucion) for f in grupos['entrenamiento']]
-    validacion = [a_ejemplo(f, args.resolucion) for f in grupos['validacion']]
+    entrenamiento = [a_ejemplo(f, args.resolucion, args.fotos) for f in grupos['entrenamiento']]
+    validacion = [a_ejemplo(f, args.resolucion, args.fotos) for f in grupos['validacion']]
 
     model, tokenizer = cargar_modelo_base()
     model = FastVisionModel.get_peft_model(

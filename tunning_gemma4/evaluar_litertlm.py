@@ -17,7 +17,7 @@ import time
 import litert_lm
 from huggingface_hub import hf_hub_download
 
-from comun import CAMPOS, CARPETA, INSTRUCCION, MODELOS, cargar_imagen, interpretar, leer_etiquetas, normalizar
+from comun import CAMPOS, FOTOS, INSTRUCCION, MODELOS, cargar_imagen, interpretar, leer_etiquetas, normalizar
 
 REPO_OFICIAL = 'litert-community/gemma-4-E2B-it-litert-lm'
 CALIDAD_JPEG = 90
@@ -43,12 +43,12 @@ def texto(mensaje):
     return str(mensaje)
 
 
-def evaluar(ruta_modelo, filas, lado):
+def evaluar(ruta_modelo, filas, lado, fotos):
     motor = litert_lm.Engine(ruta_modelo, backend=litert_lm.Backend.CPU(), vision_backend=litert_lm.Backend.CPU())
     detalle = []
     try:
         for fila in filas:
-            jpeg = jpeg_como_la_app(CARPETA / 'imagenes' / fila['archivo'], lado)
+            jpeg = jpeg_como_la_app(FOTOS[fotos] / fila['archivo'], lado)
             # Siempre el token más probable, como la app.
             conversacion = motor.create_conversation(
                 sampler_config=litert_lm.SamplerConfig(top_k=1, top_p=1.0, temperature=1.0))
@@ -77,6 +77,8 @@ def main():
     ap.add_argument('--grupo', default='prueba', choices=['prueba', 'prueba_conocidos', 'validacion', 'entrenamiento'])
     ap.add_argument('--modelos', default='oficial,base,afinado',
                     help='cuáles evaluar: oficial, base (modelos/base/empaquetado) y afinado (modelos/<nombre>/empaquetado)')
+    ap.add_argument('--fotos', default='recortadas', choices=list(FOTOS),
+                    help='recortadas por recortar.py (como el escáner de la app) u originales')
     ap.add_argument('--limite', type=int, help='solo las primeras N fotos (para probar)')
     ap.add_argument('--resolucion', type=int, default=512,
                     help='lado mayor de la foto, como ReductorFoto.LADO_MODELO en la app')
@@ -95,7 +97,7 @@ def main():
     resultados = {}
     for nombre in args.modelos.split(','):
         print(f'Modelo {nombre}:', flush=True)
-        resultados[nombre] = evaluar(rutas[nombre](), filas, args.resolucion)
+        resultados[nombre] = evaluar(rutas[nombre](), filas, args.resolucion, args.fotos)
 
     salida = carpeta / f'evaluacion_litertlm_{args.grupo}.json'
     salida.write_text(json.dumps(resultados, indent=2, ensure_ascii=False), encoding='utf-8')
