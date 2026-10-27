@@ -22,3 +22,7 @@ tunning_gemma4/modelos/
 
 # Copia de la base del teléfono para DBeaver (datos reales; se regenera con copiar_base.ps1)
 documentos_teoricos/entregable3/entregable3_archivos/base_datos/
+
+# APK, ZIP del proyecto y PDF de investigación de req_profesor (pesan; se regeneran con generar_req_profesor.py)
+documentos_teoricos/entregable3/req_profesor/proyecto/
+documentos_teoricos/entregable3/req_profesor/fuentes/

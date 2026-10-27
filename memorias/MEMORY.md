@@ -11,3 +11,4 @@ Una línea por memoria: `- [Título](archivo.md) — gancho`. El contenido va en
 - [El usuario decide todo](009_26_10_26_feedback_usuario_decide_todo.md) — no proponer consultar ni avisar decisiones al resto del equipo
 - [Captura manual, sin escáner de Google](010_27_10_26_feedback_captura_manual_sin_escaner_google.md) — P06 con disparo manual y linterna propia; recorte automático en la app; ML Kit document scanner descartado
 - [Pruebas en el teléfono sin desinstalar](011_27_10_26_feedback_pruebas_telefono_sin_desinstalar.md) — connectedDebugAndroidTest borra datos y modelo; usar adb install -r + am instrument
+- [Entregable 3 (APF3)](012_27_10_26_proyecto_entregable3_apf3.md) — pedido del docente para la exposición; Word corregido, PPT, figuras, BD para DBeaver y carpeta req_profesor en entregable3/

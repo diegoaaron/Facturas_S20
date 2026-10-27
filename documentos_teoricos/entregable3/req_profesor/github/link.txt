@@ -1,0 +1,2 @@
+Repositorio del proyecto Facturas S20 (código de la app Android en la carpeta android/):
+https://github.com/diegoaaron/Facturas_S20
