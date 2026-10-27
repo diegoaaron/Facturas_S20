@@ -1,7 +1,9 @@
 package pe.facturass20.inferencia;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
+import android.os.StatFs;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -31,7 +33,7 @@ import pe.facturass20.dominio.puertos.Reloj;
 public final class GestorModeloLocal {
 
     public enum Estado {
-        /** Sin LiteRT-LM para este procesador (32 bits): solo registro manual. */
+        /** Procesador de 32 bits (sin LiteRT-LM) o poca memoria para Gemma: solo registro manual. */
         INCOMPATIBLE,
         /** No hay modelo instalado: se ofrece la descarga en P03. */
         SIN_MODELO,
@@ -39,6 +41,11 @@ public final class GestorModeloLocal {
         ACTUALIZACION,
         LISTO
     }
+
+    /** Los teléfonos de «6 GB» reportan algo menos de memoria total (§6.6). */
+    public static final long MEMORIA_MINIMA = 5_500L * 1024 * 1024;
+    /** El modelo afinado (4,9 GiB) más las cachés que LiteRT-LM crea al cargarlo (~2,3 GB) (§6.6). */
+    public static final long ESPACIO_MINIMO = 8_000L * 1024 * 1024;
 
     private static final String ETIQUETA = "FacturasS20";
     static final String CARPETA = "modelos";
@@ -66,8 +73,36 @@ public final class GestorModeloLocal {
         return manifiesto;
     }
 
-    public static boolean telefonoCompatible() {
-        return Arrays.asList(Build.SUPPORTED_64_BIT_ABIS).contains("arm64-v8a");
+    /** Si el teléfono puede correr Gemma: procesador arm64 y memoria suficiente (§6.6, paso 1). */
+    public boolean telefonoCompatible() {
+        return compatible(Arrays.asList(Build.SUPPORTED_64_BIT_ABIS).contains("arm64-v8a"), memoriaTotal(contexto));
+    }
+
+    static boolean compatible(boolean arm64, long memoriaTotal) {
+        return arm64 && memoriaTotal >= MEMORIA_MINIMA;
+    }
+
+    public static long memoriaTotal(Context contexto) {
+        ActivityManager.MemoryInfo memoria = new ActivityManager.MemoryInfo();
+        ((ActivityManager) contexto.getSystemService(Context.ACTIVITY_SERVICE)).getMemoryInfo(memoria);
+        return memoria.totalMem;
+    }
+
+    /** Espacio libre donde se guarda el modelo. */
+    public long espacioLibre() {
+        return new StatFs(contexto.getFilesDir().getAbsolutePath()).getAvailableBytes();
+    }
+
+    /**
+     * Si cabe el modelo para descargarlo: lo ya descargado en el archivo parcial cuenta como espacio, porque
+     * al reanudar no se vuelve a pedir.
+     */
+    static boolean espacioSuficiente(long libre, long yaDescargado) {
+        return libre + yaDescargado >= ESPACIO_MINIMO;
+    }
+
+    public boolean hayEspacioParaDescargar() {
+        return espacioSuficiente(espacioLibre(), archivoParcial().length());
     }
 
     public synchronized Estado estado() {
@@ -87,9 +122,12 @@ public final class GestorModeloLocal {
         return activo != null && activo.ruta != null && new File(activo.ruta).isFile() ? activo : null;
     }
 
-    /** El lector con el modelo activo, o nulo si no hay modelo (se registra a mano). */
+    /**
+     * El lector con el modelo activo, o nulo si no hay modelo o el teléfono no puede correrlo (se registra a
+     * mano).
+     */
     public synchronized ExtractorGemma extractor() {
-        ModeloLocalEntity activo = activo();
+        ModeloLocalEntity activo = telefonoCompatible() ? activo() : null;
         if (activo == null) {
             extractor = null;
         } else if (extractor == null || !extractor.version().equals(activo.version)) {

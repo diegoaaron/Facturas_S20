@@ -8,6 +8,7 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 import androidx.core.app.NotificationCompat;
 import androidx.lifecycle.LiveData;
 import androidx.work.BackoffPolicy;
@@ -92,8 +93,17 @@ public final class DescargaModeloWorker extends Worker {
     public Result doWork() {
         GestorModeloLocal gestor = ((App) getApplicationContext()).contenedor().gestorModelo();
         ManifiestoModelo manifiesto = gestor.manifiesto();
-        if (gestor.estado() == GestorModeloLocal.Estado.LISTO) {
+        GestorModeloLocal.Estado estado = gestor.estado();
+        if (estado == GestorModeloLocal.Estado.LISTO) {
             return Result.success();
+        }
+        if (estado == GestorModeloLocal.Estado.INCOMPATIBLE) {
+            return fallo(R.string.modelo_incompatible);
+        }
+        if (!gestor.hayEspacioParaDescargar()) {
+            // Reintentar no ayuda: hace falta que el usuario libere espacio.
+            Log.w(ETIQUETA, "Sin espacio para el modelo: " + gestor.espacioLibre() + " bytes libres");
+            return fallo(R.string.modelo_sin_espacio);
         }
         try {
             setForegroundAsync(primerPlano(Fase.DESCARGANDO, 0, manifiesto.tamanoBytes()));
@@ -119,10 +129,15 @@ public final class DescargaModeloWorker extends Worker {
             if (!isStopped() && getRunAttemptCount() + 1 < INTENTOS) {
                 return Result.retry();
             }
-            return Result.failure(new Data.Builder()
-                    .putString(ERROR, getApplicationContext().getString(R.string.modelo_error_descarga))
-                    .build());
+            return fallo(R.string.modelo_error_descarga);
         }
+    }
+
+    /** Termina sin reintentar; P03 muestra {@code mensaje}. */
+    private Result fallo(@StringRes int mensaje) {
+        return Result.failure(new Data.Builder()
+                .putString(ERROR, getApplicationContext().getString(mensaje))
+                .build());
     }
 
     /** Sigue donde quedó el archivo parcial, si el servidor acepta {@code Range}. */

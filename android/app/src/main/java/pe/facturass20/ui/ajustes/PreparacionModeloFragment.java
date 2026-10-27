@@ -64,7 +64,7 @@ public class PreparacionModeloFragment extends Fragment {
         binding.comprobaciones.removeAllViews();
         comprobacion(R.string.modelo_memoria, gigas(equipo.memoria()), equipo.memoriaSuficiente());
         comprobacion(R.string.modelo_espacio, getString(R.string.modelo_espacio_valor, gigas(equipo.espacioLibre()),
-                gigas(PreparacionModeloViewModel.ESPACIO_MINIMO)), equipo.espacioSuficiente());
+                gigas(GestorModeloLocal.ESPACIO_MINIMO)), equipo.espacioSuficiente());
         comprobacion(R.string.modelo_conexion, getString(equipo.wifi() ? R.string.modelo_wifi : R.string.modelo_sin_wifi),
                 equipo.wifi());
         comprobacion(R.string.modelo_android, equipo.android(), true);

@@ -111,7 +111,7 @@ public final class ContenedorDependencias {
         lectorDePrueba = usar;
     }
 
-    /** La versión del modelo si {@code extractor} es Gemma, o null si es el lector de prueba (P07). */
+    /** La versión del modelo si {@code extractor} es Gemma, o null si es el lector de prueba (solo en pruebas). */
     public static String versionModelo(ExtractorFacturas extractor) {
         return extractor instanceof ExtractorGemma gemma ? gemma.version() : null;
     }

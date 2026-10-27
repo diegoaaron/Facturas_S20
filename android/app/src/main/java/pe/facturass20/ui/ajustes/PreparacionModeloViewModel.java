@@ -1,12 +1,10 @@
 package pe.facturass20.ui.ajustes;
 
-import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.os.Build;
-import android.os.StatFs;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -24,14 +22,9 @@ import pe.facturass20.ui.comun.BaseViewModel;
 /**
  * P03 Preparar lectura con IA (RF-20, documentación técnica §6.6): comprueba si el teléfono puede usar el
  * modelo, muestra cuál está instalado y lanza o cancela la descarga ({@link DescargaModeloWorker}). Mientras
- * no hay modelo, la app usa el lector de prueba o el registro manual.
+ * no hay modelo, las facturas se registran a mano (P19).
  */
 public final class PreparacionModeloViewModel extends BaseViewModel {
-
-    /** Los teléfonos de «6 GB» reportan algo menos de memoria total (§6.6). */
-    static final long MEMORIA_MINIMA = 5_500L * 1024 * 1024;
-    /** El modelo afinado (4,9 GiB) más las cachés que LiteRT-LM crea al cargarlo (~2,3 GB) (§6.6). */
-    static final long ESPACIO_MINIMO = 8_000L * 1024 * 1024;
 
     /** El modelo del manifiesto frente al instalado. */
     public record Modelo(GestorModeloLocal.Estado estado, String versionManifiesto, String versionActiva,
@@ -41,14 +34,17 @@ public final class PreparacionModeloViewModel extends BaseViewModel {
     public record Equipo(long memoria, long espacioLibre, boolean wifi, String android) {
 
         public boolean memoriaSuficiente() {
-            return memoria >= MEMORIA_MINIMA;
+            return memoria >= GestorModeloLocal.MEMORIA_MINIMA;
         }
 
         public boolean espacioSuficiente() {
-            return espacioLibre >= ESPACIO_MINIMO;
+            return espacioLibre >= GestorModeloLocal.ESPACIO_MINIMO;
         }
 
-        /** El teléfono podrá usar la lectura con IA (la conexión solo importa al descargar). */
+        /**
+         * Hay memoria y espacio para descargar y usar el modelo (la conexión solo importa al descargar). La
+         * compatibilidad, que no cambia, la decide {@link GestorModeloLocal#telefonoCompatible()}.
+         */
         public boolean apto() {
             return memoriaSuficiente() && espacioSuficiente();
         }
@@ -96,12 +92,9 @@ public final class PreparacionModeloViewModel extends BaseViewModel {
     public void comprobar() {
         comprobarModelo();
         Context contexto = getApplication();
-        enFondo(() -> {
-            ActivityManager.MemoryInfo memoria = new ActivityManager.MemoryInfo();
-            ((ActivityManager) contexto.getSystemService(Context.ACTIVITY_SERVICE)).getMemoryInfo(memoria);
-            long libre = new StatFs(contexto.getFilesDir().getAbsolutePath()).getAvailableBytes();
-            return new Equipo(memoria.totalMem, libre, wifi(contexto), Build.VERSION.RELEASE);
-        }, equipo::setValue);
+        ContenedorDependencias c = contenedor();
+        enFondo(() -> new Equipo(GestorModeloLocal.memoriaTotal(contexto), c.gestorModelo().espacioLibre(),
+                wifi(contexto), Build.VERSION.RELEASE), equipo::setValue);
     }
 
     private static boolean wifi(Context contexto) {

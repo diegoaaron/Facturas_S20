@@ -23,7 +23,7 @@ import pe.facturass20.ui.comun.BaseViewModel;
  */
 public final class AjustesViewModel extends BaseViewModel {
 
-    /** @param versionModelo la del modelo de IA activo; nula si se usa el lector de prueba */
+    /** @param versionModelo la del modelo de IA activo; nula si no hay modelo */
     public record Vista(Contribuyente contribuyente, ParametrosNrus parametros, String versionModelo) { }
 
     private final MutableLiveData<Vista> vista = new MutableLiveData<>();
