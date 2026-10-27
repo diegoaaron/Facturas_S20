@@ -549,7 +549,7 @@ inicio → historial → exportarDatos
 inicio → ajustes → exportarDatos · preparacionModelo
 ```
 
-`CapturaActivity` no es un destino del `nav_graph`: P05 la abre con un `ActivityResultLauncher` y sigue a `lectura` si vuelve con la foto (13.4, paso 4). Tampoco `DuplicadoDialog`: P08 y P19 lo abren como diálogo hijo. Desde P07 fallida se puede ir a `registroManual`; P13 sigue a `categoria`, y P14 enlaza `vencimiento` e `historial`.
+`CapturaActivity` no es un destino del `nav_graph`: P05 la abre con un `ActivityResultLauncher` y sigue a `lectura` si vuelve con la foto (13.4, paso 4); si el teléfono no tiene modelo, sigue a `registroManual` (motivo `sin_modelo`) con la foto adjunta. Tampoco `DuplicadoDialog`: P08 y P19 lo abren como diálogo hijo. Desde P07 fallida se puede ir a `registroManual`; P13 sigue a `categoria`, y P14 enlaza `vencimiento` e `historial`.
 
 ### 8.3 Tokens de diseño (`res/values/colors.xml`, `dimens.xml`)
 
@@ -906,7 +906,7 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
      - P06 `CapturaActivity` (tema oscuro, vertical): **no es un destino del grafo**; P05 la abre con un `ActivityResultLauncher` y, con `RESULT_OK`, navega a `lectura`. Vista previa, foto y análisis comparten el `ViewPort` de la vista previa; `MarcoEncuadreView` dibuja el marco (verde cuando todo está bien) y `MarcoEncuadre` (Java puro) lleva el marco a las coordenadas del sensor según el giro. Cada 200 ms se mide el plano Y dentro del marco con `EvaluadorNitidez` (varianza del Laplaciano; luz media entre 60 y 200) y la etiqueta muestra «Nitidez: … · Luz: …» con un consejo. El disparador solo se activa con las dos «buenas». Hay linterna si el teléfono tiene flash, galería y un panel si falta el permiso. Si se cierra el proceso o la sesión se bloquea, la actividad se cierra (no se salta el PIN).
      - `PreparadorFoto` (§6.4): recorta al marco, gira (cámara o EXIF), reduce a 896 px de lado mayor, JPEG 90 y **vuelve a medir la foto final**: si no pasa, «Tome otra foto» (RF-02). Lo mismo con la galería (RF-03, sin recorte). `CapturaViewModel` lo corre en segundo plano, lo comparten P05 y P06.
      - La foto queda **solo en memoria** en `CapturaEnCurso` (en `ContenedorDependencias`), como `FotoCapturada` (JPEG, nitidez, luz, fecha). P07/P08 la leen de ahí, y P08 la guarda cifrada con `AlmacenImagenes` y llama a `CapturaEnCurso.limpiar()`.
-     - Queda para I4 el paso de P06 a P19 cuando no hay modelo o falta memoria (§8.2).
+     - ~~Queda para I4 el paso de P06 a P19 cuando no hay modelo o falta memoria (§8.2).~~ Hecho el 2026-10-27 (ver I4, paso 6).
    - ✅ **Tercer bloque (2026-10-24): P07 a P20 y P03**, compilado y con pruebas unitarias (`RevisionCampoTest`, `ListadoFacturasTest`, `EntradaMontoTest`, `ExtractorFalsoTest`); probado en el teléfono el 2026-10-25 (Moto G34 5G, Android 15, 7,3 GB de RAM): recorrido completo P01 → P20 con datos de prueba y las 16 pruebas instrumentadas en verde. Todas las pantallas usan los repositorios reales; lo que llega en I4–I5 (modelo, PDF, ZIP, WorkManager) se muestra con datos reales y un mensaje «estará disponible en la próxima versión».
      - Comunes: `BarraLimiteView` (barra con la marca del umbral, en P10, P14 y P17), `Filas` (filas con flecha o interruptor), `Mensajes` (Snackbar del `BaseViewModel`), `VisorImagen` (foto a pantalla completa), `BaseViewModel.periodoDe("2026-09")` (argumento `periodo` de navegación; vacío = mes en curso) y `Formatos.mes`/`decimal`. Estilos nuevos: `BarraSuperior`, `Boton.Contorno` (y `.Error`), `Chip`, `Interruptor` y `Texto.Seccion`. Los textos van en `strings_registro.xml`, `strings_facturas.xml`, `strings_mes.xml`, `strings_reportes.xml` y `strings_ajustes.xml`.
      - `FacturaRepositorio` suma `buscarImagen(idFactura)` y `buscarCampos(idFactura)` (P12, P16, P20).
@@ -945,7 +945,7 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
      - `GestorModeloLocal`: verifica tamaño y SHA-256, prueba el modelo con `assets/factura_control.jpg`, lo activa y borra la versión anterior. `GestorModeloLocalTest` (4 pruebas con un motor falso) pasa en el teléfono y encontró que el archivo de la versión anterior no se borraba; ya está corregido.
      - `DescargaModeloWorker`: WorkManager, solo Wi-Fi, reanudable con `Range`, en primer plano con notificación y 3 intentos.
      - P03 con el avance de la descarga, y P18 con la versión instalada.
-     - Si no hay modelo, P07 sigue usando el `ExtractorFalso`. P07 indica qué lector usa.
+     - P07 indica qué lector usa. (Hasta el 2026-10-27, sin modelo P07 usaba el `ExtractorFalso`; ahora va a P19, ver abajo.)
      - **Prueba en el teléfono.** Desde P03, «Descargar modelo» tomó la copia puesta por adb y la instaló en unos 60 s: copia, huella, prueba con la factura de control y activación. Después, `LecturaGemmaTest` (P05 → P07 → P08, sin cámara) leyó los 7 campos correctos en **53,7 s**, con la carga del modelo en 0,9 s.
      - Capturas `p03b_modelo_instalado` y `p07b_lectura_gemma`.
      - Descarga real desde Hugging Face por Wi-Fi probada el 2026-10-27 con el afinado: 5,3 GB y activo en 5 min 35 s (ver `003_…`, pendiente 7).
@@ -953,7 +953,7 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
    - Falta:
      - Leer una factura impresa real con la cámara (hasta ahora solo se probó la factura de control).
      - Llamar a `precargar()` antes de P07.
-     - Pasar de P06 a P19 cuando no hay modelo o falta memoria (§8.2).
+     - ~~Pasar de P06 a P19 cuando no hay modelo o falta memoria (§8.2)~~ — hecho el 2026-10-27. P05 pregunta en segundo plano si hay lector (`ContenedorDependencias.hayLectorIa()`) y, al volver con la foto de la cámara o la galería, sin modelo va a P19 (motivo `sin_modelo`: aviso `manual_sin_ia` y la foto adjunta) en lugar de P07. Falta de memoria = sin modelo, porque P03 no ofrece la descarga a un teléfono no apto. **El `ExtractorFalso` ya no se usa en la app:** sin modelo `extractor()` es null y P07, si llega (el modelo se borró entre tanto), falla con «La lectura con IA no está disponible en este equipo.» y ofrece registrar a mano. Las pruebas lo eligen con `usarLectorDePrueba(true | false | null)`; `FlujoPrincipalTest.sinModeloLaFotoVaAlRegistroManual` pasa en el Moto G34 (corrida sola con `am instrument`, para no desinstalar la app ni guardar facturas en la base del usuario).
      - Comprobar la RAM (≥ 5,5 GB) y el espacio libre en `telefonoCompatible()`, que hoy solo mira que sea arm64.
      - Ajustar la estimación de avance de P07 con más lecturas.
 7. Medir tiempo y memoria en el teléfono de referencia con el modelo convertido.

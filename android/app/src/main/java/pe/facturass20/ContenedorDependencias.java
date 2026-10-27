@@ -48,7 +48,8 @@ import pe.facturass20.ui.mes.PreferenciasAvisos;
  * Keystore), siempre desde un hilo de fondo; en ese momento también se cargan los parámetros del NRUS,
  * así ninguna pantalla los lee antes de tiempo. La primera en pedirlos es {@link Sesion#comprobar()}, al
  * abrir la app. El extractor de facturas es Gemma en el teléfono ({@link ExtractorGemma}) cuando hay un
- * modelo instalado y, mientras no, {@link ExtractorFalso}; falta agregar el exportador de datos (I5).</p>
+ * modelo instalado; sin modelo no hay lectura con IA y se registra a mano (P19). {@link ExtractorFalso} solo
+ * lo usan las pruebas. Falta agregar el exportador de datos (I5).</p>
  */
 public final class ContenedorDependencias {
 
@@ -63,6 +64,8 @@ public final class ContenedorDependencias {
     private final CapturaEnCurso capturaEnCurso = new CapturaEnCurso();
     private final PreferenciasAvisos preferenciasAvisos;
     private final ExtractorFacturas extractorFalso = new ExtractorFalso(reloj::hoy);
+    /** Solo en pruebas: null = el modelo instalado, true = {@link ExtractorFalso}, false = sin lector. */
+    private volatile Boolean lectorDePrueba;
     private Adaptadores adaptadores;
 
     ContenedorDependencias(Context contexto) {
@@ -83,10 +86,29 @@ public final class ContenedorDependencias {
         return ejecutorInferencia;
     }
 
-    /** Lee los 7 campos de la foto (P07); se pide desde el hilo de inferencia (consulta la base). */
+    /**
+     * Lee los 7 campos de la foto (P07), o null si no hay modelo instalado. Se pide desde un hilo de fondo
+     * (consulta la base).
+     */
     public ExtractorFacturas extractor() {
-        ExtractorGemma gemma = gestorModelo().extractor();
-        return gemma != null ? gemma : extractorFalso;
+        Boolean prueba = lectorDePrueba;
+        if (prueba != null) {
+            return prueba ? extractorFalso : null;
+        }
+        return gestorModelo().extractor();
+    }
+
+    /** Si hay lectura con IA; si no, P05 lleva la foto a P19 (registro manual). Desde un hilo de fondo. */
+    public boolean hayLectorIa() {
+        return extractor() != null;
+    }
+
+    /**
+     * Solo para las pruebas, haya o no modelo: true lee con {@link ExtractorFalso}, false se comporta como un
+     * teléfono sin modelo y null vuelve al modelo instalado.
+     */
+    public void usarLectorDePrueba(Boolean usar) {
+        lectorDePrueba = usar;
     }
 
     /** La versión del modelo si {@code extractor} es Gemma, o null si es el lector de prueba (P07). */

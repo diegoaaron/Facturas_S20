@@ -35,6 +35,7 @@
     <string name="lectura_paso_moneda">Moneda</string>
     <string name="lectura_paso_importe">Importe total</string>
     <string name="lectura_modelo_gemma">Gemma 4 E2B · versión %1$s · la foto no sale del teléfono</string>
+    <string name="lectura_sin_modelo">La lectura con IA no está disponible en este equipo.</string>
     <string name="lectura_modelo_prueba">Lector de prueba: completa datos de ejemplo · la foto no sale del teléfono</string>
     <string name="lectura_sin_foto">Ya no está la foto. Tómela otra vez.</string>
     <string name="lectura_tiempo_agotado">La lectura tardó demasiado. Tome otra foto o registre los datos a mano.</string>

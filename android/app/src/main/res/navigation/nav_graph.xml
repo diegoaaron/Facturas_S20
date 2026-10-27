@@ -107,7 +107,8 @@
     <fragment android:id="@+id/registroManual" android:name="pe.facturass20.ui.ajustes.RegistroManualFragment"
               android:label="@string/p19_titulo">
         <!-- Por qué se registra a mano: «guia» (lo eligió en P05), «lectura» (la IA no pudo leer la foto, que se
-             adjunta) o «sin_ia» (el teléfono no puede usar el modelo, P03). Cambia el aviso de arriba. -->
+             adjunta), «sin_ia» (el teléfono no puede usar el modelo, P03) o «sin_modelo» (no hay modelo y viene
+             de P06 con la foto, que se adjunta). Cambia el aviso de arriba. -->
         <argument android:name="motivo" app:argType="string" android:defaultValue="guia"/>
         <action android:id="@+id/registroManual_a_guardada" app:destination="@id/guardada"
                 app:popUpTo="@id/inicio"/>

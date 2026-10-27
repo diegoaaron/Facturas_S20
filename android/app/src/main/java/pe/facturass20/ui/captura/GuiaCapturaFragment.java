@@ -77,6 +77,7 @@ public class GuiaCapturaFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         modelo = new ViewModelProvider(this).get(CapturaViewModel.class);
+        modelo.comprobarLectorIa();
 
         binding.barra.setNavigationOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
         consejo(binding.consejoLuz, R.drawable.ic_linterna, R.string.guia_luz);
@@ -136,15 +137,33 @@ public class GuiaCapturaFragment extends Fragment {
         }
     }
 
-    /** Sin la guía, Atrás desde P07 vuelve a donde se tocó Escanear y no a esta pantalla. */
+    /**
+     * A P07 o, si el teléfono no tiene modelo, a P19 con la foto adjunta (§8.2); si aún no se sabe, espera a
+     * saberlo. Sin la guía, Atrás vuelve a donde se tocó Escanear y no a esta pantalla.
+     */
     private void irALectura() {
         NavController navegacion = NavHostFragment.findNavController(this);
         if (navegacion.getCurrentDestination() == null || navegacion.getCurrentDestination().getId() != R.id.guiaCaptura) {
             return;
         }
+        if (modelo.conLectorIa().getValue() == null) {
+            modelo.conLectorIa().observe(getViewLifecycleOwner(), conLector -> {
+                if (conLector != null) {
+                    modelo.conLectorIa().removeObservers(getViewLifecycleOwner());
+                    irALectura();
+                }
+            });
+            return;
+        }
         NavOptions opciones = preferencias.omitirGuia()
                 ? new NavOptions.Builder().setPopUpTo(R.id.guiaCaptura, true).build()
                 : null;
-        navegacion.navigate(R.id.guiaCaptura_a_lectura, null, opciones);
+        if (Boolean.FALSE.equals(modelo.conLectorIa().getValue())) {
+            Bundle argumentos = new Bundle();
+            argumentos.putString("motivo", "sin_modelo");
+            navegacion.navigate(R.id.guiaCaptura_a_registroManual, argumentos, opciones);
+        } else {
+            navegacion.navigate(R.id.guiaCaptura_a_lectura, null, opciones);
+        }
     }
 }

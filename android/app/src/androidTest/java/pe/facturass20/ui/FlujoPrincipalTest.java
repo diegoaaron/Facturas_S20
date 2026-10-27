@@ -7,6 +7,7 @@ import static androidx.test.espresso.intent.Intents.intending;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -50,7 +51,8 @@ import pe.facturass20.ui.comun.MainActivity;
 
 /**
  * Flujo principal en el teléfono (RNF-09, cierre de I3): Escanear → disparar → Guardar, en 3 toques o menos,
- * con la guía P05 oculta, la base cifrada real y el {@code ExtractorFalso} de P07.
+ * con la guía P05 oculta, la base cifrada real y el {@code ExtractorFalso} de P07 (aunque el teléfono tenga
+ * modelo). También, que sin modelo la foto va a P19 (registro manual) y no a P07.
  *
  * <p>La cámara (P06) se reemplaza con Espresso-Intents: una prueba no puede garantizar una foto nítida
  * frente al teléfono. La respuesta simulada hace lo mismo que {@link CapturaActivity} al disparar (deja la
@@ -75,6 +77,7 @@ public class FlujoPrincipalTest {
         contenedor = SesionDePrueba.preparar();
         omitiaGuia = contenedor.preferenciasCaptura().omitirGuia();
         contenedor.preferenciasCaptura().omitirGuia(true);
+        contenedor.usarLectorDePrueba(true);
 
         Intents.init();
         intending(hasComponent(CapturaActivity.class.getName())).respondWithFunction(intent -> {
@@ -88,6 +91,7 @@ public class FlujoPrincipalTest {
     @After
     public void restaurar() {
         Intents.release();
+        contenedor.usarLectorDePrueba(null);
         contenedor.preferenciasCaptura().omitirGuia(omitiaGuia);
     }
 
@@ -119,6 +123,21 @@ public class FlujoPrincipalTest {
         assertEquals(7, contenedor.facturas().buscarCampos(guardada.id()).size());
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() ->
                 assertNull("La captura en curso debe limpiarse", contenedor.capturaEnCurso().foto()));
+    }
+
+    @Test
+    public void sinModeloLaFotoVaAlRegistroManual() {
+        contenedor.usarLectorDePrueba(false);
+        try (ActivityScenario<MainActivity> ignorado = ActivityScenario.launch(MainActivity.class)) {
+            esperar(withId(R.id.boton_escanear));
+            tocar(withId(R.id.boton_escanear));
+
+            // P19 con el aviso de que no hay IA y la foto de P06 adjunta.
+            esperar(withText(R.string.manual_sin_ia));
+            esperar(withText(R.string.manual_foto_adjunta));
+        }
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() ->
+                contenedor.capturaEnCurso().limpiar());
     }
 
     private List<FacturaCompra> vigentes(YearMonth mes) {

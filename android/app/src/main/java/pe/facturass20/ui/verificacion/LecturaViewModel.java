@@ -104,6 +104,10 @@ public final class LecturaViewModel extends BaseViewModel {
         hiloUi.post(avanzar);
         tarea = c.ejecutorInferencia().submit(() -> {
             ExtractorFacturas extractor = c.extractor();
+            if (extractor == null) {
+                // P05 ya manda a P19 sin modelo; esto cubre que el modelo se haya borrado entre tanto.
+                throw new ExtraccionException(texto(R.string.lectura_sin_modelo));
+            }
             estimadoMs = ContenedorDependencias.duracionEstimada(extractor);
             versionModelo.postValue(ContenedorDependencias.versionModelo(extractor));
             ResultadoExtraccion leido = extractor.extraer(foto.jpeg());

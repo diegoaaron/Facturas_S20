@@ -44,6 +44,8 @@ public class RegistroManualFragment extends Fragment {
 
     private static final String MOTIVO_LECTURA = "lectura";
     private static final String MOTIVO_SIN_IA = "sin_ia";
+    /** Como {@link #MOTIVO_SIN_IA}, pero viene de P06 con la foto ya tomada. */
+    private static final String MOTIVO_SIN_MODELO = "sin_modelo";
 
     private FragmentRegistroManualBinding binding;
     private RegistroManualViewModel modelo;
@@ -74,13 +76,14 @@ public class RegistroManualFragment extends Fragment {
 
         binding.barra.setNavigationOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
         binding.botonCancelar.setOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
-        binding.textoAviso.setText(MOTIVO_SIN_IA.equals(motivo) ? R.string.manual_sin_ia
+        boolean conFoto = MOTIVO_LECTURA.equals(motivo) || MOTIVO_SIN_MODELO.equals(motivo);
+        binding.textoAviso.setText(MOTIVO_SIN_IA.equals(motivo) || MOTIVO_SIN_MODELO.equals(motivo) ? R.string.manual_sin_ia
                 : MOTIVO_LECTURA.equals(motivo) ? R.string.manual_lectura_fallida : R.string.manual_elegido);
 
         campos = new CamposFactura(binding.campos);
         if (savedInstanceState == null) {
             campos.poner(CampoFactura.FECHA_EMISION, Formatos.fecha(modelo.hoy()));
-            if (MOTIVO_LECTURA.equals(motivo)) {
+            if (conFoto) {
                 modelo.adjuntarFotoCapturada();
             } else {
                 ((App) requireActivity().getApplication()).contenedor().capturaEnCurso().limpiar();

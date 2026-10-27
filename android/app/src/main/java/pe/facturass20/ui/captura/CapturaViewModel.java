@@ -23,9 +23,25 @@ import pe.facturass20.ui.comun.Evento;
 public class CapturaViewModel extends BaseViewModel {
 
     private final MutableLiveData<Evento<Boolean>> fotoLista = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> conLectorIa = new MutableLiveData<>();
 
     public CapturaViewModel(@NonNull Application aplicacion) {
         super(aplicacion);
+    }
+
+    /**
+     * Averigua en segundo plano si hay lectura con IA, para que P05 lleve la foto a P07 o a P19 (§8.2). Sin
+     * {@code enFondo}: no debe desactivar los botones mientras consulta.
+     */
+    public void comprobarLectorIa() {
+        if (conLectorIa.getValue() == null) {
+            contenedor().ejecutor().execute(() -> conLectorIa.postValue(contenedor().hayLectorIa()));
+        }
+    }
+
+    /** Nulo mientras no se sabe. */
+    public LiveData<Boolean> conLectorIa() {
+        return conLectorIa;
     }
 
     /** Se dispara una vez cuando la foto quedó en {@link CapturaEnCurso}. */
