@@ -55,6 +55,16 @@
                 android:name="androidx.work.impl.foreground.SystemForegroundService"
                 android:foregroundServiceType="dataSync"
                 tools:node="merge"/>
+        <!-- Comparte el PDF del mes (P16) sin permisos de almacenamiento; solo da acceso a filesDir/reportes/ (§10). -->
+        <provider
+                android:name="androidx.core.content.FileProvider"
+                android:authorities="pe.facturass20.archivos"
+                android:exported="false"
+                android:grantUriPermissions="true">
+            <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/rutas_archivos"/>
+        </provider>
     </application>
 
 </manifest>

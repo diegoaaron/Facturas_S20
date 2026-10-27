@@ -108,6 +108,11 @@ public final class PeriodoRepositorioRoom implements PeriodoRepositorio {
         return contribuyente == null ? Optional.empty() : Optional.of(contribuyente.idContribuyente);
     }
 
+    /** El id de la fila del mes, si existe (para lo que cuelga de él, como el reporte PDF). */
+    Optional<Long> idPeriodo(YearMonth periodo) {
+        return fila(periodo).map(encontrada -> encontrada.idPeriodo);
+    }
+
     private Optional<PeriodoEntity> fila(YearMonth periodo) {
         return idContribuyente().map(id -> dao.buscar(id, periodo.getYear(), periodo.getMonthValue()));
     }

@@ -593,7 +593,9 @@ inicio → ajustes → exportarDatos · preparacionModelo
 
 ### 8.5 Reporte PDF (RF-15)
 
-A4 vertical. Página 1: encabezado (título, período, fecha de generación), contribuyente (nombre, RUC, régimen), resumen (compras con n.º de facturas, ventas, monto determinante, categoría y cuota, vencimiento con dígito), tabla de facturas (n.º, fecha, proveedor, RUC, serie-número, importe), total. Páginas siguientes: una miniatura por factura con su serie-número. Pie: «Documento de apoyo para la declaración; no reemplaza la declaración ante la SUNAT» y SHA-256 del archivo. Nombre: `facturas-s20_AAAA-MM.pdf`. Compartir con `FileProvider` + `Intent.ACTION_SEND`.
+A4 vertical. Página 1: encabezado (título, período, fecha de generación), contribuyente (nombre, RUC, régimen), resumen (compras con n.º de facturas, ventas, monto determinante, categoría y cuota, vencimiento con dígito), tabla de facturas (n.º, fecha, proveedor, RUC, serie-número, importe), total. Páginas siguientes: una miniatura por factura con su serie-número. Pie: «Documento de apoyo para la declaración; no reemplaza la declaración ante la SUNAT» y «Página x de y». El SHA-256 del archivo **no puede ir dentro del propio PDF** (cambiaría al escribirlo): se guarda en `reporte_mensual` (decidido el 2026-10-27). Nombre: `facturas-s20_AAAA-MM.pdf`. Compartir con `FileProvider` + `Intent.ACTION_SEND`.
+
+**Implementado el 2026-10-27** (I5, paso 9): `ui.reportes.ReportePdf` dibuja con `PdfDocument` (va en `ui` y no en `exportacion` porque usa `Formatos`). P16 lo genera de nuevo en cada «Compartir» o «Guardar», con los datos del momento, en `filesDir/reportes/` (lo único que expone el `FileProvider` `pe.facturass20.archivos`, `res/xml/rutas_archivos.xml`), y lo anota en `reporte_mensual` con `ReporteRepositorioRoom` (si el mes existe en la base). «Guardar» usa el selector del sistema (`CreateDocument`), sin permisos de almacenamiento. `PdfDocument` guarda las fotos como PNG, sin pérdida: a 896 px un PDF de 9 facturas pesaba 5,5 MB; las miniaturas se achican a 1,5 px por punto (~360 × 505 px) y quedó en 2,1 MB (~230 KB por foto, unos 12 MB con 50 facturas). Probado en el Moto G34 con las 9 facturas de octubre: 4 páginas, guardar y compartir funcionan.
 
 ---
 
@@ -840,7 +842,7 @@ Son iteraciones de dos semanas, alineadas con las entregas del curso.
 | Paso 0 | 8 | Configuración del equipo y proyecto Android base | App "Hello World!" en el teléfono | ✅ completo (ver 13.3) |
 | I3 | 9–10 | Front-end navegable (P01–P20) sobre la base de datos cifrada, y dominio con motor de reglas probado | Incremento 1 | ✅ completo el 2026-10-25 (pasos 1 a 5, ver 13.4) |
 | I4 | 11–12 | Inferencia local con el modelo convertido, medición en el teléfono y prueba de usabilidad | APF3 | en curso (ver 13.4) |
-| I5 | 13–14 | Reporte PDF, exportación de datos e historial | Incremento 3 | pendiente |
+| I5 | 13–14 | Reporte PDF, exportación de datos e historial | Incremento 3 | en curso (PDF hecho el 2026-10-27) |
 | I6 | 15–18 | Pruebas, validación en mes simulado y sustentación | Informe final | pendiente |
 
 ### 13.3 Paso 0 · Configuración del equipo ✅ (hecho)
@@ -961,7 +963,7 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
 8. Prueba de usabilidad con 3 titulares (protocolo del informe, Anexo S). **Decidido (2026-09-27): semanas 11–12.** El informe del APF2 también la menciona en I3 (§3.7.6 y conclusión cuarta); se corrige en el informe del APF3.
 
 **I5 · semanas 13–14 — Reportes, exportación de datos e historial**
-9. Reporte PDF (8.5) y compartir; cierre de mes e historial (P17) con la sugerencia de exportar.
+9. ~~Reporte PDF (8.5) y compartir~~ (hecho el 2026-10-27, ver §8.5); cierre de mes e historial (P17) con la sugerencia de exportar (hechos en I3). Pendiente: que `CerrarPeriodo` genere el PDF al cerrar el mes (hoy se genera desde P16).
 10. WorkManager: recordatorios y avisos.
 11. Exportación de datos (sección 9): `ExportarDatos`, `ExportadorDatos`, `EscritorCsv`, P20 con SAF y compartir por `FileProvider`.
 12. Pruebas de exportación y verificación del criterio 9.5 en Excel y LibreOffice.

@@ -32,7 +32,29 @@
     <string name="reporte_compartir">Compartir con mi contador</string>
     <string name="reporte_guardar">Guardar PDF en el teléfono</string>
     <string name="reporte_faltan_ventas">Aún no registra las ventas del mes. El reporte las mostrará como «Sin registrar».</string>
-    <string name="reporte_pronto">La generación del PDF estará disponible en la próxima versión.</string>
+    <string name="reporte_guardado">PDF guardado.</string>
+    <!-- Contenido del PDF (§8.5). -->
+    <string name="reporte_pdf_periodo">%1$s · generado el %2$s a las %3$s</string>
+    <string name="reporte_pdf_contribuyente">RUC %1$s · Nuevo Régimen Único Simplificado (NRUS)</string>
+    <string name="reporte_pdf_compras">Compras del mes</string>
+    <plurals name="reporte_pdf_compras_valor">
+        <item quantity="one">%1$s (%2$d factura)</item>
+        <item quantity="many">%1$s (%2$d facturas)</item>
+        <item quantity="other">%1$s (%2$d facturas)</item>
+    </plurals>
+    <string name="reporte_pdf_categoria">Categoría %1$d · cuota %2$s</string>
+    <string name="reporte_pdf_vencimiento">Vencimiento de la declaración</string>
+    <string name="reporte_pdf_vencimiento_valor">%1$s (RUC terminado en %2$d)</string>
+    <string name="reporte_pdf_col_numero">N.º</string>
+    <string name="reporte_pdf_col_fecha">Fecha</string>
+    <string name="reporte_pdf_col_proveedor">Proveedor</string>
+    <string name="reporte_pdf_col_ruc">RUC</string>
+    <string name="reporte_pdf_col_comprobante">Serie-número</string>
+    <string name="reporte_pdf_col_importe">Importe</string>
+    <string name="reporte_pdf_total">Total</string>
+    <string name="reporte_pdf_foto">%1$d · %2$s · %3$s</string>
+    <string name="reporte_pdf_aviso">Documento de apoyo para la declaración; no reemplaza la declaración ante la SUNAT.</string>
+    <string name="reporte_pdf_pagina">Página %1$d de %2$d</string>
 
     <!-- P17 -->
     <string name="historial_titulo">Historial de meses</string>

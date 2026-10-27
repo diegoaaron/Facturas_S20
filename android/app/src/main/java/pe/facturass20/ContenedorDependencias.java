@@ -17,6 +17,7 @@ import pe.facturass20.datos.repositorios.ContribuyenteRepositorioRoom;
 import pe.facturass20.datos.repositorios.FacturaRepositorioRoom;
 import pe.facturass20.datos.repositorios.ParametrosRepositorioRoom;
 import pe.facturass20.datos.repositorios.PeriodoRepositorioRoom;
+import pe.facturass20.datos.repositorios.ReporteRepositorioRoom;
 import pe.facturass20.dominio.casosuso.AnularFactura;
 import pe.facturass20.dominio.casosuso.CerrarPeriodo;
 import pe.facturass20.dominio.casosuso.DeterminarCategoria;
@@ -224,6 +225,11 @@ public final class ContenedorDependencias {
         return adaptadores().parametros;
     }
 
+    /** Los PDF del mes ya generados (P16). */
+    public ReporteRepositorioRoom reportes() {
+        return adaptadores().reportes;
+    }
+
     public AlmacenImagenes almacenImagenes() {
         return adaptadores().imagenes;
     }
@@ -281,6 +287,7 @@ public final class ContenedorDependencias {
         final PeriodoRepositorioRoom periodos;
         final FacturaRepositorioRoom facturas;
         final ParametrosRepositorioRoom parametros;
+        final ReporteRepositorioRoom reportes;
         final AlmacenImagenes imagenes;
         final GestorPin pin;
         final CargadorParametrosNrus cargador;
@@ -293,6 +300,7 @@ public final class ContenedorDependencias {
             periodos = new PeriodoRepositorioRoom(base, reloj);
             facturas = new FacturaRepositorioRoom(base, periodos, reloj);
             parametros = new ParametrosRepositorioRoom(base);
+            reportes = new ReporteRepositorioRoom(base, periodos);
             imagenes = new AlmacenImagenes(contexto);
             pin = new GestorPin(base.contribuyenteDao());
             cargador = new CargadorParametrosNrus(contexto, base);
