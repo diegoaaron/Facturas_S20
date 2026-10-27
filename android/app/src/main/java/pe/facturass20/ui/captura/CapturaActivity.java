@@ -68,7 +68,7 @@ public class CapturaActivity extends AppCompatActivity {
     /** Cada cuánto se mide un fotograma; más seguido no aporta y gasta batería. */
     private static final long INTERVALO_ANALISIS_MS = 200;
     /**
-     * Fotogramas legibles seguidos (~0,6 s) para habilitar el disparador: moviendo el teléfono, la nitidez
+     * Fotogramas legibles (y con comprobante) seguidos (~0,6 s) para habilitar el disparador: moviendo el teléfono, la nitidez
      * salta de un fotograma a otro (22 → 445 → 117 en el Moto G34) y uno solo nítido no basta.
      */
     private static final int LEGIBLES_SEGUIDOS = 3;
@@ -108,6 +108,10 @@ public class CapturaActivity extends AppCompatActivity {
     /** Para calibrar los umbrales con el teléfono: la vista previa se registra una vez por segundo. */
     private long ultimoRegistro;
     private byte[] luma = new byte[0];
+    /** El marco del plano Y sin relleno entre filas, para buscar el comprobante. */
+    private byte[] region = new byte[0];
+    /** Si la última evaluación encontró un comprobante en el marco. */
+    private boolean comprobanteEnMarco;
 
     private final ActivityResultLauncher<String> pedirPermiso =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), concedido -> revisarPermiso());
@@ -168,7 +172,7 @@ public class CapturaActivity extends AppCompatActivity {
             }
         });
 
-        mostrarEvaluacion(null);
+        mostrarEvaluacion(null, false);
         if (savedInstanceState == null && !tienePermiso()) {
             pedirPermiso.launch(Manifest.permission.CAMERA);
         } else {
@@ -332,20 +336,46 @@ public class CapturaActivity extends AppCompatActivity {
                     .enPixeles(visible.left, visible.top, visible.width(), visible.height());
             int paso = planoY.getRowStride();
             int filas = Math.min(imagen.getHeight(), (luma.length + paso - imagen.getWidth()) / paso);
-            EvaluadorNitidez.Evaluacion resultado = EvaluadorNitidez.evaluar(luma, paso,
-                    Math.max(0, r[0]), Math.max(0, r[1]), Math.min(imagen.getWidth(), r[2]), Math.min(filas, r[3]));
+            int izquierda = Math.max(0, r[0]);
+            int arriba = Math.max(0, r[1]);
+            int derecha = Math.min(imagen.getWidth(), r[2]);
+            int abajo = Math.min(filas, r[3]);
+            EvaluadorNitidez.Evaluacion resultado = EvaluadorNitidez.evaluar(luma, paso, izquierda, arriba, derecha, abajo);
+            // Solo si lo demás ya está bien: es lo más caro del análisis.
+            long inicioBusqueda = SystemClock.elapsedRealtime();
+            boolean comprobante = resultado.legible() && hayComprobante(paso, izquierda, arriba, derecha, abajo);
+            long busquedaMs = SystemClock.elapsedRealtime() - inicioBusqueda;
             if (ahora - ultimoRegistro >= 1000) {
                 ultimoRegistro = ahora;
                 // Para calibrar los umbrales: adb logcat -s FacturasS20
-                Log.d(ETIQUETA, String.format(java.util.Locale.ROOT, "Vista previa: nitidez %.1f, luz %.1f (%d x %d)",
-                        resultado.nitidez(), resultado.luz(), r[2] - r[0], r[3] - r[1]));
+                Log.d(ETIQUETA, String.format(java.util.Locale.ROOT,
+                        "Vista previa: nitidez %.1f, luz %.1f, comprobante %s en %d ms (%d x %d)",
+                        resultado.nitidez(), resultado.luz(), comprobante, busquedaMs, derecha - izquierda, abajo - arriba));
             }
-            runOnUiThread(() -> mostrarEvaluacion(resultado));
+            runOnUiThread(() -> mostrarEvaluacion(resultado, comprobante));
         } catch (RuntimeException e) {
             Log.w(ETIQUETA, "Fotograma no evaluado: " + e.getClass().getName());
         } finally {
             imagen.close();
         }
+    }
+
+    /**
+     * Si hay un comprobante en el marco: la misma búsqueda de tinta del recorte automático
+     * ({@link RecortadorComprobante}). La nitidez sola no basta, porque una mesa con textura da valores de
+     * factura enfocada (§6.4). El marco de la vista previa (~885 × 630) ya está cerca del tamaño con el que
+     * se calibró la búsqueda.
+     */
+    private boolean hayComprobante(int paso, int izquierda, int arriba, int derecha, int abajo) {
+        int ancho = derecha - izquierda;
+        int alto = abajo - arriba;
+        if (region.length != ancho * alto) {
+            region = new byte[ancho * alto];
+        }
+        for (int y = 0; y < alto; y++) {
+            System.arraycopy(luma, (arriba + y) * paso + izquierda, region, y * ancho, ancho);
+        }
+        return RecortadorComprobante.esquinas(region, ancho, alto) != null;
     }
 
     private void disparar() {
@@ -413,10 +443,14 @@ public class CapturaActivity extends AppCompatActivity {
 
     // --- Estado en pantalla ---
 
-    /** {@code null} mientras no llega el primer fotograma. */
-    private void mostrarEvaluacion(EvaluadorNitidez.Evaluacion nueva) {
+    /**
+     * @param nueva       {@code null} mientras no llega el primer fotograma
+     * @param comprobante si hay un comprobante en el marco (solo se busca si la nitidez y la luz son buenas)
+     */
+    private void mostrarEvaluacion(EvaluadorNitidez.Evaluacion nueva, boolean comprobante) {
         evaluacion = nueva;
-        legiblesSeguidas = nueva != null && nueva.legible() ? legiblesSeguidas + 1 : 0;
+        comprobanteEnMarco = comprobante;
+        legiblesSeguidas = nueva != null && nueva.legible() && comprobante ? legiblesSeguidas + 1 : 0;
         @ColorRes int fondo;
         @ColorRes int colorTexto;
         String estado;
@@ -430,10 +464,15 @@ public class CapturaActivity extends AppCompatActivity {
             boolean legible = estable();
             fondo = legible ? R.color.color_ok : R.color.color_alerta;
             colorTexto = legible ? R.color.color_superficie : R.color.color_texto;
-            estado = getString(R.string.captura_estado,
-                    getString(nueva.nitidezBuena() ? R.string.captura_nitidez_buena : R.string.captura_nitidez_baja),
-                    getString(textoLuz(nueva.nivelLuz())));
-            ayuda = ayuda(nueva);
+            if (nueva.legible() && !comprobante) {
+                estado = getString(R.string.captura_sin_comprobante);
+                ayuda = R.string.captura_ayuda_encuadrar;
+            } else {
+                estado = getString(R.string.captura_estado,
+                        getString(nueva.nitidezBuena() ? R.string.captura_nitidez_buena : R.string.captura_nitidez_baja),
+                        getString(textoLuz(nueva.nivelLuz())));
+                ayuda = ayuda(nueva);
+            }
         }
         binding.marco.setBueno(estable());
         if (!estado.contentEquals(binding.etiquetaEstado.getText())) {
@@ -489,9 +528,12 @@ public class CapturaActivity extends AppCompatActivity {
         }
     }
 
-    /** Nitidez y luz buenas en los últimos {@link #LEGIBLES_SEGUIDOS} fotogramas: se puede disparar. */
+    /**
+     * Nitidez y luz buenas y un comprobante en el marco en los últimos {@link #LEGIBLES_SEGUIDOS} fotogramas:
+     * se puede disparar.
+     */
     private boolean estable() {
-        return evaluacion != null && legiblesSeguidas >= LEGIBLES_SEGUIDOS;
+        return evaluacion != null && comprobanteEnMarco && legiblesSeguidas >= LEGIBLES_SEGUIDOS;
     }
 
     private void actualizarDisparador() {

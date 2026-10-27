@@ -161,6 +161,8 @@
     <string name="captura_luz_buena">buena</string>
     <string name="captura_luz_baja">poca</string>
     <string name="captura_luz_excesiva">demasiada</string>
+    <string name="captura_sin_comprobante">No se ve una factura en el marco</string>
+    <string name="captura_ayuda_encuadrar">Ponga la factura dentro del marco</string>
     <string name="captura_ayuda_lista">Toque el botón para tomar la foto</string>
     <string name="captura_ayuda_poca_luz">Busque más luz o encienda la linterna</string>
     <string name="captura_ayuda_brillo">Hay demasiado brillo: evite los reflejos sobre el papel</string>
