@@ -19,3 +19,6 @@ unsloth_compiled_cache/
 
 # LoRA, checkpoints y resultados del ajuste fino (pesan y salen de datos reales)
 tunning_gemma4/modelos/
+
+# Copia de la base del teléfono para DBeaver (datos reales; se regenera con copiar_base.ps1)
+documentos_teoricos/entregable3/entregable3_archivos/base_datos/
