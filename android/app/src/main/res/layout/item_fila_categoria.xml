@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textAppearance="@style/Texto.FacturasS20.Dato"
-            tools:text="hasta S/ 5 000"/>
+            tools:text="hasta S/ 5,000"/>
 
     <TextView
             android:id="@+id/texto_cuota"

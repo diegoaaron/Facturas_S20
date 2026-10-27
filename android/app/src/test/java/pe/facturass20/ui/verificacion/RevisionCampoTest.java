@@ -15,14 +15,14 @@ public class RevisionCampoTest {
 
     @Test
     public void confianzaBajaSinTocarPideRevisar() {
-        RevisionCampo revision = RevisionCampo.revisar(CampoFactura.IMPORTE_TOTAL, "1450,00", "1450,00", IMPORTE_DUDOSO);
+        RevisionCampo revision = RevisionCampo.revisar(CampoFactura.IMPORTE_TOTAL, "1450.00", "1450.00", IMPORTE_DUDOSO);
         assertEquals(RevisionCampo.Estado.REVISAR, revision.estado());
         assertEquals(62, revision.confianzaPorcentaje());
     }
 
     @Test
     public void siElUsuarioLoCambiaQuedaValido() {
-        RevisionCampo revision = RevisionCampo.revisar(CampoFactura.IMPORTE_TOTAL, "1540,00", "1450,00", IMPORTE_DUDOSO);
+        RevisionCampo revision = RevisionCampo.revisar(CampoFactura.IMPORTE_TOTAL, "1540.00", "1450.00", IMPORTE_DUDOSO);
         assertEquals(RevisionCampo.Estado.VALIDO, revision.estado());
     }
 
@@ -49,7 +49,7 @@ public class RevisionCampoTest {
     @Test
     public void muestraFechaEImporteComoLosEscribeElUsuario() {
         assertEquals("22/09/2026", RevisionCampo.paraMostrar(CampoFactura.FECHA_EMISION, "2026-09-22"));
-        assertEquals("1450,00", RevisionCampo.paraMostrar(CampoFactura.IMPORTE_TOTAL, "1450.00"));
+        assertEquals("1450.00", RevisionCampo.paraMostrar(CampoFactura.IMPORTE_TOTAL, "1450.00"));
         assertEquals("F001", RevisionCampo.paraMostrar(CampoFactura.SERIE, " F001 "));
         assertEquals("", RevisionCampo.paraMostrar(CampoFactura.NUMERO, null));
     }

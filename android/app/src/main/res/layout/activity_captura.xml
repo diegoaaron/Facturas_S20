@@ -34,21 +34,8 @@
             app:layout_constraintTop_toTopOf="@id/boton_cerrar"
             app:layout_constraintBottom_toBottomOf="@id/boton_cerrar"
             app:layout_constraintStart_toEndOf="@id/boton_cerrar"
-            app:layout_constraintEnd_toStartOf="@id/boton_linterna"/>
-
-    <ImageButton
-            android:id="@+id/boton_linterna"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_marginEnd="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/captura_linterna_encender"
-            android:src="@drawable/ic_linterna_apagada"
-            android:visibility="invisible"
-            app:tint="@color/color_superficie"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:visibility="visible"/>
+            android:layout_marginEnd="64dp"/>
 
     <androidx.camera.view.PreviewView
             android:id="@+id/vista_previa"
@@ -207,6 +194,44 @@
                     android:layout_marginTop="4dp"
                     android:importantForAccessibility="no"
                     android:text="@string/captura_galeria"
+                    android:textColor="@color/color_superficie"
+                    android:textSize="@dimen/texto_secundario"/>
+        </LinearLayout>
+
+        <!-- A la derecha del disparador, al alcance del pulgar; se oculta si el teléfono no tiene linterna. -->
+        <LinearLayout
+                android:id="@+id/boton_linterna"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="32dp"
+                android:clickable="true"
+                android:contentDescription="@string/captura_linterna_encender"
+                android:focusable="true"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:visibility="invisible"
+                app:layout_constraintTop_toTopOf="@id/boton_disparar"
+                app:layout_constraintBottom_toBottomOf="@id/boton_disparar"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:visibility="visible">
+
+            <ImageView
+                    android:id="@+id/icono_linterna"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/fondo_boton_galeria"
+                    android:duplicateParentState="true"
+                    android:importantForAccessibility="no"
+                    android:padding="14dp"
+                    android:src="@drawable/ic_linterna_apagada"
+                    app:tint="@color/color_superficie"/>
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:importantForAccessibility="no"
+                    android:text="@string/captura_linterna"
                     android:textColor="@color/color_superficie"
                     android:textSize="@dimen/texto_secundario"/>
         </LinearLayout>

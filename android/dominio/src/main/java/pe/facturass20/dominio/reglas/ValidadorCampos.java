@@ -71,7 +71,7 @@ public final class ValidadorCampos {
     private static String errorImporte(String v) {
         Optional<BigDecimal> monto = Montos.interpretar(v);
         if (!monto.isPresent()) {
-            return "Escriba el importe total, por ejemplo 1450,00.";
+            return "Escriba el importe total, por ejemplo 1450.00.";
         }
         return Montos.esPositivo(monto.get()) ? null : "El importe debe ser mayor que cero.";
     }

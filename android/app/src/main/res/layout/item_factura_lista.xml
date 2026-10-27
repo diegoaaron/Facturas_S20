@@ -70,7 +70,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/Texto.FacturasS20.Dato"
                     android:textStyle="bold"
-                    tools:text="S/ 1 450,00"/>
+                    tools:text="S/ 1,450.00"/>
 
             <TextView
                     android:id="@+id/texto_origen"

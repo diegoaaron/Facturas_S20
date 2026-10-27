@@ -81,7 +81,7 @@
                     android:accessibilityLiveRegion="polite"
                     android:textAppearance="@style/Texto.FacturasS20.Monto"
                     android:textSize="40sp"
-                    tools:text="S/ 3 900,00"/>
+                    tools:text="S/ 3,900.00"/>
 
             <View
                     android:layout_width="220dp"
@@ -95,7 +95,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:textAppearance="@style/Texto.FacturasS20.Secundario"
-                    tools:text="Compras registradas: S/ 4 120,50"/>
+                    tools:text="Compras registradas: S/ 4,120.50"/>
 
             <GridLayout
                     android:id="@+id/teclado"
@@ -232,7 +232,7 @@
                         android:textSize="26sp"/>
 
                 <TextView
-                        android:id="@+id/tecla_coma"
+                        android:id="@+id/tecla_punto"
                         android:layout_width="0dp"
                         android:layout_height="60dp"
                         android:layout_columnWeight="1"
@@ -241,7 +241,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
-                        android:text=","
+                        android:text="."
                         android:textColor="@color/color_texto"
                         android:textSize="26sp"/>
 

@@ -340,6 +340,7 @@ static final String INSTRUCCION =
 
 - `importe_total` es el monto que se paga, **con la percepción** si el comprobante la trae («Monto total», «Total a pagar con», «Total pagar»), no el «Importe total» sin ella.
 - La **confianza la calcula la app**: 0,9 si el valor pasa `ValidadorCampos` (verde) y 0,5 si no (ámbar o rojo). Un campo vacío queda con 0. El modelo no da confianzas calibradas y escribirlas duplicaba los tokens de la respuesta.
+- **La moneda queda siempre en `PEN`** (confianza 1), diga lo que diga el modelo, y P08 no muestra el campo, igual que P19: todas las compras que se registran son en soles (decidido el 2026-10-27). El modelo la sigue escribiendo porque así se entrenó; quitarla de la instrucción obligaría a reentrenar.
 - El parser sigue aceptando el **esquema anterior** (`{"ruc": {"valor": "…", "confianza": 0.98}, …}`) y, en ese caso, usa la confianza que dio el modelo.
 
 > **La misma instrucción y el mismo esquema** deben usarse en el script de ajuste fino (etiquetas de entrenamiento) y en la app. Si cambian los campos, se actualizan a la vez: script de entrenamiento, `INSTRUCCION`, `ParserRespuesta`, `CampoFactura` y la tabla `campo_extraido`.
@@ -356,9 +357,9 @@ static final String INSTRUCCION =
 ### 6.4 Preprocesado de la imagen
 
 - Recorte al marco de encuadre, corrección de orientación EXIF, redimensionado al lado mayor de **896 px**, JPEG calidad 90. Así se guarda la imagen de la factura.
-- **QR del comprobante** (desde el 2026-10-27): antes de reducir la foto, `LectorQr` (ML Kit, modelo dentro del APK, sin conexión) lo busca en el marco a resolución completa; por eso la cámara toma la foto a 4080 × 3072. `QrSunat` (dominio) interpreta los formatos que usa cada emisor y, después de Gemma, reemplaza con lo del QR el RUC, la serie, el número, la fecha y el total, con confianza 1. Se queda con lo de Gemma si coincide en el número (con los ceros impresos) o si su total es el del QR más hasta 2 % (el QR no incluye la percepción). La razón social y la moneda no van en el QR. En las 120 fotos del dataset lee el QR en 39, sin errores, en ~160 ms.
+- **QR del comprobante** (desde el 2026-10-27): antes de reducir la foto, `LectorQr` (ML Kit, modelo dentro del APK, sin conexión) lo busca en el marco a resolución completa; por eso la cámara pide la foto más grande en 4:3 (en el Moto G34, 3264 × 2448). `QrSunat` (dominio) interpreta los formatos que usa cada emisor y, después de Gemma, reemplaza con lo del QR el RUC, la serie, el número, la fecha y el total, con confianza 1. Se queda con lo de Gemma si coincide en el número (con los ceros impresos) o si su total es el del QR más hasta 2 % (el QR no incluye la percepción). La razón social y la moneda no van en el QR. En las 120 fotos del dataset lee el QR en 39, sin errores, en ~160 ms.
 - **Al modelo le llega a 512 px** (`ReductorFoto`, desde el 2026-10-25). Con 896 px el modelo base tarda unas cinco veces más (2394 parches de visión) y no lee mejor: en la factura de control falla la fecha (y con GPU, también la serie y el número). Con 512 px acierta los 7 campos (ver 6.5, mediciones). El cuaderno de ajuste fino sigue entrenando a 896 px. Conviene probar el modelo afinado a 512 px y, si baja la exactitud, entrenarlo a esa resolución.
-- **Nitidez:** varianza del Laplaciano sobre la imagen en gris: umbral 50 en la vista previa para habilitar el disparador y 25 para la foto ya preparada (el JPEG y el escalado la suavizan). Se bajó del 100 inicial el 2026-09-29 porque rechazaba boletas bien enfocadas; falta calibrarlo con el equipo de referencia (el valor de cada foto sale en `adb logcat -s FacturasS20`). **Luz:** media de luminancia entre 60 y 200.
+- **Nitidez:** varianza del Laplaciano sobre la imagen en gris: umbral 50 en la vista previa para habilitar el disparador y 25 para la foto ya preparada (el JPEG y el escalado la suavizan). Se bajó del 100 inicial el 2026-09-29 porque rechazaba boletas bien enfocadas; falta calibrarlo con el equipo de referencia (el valor de cada foto sale en `adb logcat -s FacturasS20`). **Luz:** media de luminancia entre 60 y 200. Si hay poca luz durante 1 s, P06 enciende la linterna (luz continua; nunca flash, porque deja una mancha blanca sobre el papel) y avisa; si el usuario la apaga, no se vuelve a encender en esa pantalla (2026-10-27).
 
 ### 6.5 Puente Kotlin (único archivo Kotlin)
 
@@ -568,7 +569,7 @@ inicio → ajustes → exportarDatos · preparacionModelo
 | `radio_tarjeta` / `radio_boton` | 14 dp / 24 dp | Forma |
 | Texto | título 18–22 sp; monto 28–36 sp; dato 16 sp; ayuda 12 sp | Roboto |
 
-**Reglas UX:** lenguaje cotidiano («compras», «ventas», «le corresponde»); nunca códigos de error; el color siempre acompañado de ícono y texto; contraste ≥ 4,5:1; acciones principales en la mitad inferior; formato de moneda `S/ 4 120,50` (espacio como separador de miles, coma decimal) y fechas `22/09/2026` o «jueves 15 de octubre».
+**Reglas UX:** lenguaje cotidiano («compras», «ventas», «le corresponde»); nunca códigos de error; el color siempre acompañado de ícono y texto; contraste ≥ 4,5:1; acciones principales en la mitad inferior; formato de moneda `S/ 4,120.50` (coma de miles y punto decimal, como en los comprobantes peruanos; antes del 2026-10-27 era `S/ 4 120,50`) y fechas `22/09/2026` o «jueves 15 de octubre».
 
 ### 8.4 Textos clave (strings.xml)
 
@@ -864,7 +865,7 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
 1. ✅ **Base de la app (FE)** — hecho el 2026-09-28:
    - Navigation 2.10.2 y Fragment 1.9.1 en `libs.versions.toml`.
    - Tokens de §8.3 en `colors.xml` y `dimens.xml`, tema Material 3 solo claro con estilos de botón, tarjeta, barra y textos (`Texto.FacturasS20.Titulo/Monto/Dato/Ayuda`), y `strings.xml` con los títulos P01–P20 y los textos de §8.4.
-   - `ui.comun.Formatos` (moneda `S/ 4 120,50` y `monedaCorta` `S/ 5 000`, fechas `22/09/2026`, `22/09`, «jueves 15 de octubre», «Septiembre 2026»), con `FormatosTest`.
+   - `ui.comun.Formatos` (moneda `S/ 4,120.50` y `monedaCorta` `S/ 5,000`, fechas `22/09/2026`, `22/09`, «jueves 15 de octubre», «Septiembre 2026»), con `FormatosTest`.
    - `App` (crea el canal de notificaciones `avisos_nrus`) y `ContenedorDependencias` (por ahora solo el ejecutor de fondo).
    - `MainActivity` con NavHost, `nav_graph.xml` con los destinos y acciones de §8.2 y la barra inferior con el botón central Escanear (visible solo en P04, P11, P14, P17 y P18).
    - Al principio todos los destinos usaban un `PantallaPendienteFragment` provisional; se borró el 2026-10-24, cuando quedaron construidas todas las pantallas. `CapturaActivity` (P06) y `DuplicadoDialog` (P09) no van en el grafo (ver el paso 4).
@@ -1023,7 +1024,7 @@ No hay desviaciones respecto de la línea base (Anexo D del informe). La constru
 
 - **Idioma:** identificadores del dominio en español sin tildes (`FacturaCompra`, `importeTotal`, `registrarVentas`); sufijos técnicos en inglés cuando son convención (`UseCase`, `ViewModel`, `Dao`, `Entity`, `Fragment`, `Worker`).
 - **Estilo:** Google Java Style; clases `final` cuando no se heredan; sin `null` en retornos de colecciones; `Optional` en búsquedas; inmutabilidad en objetos de valor (`Determinacion`, `ResultadoExtraccion`).
-- **Dinero:** `BigDecimal` escala 2 (`Montos.de("1450.00")`); comparar con `compareTo`, nunca `equals`. En pantalla `S/ 4 120,50`; en los CSV exportados `4120.50` (9.3).
+- **Dinero:** `BigDecimal` escala 2 (`Montos.de("1450.00")`); comparar con `compareTo`, nunca `equals`. En pantalla `S/ 4,120.50`; en los CSV exportados `4120.50` (9.3).
 - **Fechas:** `java.time` (`LocalDate`, `YearMonth`); zona `America/Lima` para «hoy».
 - **Archivos versionados en `assets/`:** `modelo.json` (versión, URL, SHA-256 y tamaño del modelo) y `parametros_nrus.json` (sección 5.2). Cambiarlos implica publicar una nueva versión de la app y anotarlo en sus notas de versión.
 - **Git:** rama `main` protegida; ramas `feature/<rf>-<descripcion>`; commits en español en imperativo («Agrega validación de RUC»); cada PR indica los RF/RNF que cubre.

@@ -78,7 +78,7 @@
                                 android:textColor="@color/color_acento"
                                 android:textSize="18sp"
                                 android:textStyle="bold"
-                                tools:text="Cuota mensual: S/ 20,00"/>
+                                tools:text="Cuota mensual: S/ 20.00"/>
                     </LinearLayout>
 
                     <TextView
@@ -108,7 +108,7 @@
                         android:visibility="gone"
                         app:drawableStartCompat="@drawable/ic_alerta"
                         app:drawableTint="@color/color_alerta_oscuro"
-                        tools:text="Sus compras o ventas del año se acercan al tope de S/ 96 000"
+                        tools:text="Sus compras o ventas del año se acercan al tope de S/ 96,000"
                         tools:visibility="visible"/>
 
                 <!-- ¿Qué monto decide la categoría? -->
@@ -150,7 +150,7 @@
                                     android:layout_height="wrap_content"
                                     android:textAppearance="@style/Texto.FacturasS20.Dato"
                                     android:textStyle="bold"
-                                    tools:text="S/ 4 120,50 ← mayor"/>
+                                    tools:text="S/ 4,120.50 ← mayor"/>
                         </LinearLayout>
 
                         <pe.facturass20.ui.comun.BarraLimiteView
@@ -177,7 +177,7 @@
                                     android:layout_height="wrap_content"
                                     android:textAppearance="@style/Texto.FacturasS20.Dato"
                                     android:textStyle="bold"
-                                    tools:text="S/ 3 900,00"/>
+                                    tools:text="S/ 3,900.00"/>
                         </LinearLayout>
 
                         <pe.facturass20.ui.comun.BarraLimiteView
@@ -192,7 +192,7 @@
                                 android:layout_marginTop="8dp"
                                 android:textAppearance="@style/Texto.FacturasS20.Ayuda"
                                 android:textSize="@dimen/texto_secundario"
-                                tools:text="Línea negra: aviso al 80 % del límite (S/ 4 000)"/>
+                                tools:text="Línea negra: aviso al 80 % del límite (S/ 4,000)"/>
 
                         <com.google.android.material.button.MaterialButton
                                 android:id="@+id/boton_ventas"

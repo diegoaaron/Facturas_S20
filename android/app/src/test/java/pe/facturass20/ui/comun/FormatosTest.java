@@ -17,23 +17,24 @@ public class FormatosTest {
 
     @Test
     public void monedaConMilesYDecimales() {
-        assertEquals("S/ 4 120,50", legible(Formatos.moneda(new BigDecimal("4120.5"))));
-        assertEquals("S/ 386,40", legible(Formatos.moneda(new BigDecimal("386.40"))));
-        assertEquals("S/ 1 234 567,00", legible(Formatos.moneda(new BigDecimal("1234567"))));
-        assertEquals("S/ 0,00", legible(Formatos.moneda(BigDecimal.ZERO)));
+        assertEquals("S/ 4,120.50", legible(Formatos.moneda(new BigDecimal("4120.5"))));
+        assertEquals("S/ 386.40", legible(Formatos.moneda(new BigDecimal("386.40"))));
+        assertEquals("S/ 1,234,567.00", legible(Formatos.moneda(new BigDecimal("1234567"))));
+        assertEquals("S/ 0.00", legible(Formatos.moneda(BigDecimal.ZERO)));
+        assertEquals("1450.50", Formatos.decimal(new BigDecimal("1450.5")));
     }
 
     @Test
     public void monedaRedondeaAMedioCentimo() {
-        assertEquals("S/ 10,01", legible(Formatos.moneda(new BigDecimal("10.005"))));
-        assertEquals("-S/ 5,00", legible(Formatos.moneda(new BigDecimal("-5"))));
+        assertEquals("S/ 10.01", legible(Formatos.moneda(new BigDecimal("10.005"))));
+        assertEquals("-S/ 5.00", legible(Formatos.moneda(new BigDecimal("-5"))));
     }
 
     @Test
     public void monedaCortaQuitaDecimalesSoloSiEsEntero() {
-        assertEquals("S/ 5 000", legible(Formatos.monedaCorta(new BigDecimal("5000.00"))));
+        assertEquals("S/ 5,000", legible(Formatos.monedaCorta(new BigDecimal("5000.00"))));
         assertEquals("S/ 20", legible(Formatos.monedaCorta(new BigDecimal("20"))));
-        assertEquals("S/ 879,50", legible(Formatos.monedaCorta(new BigDecimal("879.5"))));
+        assertEquals("S/ 879.50", legible(Formatos.monedaCorta(new BigDecimal("879.5"))));
     }
 
     @Test

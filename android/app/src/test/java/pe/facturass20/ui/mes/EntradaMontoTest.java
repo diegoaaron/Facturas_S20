@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 
 import org.junit.Test;
 
-import pe.facturass20.ui.comun.Formatos;
 
 /** El teclado de montos de P13. */
 public class EntradaMontoTest {
@@ -15,8 +14,8 @@ public class EntradaMontoTest {
     private static EntradaMonto escribir(String teclas) {
         EntradaMonto entrada = new EntradaMonto();
         for (char tecla : teclas.toCharArray()) {
-            if (tecla == ',') {
-                entrada.coma();
+            if (tecla == '.') {
+                entrada.punto();
             } else if (tecla == '<') {
                 entrada.borrar();
             } else {
@@ -28,22 +27,22 @@ public class EntradaMontoTest {
 
     @Test
     public void escribeEnterosYDecimales() {
-        EntradaMonto entrada = escribir("3900,5");
-        assertEquals("3900,5", entrada.texto());
+        EntradaMonto entrada = escribir("3900.5");
+        assertEquals("3900.5", entrada.texto());
         assertEquals(new BigDecimal("3900.50"), entrada.monto());
-        assertEquals("3" + Formatos.ESPACIO + "900,5", entrada.paraMostrar());
+        assertEquals("3,900.5", entrada.paraMostrar());
     }
 
     @Test
-    public void admiteSoloDosDecimalesYUnaComa() {
-        assertEquals("12,34", escribir("12,345").texto());
-        assertEquals("12,3", escribir("12,,3").texto());
+    public void admiteSoloDosDecimalesYUnPunto() {
+        assertEquals("12.34", escribir("12.345").texto());
+        assertEquals("12.3", escribir("12..3").texto());
     }
 
     @Test
-    public void comaAlInicioPoneCero() {
-        EntradaMonto entrada = escribir(",5");
-        assertEquals("0,5", entrada.texto());
+    public void puntoAlInicioPoneCero() {
+        EntradaMonto entrada = escribir(".5");
+        assertEquals("0.5", entrada.texto());
         assertEquals(new BigDecimal("0.50"), entrada.monto());
     }
 
@@ -65,8 +64,8 @@ public class EntradaMontoTest {
     }
 
     @Test
-    public void comaFinalSeIgnoraAlConvertir() {
-        assertEquals(new BigDecimal("15.00"), escribir("15,").monto());
+    public void puntoFinalSeIgnoraAlConvertir() {
+        assertEquals(new BigDecimal("15.00"), escribir("15.").monto());
     }
 
     @Test
@@ -75,7 +74,7 @@ public class EntradaMontoTest {
         entrada.cargar(new BigDecimal("3900.00"));
         assertEquals("3900", entrada.texto());
         entrada.cargar(new BigDecimal("12.50"));
-        assertEquals("12,5", entrada.texto());
+        assertEquals("12.5", entrada.texto());
         entrada.cargar(new BigDecimal("0.00"));
         assertTrue(entrada.vacio());
     }

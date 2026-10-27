@@ -54,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:textAppearance="@style/Texto.FacturasS20.Secundario"
-                tools:text="Emitida el 22/09/2026 · S/ 1 450,00"/>
+                tools:text="Emitida el 22/09/2026 · S/ 1,450.00"/>
 
         <TextView
                 android:layout_width="match_parent"

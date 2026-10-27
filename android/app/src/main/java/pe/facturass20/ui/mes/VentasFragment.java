@@ -48,7 +48,7 @@ public class VentasFragment extends Fragment {
             char digito = (char) ('0' + i);
             digitos[i].setOnClickListener(v -> modelo.digito(digito));
         }
-        binding.teclaComa.setOnClickListener(v -> modelo.coma());
+        binding.teclaPunto.setOnClickListener(v -> modelo.punto());
         binding.teclaBorrar.setOnClickListener(v -> modelo.borrar());
         binding.teclaBorrar.setOnLongClickListener(v -> {
             for (int i = 0; i < 12; i++) {

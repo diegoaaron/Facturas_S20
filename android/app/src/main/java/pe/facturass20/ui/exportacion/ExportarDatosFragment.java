@@ -149,7 +149,7 @@ public class ExportarDatosFragment extends Fragment {
         if (bytes < 1024 * 1024) {
             return Math.max(1, bytes / 1024) + " KB";
         }
-        return String.format(Locale.ROOT, "%.1f", bytes / (1024.0 * 1024)).replace('.', ',') + " MB";
+        return String.format(Locale.ROOT, "%.1f", bytes / (1024.0 * 1024)) + " MB";
     }
 
     @Override

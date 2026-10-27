@@ -38,7 +38,7 @@ class ValidadorCamposTest {
         "FECHA_EMISION|31/02/2026|Escriba la fecha como día/mes/año, por ejemplo 22/09/2026.",
         "MONEDA|USD|Por ahora solo se registran compras en soles (S/).",
         "MONEDA|EUR|La moneda debe ser soles (PEN).",
-        "IMPORTE_TOTAL|mil|Escriba el importe total, por ejemplo 1450,00.",
+        "IMPORTE_TOTAL|mil|Escriba el importe total, por ejemplo 1450.00.",
         "IMPORTE_TOTAL|0,00|El importe debe ser mayor que cero.",
     })
     void rechazaValoresInvalidos(CampoFactura campo, String valor, String mensaje) {

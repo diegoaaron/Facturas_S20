@@ -55,7 +55,7 @@ import pe.facturass20.ui.acceso.Sesion;
 
 /**
  * P06 Cámara (RF-01 a RF-03): vista previa con el marco de encuadre, nitidez y luz medidas en vivo dentro
- * del marco, linterna y galería. El disparador solo se activa cuando nitidez y luz son «buenas»; la foto se
+ * del marco, linterna (se enciende sola con poca luz) y galería. El disparador solo se activa cuando nitidez y luz son «buenas»; la foto se
  * vuelve a medir ya preparada y, si pasa, queda en {@link CapturaEnCurso} y la actividad termina con
  * {@code RESULT_OK} (quien la abrió sigue a P07).
  *
@@ -67,11 +67,17 @@ public class CapturaActivity extends AppCompatActivity {
     private static final String ETIQUETA = "FacturasS20";
     /** Cada cuánto se mide un fotograma; más seguido no aporta y gasta batería. */
     private static final long INTERVALO_ANALISIS_MS = 200;
+    /**
+     * Con poca luz durante este tiempo se enciende la linterna (luz continua, no flash: el destello deja
+     * una mancha blanca sobre el papel que puede tapar los dígitos o el QR).
+     */
+    private static final long POCA_LUZ_PARA_LINTERNA_MS = 1_000;
     /** Lado mayor ~900 px dentro del marco, como la foto final (§6.4), para que la nitidez sea comparable. */
     private static final Size RESOLUCION_ANALISIS = new Size(1280, 960);
     /**
-     * La de las fotos del dataset (12 MP en el Moto G34): la foto se reduce a 896 px, pero antes se busca
-     * el QR en el marco a resolución completa, y a 1920 px se leía en muchas menos fotos (§6.4).
+     * La más alta 4:3: la foto se reduce a 896 px, pero antes se busca el QR en el marco a resolución
+     * completa, y a 1920 px se leía en muchas menos fotos (§6.4). El Moto G34 entrega 3264 × 2448 (8 MP):
+     * disparo de ~500 ms, foto lista con el QR en ~200–400 ms, y lee el QR (prueba del 2026-10-27).
      */
     private static final Size RESOLUCION_FOTO = new Size(4080, 3072);
 
@@ -83,6 +89,10 @@ public class CapturaActivity extends AppCompatActivity {
     private Camera camara;
     private boolean camaraIniciada;
     private boolean linternaEncendida;
+    /** El usuario la apagó: ya no se enciende sola mientras siga en esta pantalla. */
+    private boolean linternaApagadaAMano;
+    /** Desde cuándo hay poca luz sin linterna; 0 si hay luz suficiente. */
+    private long inicioPocaLuz;
     private boolean disparando;
     private EvaluadorNitidez.Evaluacion evaluacion;
     /** Lo escribe el hilo de UI al medir la vista y lo lee el hilo de análisis. */
@@ -120,7 +130,13 @@ public class CapturaActivity extends AppCompatActivity {
         modelo = new ViewModelProvider(this).get(CapturaViewModel.class);
 
         binding.botonCerrar.setOnClickListener(v -> finish());
-        binding.botonLinterna.setOnClickListener(v -> cambiarLinterna());
+        binding.botonLinterna.setOnClickListener(v -> {
+            if (linternaEncendida) {
+                linternaApagadaAMano = true;
+            }
+            Log.i(ETIQUETA, "Linterna " + (linternaEncendida ? "apagada" : "encendida") + " a mano");
+            ponerLinterna(!linternaEncendida);
+        });
         binding.botonDisparar.setOnClickListener(v -> disparar());
         binding.botonGaleria.setOnClickListener(v -> elegirDeGaleria.launch(new PickVisualMediaRequest.Builder()
                 .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE).build()));
@@ -129,6 +145,8 @@ public class CapturaActivity extends AppCompatActivity {
 
         modelo.fotoLista().observe(this, evento -> {
             if (evento.tomar() != null) {
+                // Ya no hace falta: que no siga encendida mientras se cierra la cámara.
+                apagarLinterna();
                 setResult(RESULT_OK);
                 finish();
             }
@@ -170,6 +188,7 @@ public class CapturaActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        apagarLinterna();
         sesion.alSalir();
     }
 
@@ -321,6 +340,7 @@ public class CapturaActivity extends AppCompatActivity {
         disparando = true;
         actualizarDisparador();
         MarcoEncuadre marcoAlDisparar = binding.marco.marco();
+        long inicio = SystemClock.elapsedRealtime();
         captura.takePicture(ContextCompat.getMainExecutor(this), new ImageCapture.OnImageCapturedCallback() {
             @Override
             public void onCaptureSuccess(@NonNull ImageProxy imagen) {
@@ -329,6 +349,8 @@ public class CapturaActivity extends AppCompatActivity {
                     datos.rewind();
                     byte[] jpeg = new byte[datos.remaining()];
                     datos.get(jpeg);
+                    Log.i(ETIQUETA, "Disparo en " + (SystemClock.elapsedRealtime() - inicio) + " ms: "
+                            + imagen.getWidth() + " x " + imagen.getHeight() + ", " + jpeg.length / 1024 + " KB");
                     modelo.desdeCamara(jpeg, imagen.getWidth(), imagen.getHeight(), new Rect(imagen.getCropRect()),
                             imagen.getImageInfo().getRotationDegrees(), marcoAlDisparar);
                 } finally {
@@ -348,15 +370,24 @@ public class CapturaActivity extends AppCompatActivity {
         });
     }
 
-    private void cambiarLinterna() {
+    private void ponerLinterna(boolean encendida) {
         if (camara == null) {
             return;
         }
-        linternaEncendida = !linternaEncendida;
+        linternaEncendida = encendida;
         camara.getCameraControl().enableTorch(linternaEncendida);
-        binding.botonLinterna.setImageResource(linternaEncendida ? R.drawable.ic_linterna : R.drawable.ic_linterna_apagada);
+        binding.iconoLinterna.setImageResource(linternaEncendida ? R.drawable.ic_linterna : R.drawable.ic_linterna_apagada);
+        binding.iconoLinterna.setBackgroundResource(linternaEncendida
+                ? R.drawable.fondo_boton_linterna_encendida : R.drawable.fondo_boton_galeria);
         binding.botonLinterna.setContentDescription(getString(linternaEncendida
                 ? R.string.captura_linterna_apagar : R.string.captura_linterna_encender));
+    }
+
+    /** Al salir de la pantalla; si el usuario vuelve, la linterna puede encenderse sola otra vez. */
+    private void apagarLinterna() {
+        if (linternaEncendida) {
+            ponerLinterna(false);
+        }
     }
 
     private void alElegirDeGaleria(Uri uri) {
@@ -395,7 +426,29 @@ public class CapturaActivity extends AppCompatActivity {
         binding.etiquetaEstado.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, fondo)));
         binding.etiquetaEstado.setTextColor(ContextCompat.getColor(this, colorTexto));
         binding.textoAyuda.setText(ayuda);
+        encenderLinternaSiFalta(nueva);
         actualizarDisparador();
+    }
+
+    /**
+     * Enciende la linterna si hay poca luz desde hace {@link #POCA_LUZ_PARA_LINTERNA_MS}. No la apaga sola
+     * (con la linterna la luz ya se mide buena); si el usuario la apaga, no se vuelve a encender.
+     */
+    private void encenderLinternaSiFalta(EvaluadorNitidez.Evaluacion nueva) {
+        boolean pocaLuz = nueva != null && nueva.nivelLuz() == EvaluadorNitidez.Luz.BAJA;
+        if (!pocaLuz || linternaEncendida || linternaApagadaAMano || camara == null
+                || !camara.getCameraInfo().hasFlashUnit()) {
+            inicioPocaLuz = 0;
+            return;
+        }
+        long ahora = SystemClock.elapsedRealtime();
+        if (inicioPocaLuz == 0) {
+            inicioPocaLuz = ahora;
+        } else if (ahora - inicioPocaLuz >= POCA_LUZ_PARA_LINTERNA_MS) {
+            Log.i(ETIQUETA, "Linterna encendida sola: poca luz");
+            ponerLinterna(true);
+            mostrarMensaje(getString(R.string.captura_linterna_automatica));
+        }
     }
 
     private static int textoLuz(EvaluadorNitidez.Luz luz) {

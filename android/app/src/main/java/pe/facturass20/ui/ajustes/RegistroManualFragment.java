@@ -78,9 +78,7 @@ public class RegistroManualFragment extends Fragment {
                 : MOTIVO_LECTURA.equals(motivo) ? R.string.manual_lectura_fallida : R.string.manual_elegido);
 
         campos = new CamposFactura(binding.campos);
-        campos.campo(CampoFactura.MONEDA).setVisibility(View.GONE);
         if (savedInstanceState == null) {
-            campos.poner(CampoFactura.MONEDA, "PEN");
             campos.poner(CampoFactura.FECHA_EMISION, Formatos.fecha(modelo.hoy()));
             if (MOTIVO_LECTURA.equals(motivo)) {
                 modelo.adjuntarFotoCapturada();

@@ -35,7 +35,7 @@ public class ParserRespuestaTest {
         assertCampo(campos, CampoFactura.SERIE, "F001", 0.99);
         assertCampo(campos, CampoFactura.NUMERO, "004821", 0.97);
         assertCampo(campos, CampoFactura.FECHA_EMISION, "2026-09-22", 0.96);
-        assertCampo(campos, CampoFactura.MONEDA, "PEN", 0.99);
+        assertCampo(campos, CampoFactura.MONEDA, "PEN", 1.0);
         assertCampo(campos, CampoFactura.IMPORTE_TOTAL, "1450.00", 0.62);
     }
 
@@ -67,7 +67,7 @@ public class ParserRespuestaTest {
         assertCampo(campos, CampoFactura.SERIE, "F001", 0.9);
         assertCampo(campos, CampoFactura.NUMERO, "004821", 0.9);
         assertCampo(campos, CampoFactura.FECHA_EMISION, "2026-09-22", 0.9);
-        assertCampo(campos, CampoFactura.MONEDA, "PEN", 0.9);
+        assertCampo(campos, CampoFactura.MONEDA, "PEN", 1.0);
         assertCampo(campos, CampoFactura.IMPORTE_TOTAL, "1450.00", 0.9);
     }
 
@@ -106,7 +106,7 @@ public class ParserRespuestaTest {
         assertCampo(campos, CampoFactura.SERIE, "B001", validado);
         assertCampo(campos, CampoFactura.NUMERO, "00308984", validado);
         assertCampo(campos, CampoFactura.FECHA_EMISION, "2025-12-20", validado);
-        assertCampo(campos, CampoFactura.MONEDA, "PEN", validado);
+        assertCampo(campos, CampoFactura.MONEDA, "PEN", 1.0);
         assertCampo(campos, CampoFactura.IMPORTE_TOTAL, "131.31", validado);
     }
 
@@ -117,7 +117,7 @@ public class ParserRespuestaTest {
         List<CampoExtraido> campos = ParserRespuesta.interpretar(respuesta);
         assertCampo(campos, CampoFactura.RUC, "20601234565", ParserRespuesta.CONFIANZA_VALIDADO);
         assertCampo(campos, CampoFactura.IMPORTE_TOTAL, "1450.50", ParserRespuesta.CONFIANZA_VALIDADO);
-        assertCampo(campos, CampoFactura.MONEDA, "PEN", ParserRespuesta.CONFIANZA_VALIDADO);
+        assertCampo(campos, CampoFactura.MONEDA, "PEN", 1.0);
         assertCampo(campos, CampoFactura.SERIE, "F0001", ParserRespuesta.CONFIANZA_SIN_VALIDAR);
         assertCampo(campos, CampoFactura.RAZON_SOCIAL, null, 0);
     }
@@ -126,8 +126,8 @@ public class ParserRespuestaTest {
     public void unRucConDigitoVerificadorErradoQuedaParaRevisar() throws Exception {
         List<CampoExtraido> campos = ParserRespuesta.interpretar("{\"ruc\":\"20601234566\",\"moneda\":\"USD\"}");
         assertCampo(campos, CampoFactura.RUC, "20601234566", ParserRespuesta.CONFIANZA_SIN_VALIDAR);
-        // USD se lee bien, pero por ahora solo se registran compras en soles.
-        assertCampo(campos, CampoFactura.MONEDA, "USD", ParserRespuesta.CONFIANZA_SIN_VALIDAR);
+        // La app solo registra compras en soles: lo que diga el modelo no cuenta.
+        assertCampo(campos, CampoFactura.MONEDA, "PEN", 1.0);
     }
 
     @Test

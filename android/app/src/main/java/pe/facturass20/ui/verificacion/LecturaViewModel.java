@@ -4,6 +4,7 @@ import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -17,6 +18,7 @@ import java.util.concurrent.TimeoutException;
 
 import pe.facturass20.ContenedorDependencias;
 import pe.facturass20.R;
+import pe.facturass20.dominio.modelo.CampoExtraido;
 import pe.facturass20.dominio.modelo.ReglaNegocioException;
 import pe.facturass20.dominio.modelo.ResultadoExtraccion;
 import pe.facturass20.dominio.puertos.ExtraccionException;
@@ -105,7 +107,14 @@ public final class LecturaViewModel extends BaseViewModel {
             estimadoMs = ContenedorDependencias.duracionEstimada(extractor);
             versionModelo.postValue(ContenedorDependencias.versionModelo(extractor));
             ResultadoExtraccion leido = extractor.extraer(foto.jpeg());
-            return foto.qr() == null ? leido : QrSunat.completar(leido, foto.qr());
+            ResultadoExtraccion resultado = foto.qr() == null ? leido : QrSunat.completar(leido, foto.qr());
+            // Para las pruebas en el teléfono (adb logcat -s FacturasS20). Sin los valores: son datos del usuario.
+            StringBuilder confianzas = new StringBuilder(foto.qr() == null ? "Sin QR:" : "Con QR:");
+            for (CampoExtraido campo : resultado.campos()) {
+                confianzas.append(' ').append(campo.nombre().clave()).append('=').append(campo.confianza());
+            }
+            Log.i("FacturasS20", confianzas.toString());
+            return resultado;
         });
         Future<ResultadoExtraccion> enCurso = tarea;
         enFondo(() -> esperar(enCurso), resultado -> {

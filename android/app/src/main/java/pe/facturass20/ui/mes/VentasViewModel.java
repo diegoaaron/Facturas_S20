@@ -59,8 +59,8 @@ public final class VentasViewModel extends BaseViewModel {
         texto.setValue(entrada.paraMostrar());
     }
 
-    public void coma() {
-        entrada.coma();
+    public void punto() {
+        entrada.punto();
         texto.setValue(entrada.paraMostrar());
     }
 

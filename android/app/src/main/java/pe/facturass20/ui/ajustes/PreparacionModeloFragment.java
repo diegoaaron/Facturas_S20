@@ -169,7 +169,7 @@ public class PreparacionModeloFragment extends Fragment {
     /** {@code 2,6 GB}, con coma decimal como el resto de la app. */
     private static String gigas(long bytes) {
         double gb = bytes / (1024.0 * 1024 * 1024);
-        return String.format(Locale.ROOT, "%.1f", gb).replace('.', ',') + " GB";
+        return String.format(Locale.ROOT, "%.1f", gb) + " GB";
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
 
 import androidx.annotation.ColorRes;
@@ -20,11 +21,14 @@ import java.util.function.BiConsumer;
 import pe.facturass20.R;
 import pe.facturass20.databinding.CamposFacturaBinding;
 import pe.facturass20.dominio.modelo.CampoFactura;
+import pe.facturass20.dominio.modelo.Moneda;
 
 /**
  * Los campos de {@code campos_factura.xml} de P08 y P19: los lee, los escribe y los pinta según
  * {@link RevisionCampo}. Un campo vacío o inválido solo se pinta de rojo después de que el usuario lo
  * tocó o intentó guardar, para no recibirlo con errores en el registro manual.
+ *
+ * <p>La moneda no se muestra: la app solo registra compras en soles, así que siempre vale {@code PEN}.</p>
  */
 public final class CamposFactura {
 
@@ -42,6 +46,8 @@ public final class CamposFactura {
         campos.put(CampoFactura.FECHA_EMISION, binding.campoFecha);
         campos.put(CampoFactura.MONEDA, binding.campoMoneda);
         campos.put(CampoFactura.IMPORTE_TOTAL, binding.campoImporteTotal);
+        binding.campoMoneda.setVisibility(View.GONE);
+        poner(CampoFactura.MONEDA, Moneda.PEN.name());
     }
 
     public TextInputLayout campo(CampoFactura campo) {

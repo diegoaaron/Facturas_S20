@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:textAppearance="@style/Texto.FacturasS20.Secundario"
-            tools:text="Compras S/ 4 120,50 · Ventas S/ 3 900,00"/>
+            tools:text="Compras S/ 4,120.50 · Ventas S/ 3,900.00"/>
 
     <TextView
             android:id="@+id/texto_categoria"

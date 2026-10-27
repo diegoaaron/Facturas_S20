@@ -52,6 +52,9 @@ public class VerificacionFragment extends Fragment {
         campos = new CamposFactura(binding.campos);
         if (savedInstanceState == null) {
             for (CampoFactura campo : CampoFactura.values()) {
+                if (campo == CampoFactura.MONEDA) {
+                    continue;
+                }
                 campos.poner(campo, modelo.textoLeido(campo));
             }
         }

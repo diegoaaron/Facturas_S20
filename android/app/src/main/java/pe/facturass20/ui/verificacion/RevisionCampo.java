@@ -42,7 +42,7 @@ public record RevisionCampo(Estado estado, String mensaje, int confianzaPorcenta
 
     /**
      * Cómo se muestra en el campo un valor leído por la IA: la fecha {@code 2026-09-22} como
-     * {@code 22/09/2026} y el importe {@code 1450.00} como {@code 1450,00}. Si no se entiende, va tal cual.
+     * {@code 22/09/2026} y el importe {@code 1450.5} como {@code 1450.50}. Si no se entiende, va tal cual.
      */
     public static String paraMostrar(CampoFactura campo, String valor) {
         if (valor == null) {

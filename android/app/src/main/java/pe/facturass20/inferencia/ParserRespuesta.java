@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import pe.facturass20.dominio.modelo.CampoExtraido;
 import pe.facturass20.dominio.modelo.CampoFactura;
+import pe.facturass20.dominio.modelo.Moneda;
 import pe.facturass20.dominio.puertos.ExtraccionException;
 import pe.facturass20.dominio.reglas.Montos;
 import pe.facturass20.dominio.reglas.ValidadorCampos;
@@ -32,6 +33,10 @@ import pe.facturass20.dominio.reglas.ValidadorFecha;
  * <p>Los valores quedan normalizados como los guarda la app: RUC solo dígitos, serie en mayúsculas, fecha
  * {@code 2026-09-22}, moneda {@code PEN} o {@code USD} e importe {@code 1450.00}. Un campo que falta o no
  * se entiende queda con valor nulo y confianza 0, para que el usuario lo complete en P08.</p>
+ *
+ * <p>La moneda queda siempre en {@code PEN} con confianza 1, lea lo que lea el modelo: la app solo registra
+ * compras en soles y P08 no muestra el campo (decidido el 2026-10-27). El modelo la sigue escribiendo
+ * porque así se entrenó.</p>
  */
 public final class ParserRespuesta {
 
@@ -58,6 +63,8 @@ public final class ParserRespuesta {
      * se muestre en ámbar (o en rojo, por la validación) y el usuario lo revise.
      */
     static final double CONFIANZA_SIN_VALIDAR = 0.5;
+    /** Siempre soles, ver arriba. */
+    private static final Lectura EN_SOLES = new Lectura(Moneda.PEN.name(), Optional.of(1.0));
 
     /** El valor ya normalizado de un campo y la confianza que dio el modelo, si la dio. */
     private record Lectura(String valor, Optional<Double> confianzaDada) { }
@@ -70,7 +77,7 @@ public final class ParserRespuesta {
                 .orElseThrow(() -> new ExtraccionException(SIN_JSON));
         List<Lectura> lecturas = new ArrayList<>();
         for (CampoFactura campo : CampoFactura.values()) {
-            lecturas.add(leer(json, campo));
+            lecturas.add(campo == CampoFactura.MONEDA ? EN_SOLES : leer(json, campo));
         }
         separarSerieDelNumero(lecturas);
         List<CampoExtraido> campos = new ArrayList<>();

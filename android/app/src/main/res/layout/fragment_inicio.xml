@@ -141,7 +141,7 @@
                             app:layout_constraintTop_toBottomOf="@id/texto_numero_facturas"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
-                            tools:text="S/ 4 120,50"/>
+                            tools:text="S/ 4,120.50"/>
 
                     <com.google.android.material.progressindicator.LinearProgressIndicator
                             android:id="@+id/barra_limite"
@@ -189,7 +189,7 @@
                             app:layout_constraintTop_toBottomOf="@id/barra_limite"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
-                            tools:text="82 % del límite de la categoría 1 (S/ 5 000)"/>
+                            tools:text="82 % del límite de la categoría 1 (S/ 5,000)"/>
 
                     <TextView
                             android:id="@+id/texto_restante"
@@ -200,7 +200,7 @@
                             app:layout_constraintTop_toBottomOf="@id/texto_limite"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
-                            tools:text="Le quedan S/ 879,50 antes de pasar a la categoría 2"/>
+                            tools:text="Le quedan S/ 879.50 antes de pasar a la categoría 2"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -245,7 +245,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
                             android:textAppearance="@style/Texto.FacturasS20.Titulo"
-                            tools:text="S/ 3 900,00"/>
+                            tools:text="S/ 3,900.00"/>
 
                     <Space
                             android:layout_width="0dp"
@@ -333,7 +333,7 @@
                     app:layout_constraintTop_toBottomOf="@id/tarjeta_categoria"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    tools:text="Sus compras o ventas del año se acercan al tope de S/ 96 000"
+                    tools:text="Sus compras o ventas del año se acercan al tope de S/ 96,000"
                     tools:visibility="visible"/>
 
             <!-- Vencimiento -->

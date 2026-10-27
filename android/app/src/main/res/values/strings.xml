@@ -147,8 +147,10 @@
 
     <!-- P06 Cámara -->
     <string name="captura_cerrar">Cerrar la cámara</string>
+    <string name="captura_linterna">Linterna</string>
     <string name="captura_linterna_encender">Encender la linterna</string>
     <string name="captura_linterna_apagar">Apagar la linterna</string>
+    <string name="captura_linterna_automatica">Encendimos la linterna porque hay poca luz. Si hay brillo sobre el papel, apáguela con el botón.</string>
     <string name="captura_disparar">Tomar la foto</string>
     <string name="captura_galeria">Galería</string>
     <string name="captura_galeria_descripcion">Elegir una foto de la galería</string>

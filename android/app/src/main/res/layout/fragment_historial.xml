@@ -69,7 +69,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="6dp"
                                 android:textAppearance="@style/Texto.FacturasS20.Secundario"
-                                tools:text="Compras S/ 34 212,60 de S/ 96 000 (tope anual)"/>
+                                tools:text="Compras S/ 34,212.60 de S/ 96,000 (tope anual)"/>
 
                         <pe.facturass20.ui.comun.BarraLimiteView
                                 android:id="@+id/barra_anio"
@@ -81,7 +81,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textAppearance="@style/Texto.FacturasS20.Secundario"
-                                tools:text="Ventas registradas: S/ 30 100,00"/>
+                                tools:text="Ventas registradas: S/ 30,100.00"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 

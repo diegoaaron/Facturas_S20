@@ -26,7 +26,7 @@ public class AnulacionBottomSheet extends BottomSheetDialogFragment {
 
     private HojaAnulacionBinding binding;
 
-    /** @param importe ya formateado, p. ej. «S/ 386,40» */
+    /** @param importe ya formateado, p. ej. «S/ 386.40» */
     public static void mostrar(Fragment padre, String importe) {
         Bundle argumentos = new Bundle();
         argumentos.putString(IMPORTE, importe);

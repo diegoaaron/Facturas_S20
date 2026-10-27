@@ -7,15 +7,16 @@ import java.time.YearMonth;
 
 /**
  * Formatos de moneda y fecha que usa toda la interfaz (documentación técnica §8.3):
- * {@code S/ 4 120,50}, {@code 22/09/2026} y «jueves 15 de octubre».
+ * {@code S/ 4,120.50} (punto decimal y coma de miles, como en los comprobantes peruanos), {@code 22/09/2026}
+ * y «jueves 15 de octubre».
  *
  * <p>Los nombres de días y meses están fijos para que el texto no dependa del idioma ni de la
- * versión de Android del teléfono. Los espacios son de no separación, para que un monto nunca se
+ * versión de Android del teléfono. El espacio tras «S/» es de no separación, para que un monto nunca se
  * parta en dos líneas.</p>
  */
 public final class Formatos {
 
-    /** Espacio de no separación: entre «S/» y el número, y como separador de miles. */
+    /** Espacio de no separación, entre «S/» y el número. */
     public static final char ESPACIO = ' ';
 
     private static final String[] MESES = {"enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
@@ -24,12 +25,12 @@ public final class Formatos {
 
     private Formatos() { }
 
-    /** {@code 4120.5 → "S/ 4 120,50"}; siempre con dos decimales. */
+    /** {@code 4120.5 → "S/ 4,120.50"}; siempre con dos decimales. */
     public static String moneda(BigDecimal monto) {
         return formatear(monto, true);
     }
 
-    /** Como {@link #moneda} pero sin «,00» cuando el monto es entero: {@code 5000 → "S/ 5 000"}. */
+    /** Como {@link #moneda} pero sin «.00» cuando el monto es entero: {@code 5000 → "S/ 5,000"}. */
     public static String monedaCorta(BigDecimal monto) {
         boolean entero = monto.setScale(2, RoundingMode.HALF_UP).stripTrailingZeros().scale() <= 0;
         return formatear(monto, !entero);
@@ -62,9 +63,9 @@ public final class Formatos {
         return MESES[periodo.getMonthValue() - 1];
     }
 
-    /** {@code 1450.5 → "1450,50"}: el importe tal como se escribe en un campo, sin «S/» ni separador de miles. */
+    /** {@code 1450.5 → "1450.50"}: el importe tal como se escribe en un campo, sin «S/» ni separador de miles. */
     public static String decimal(BigDecimal monto) {
-        return monto.setScale(2, RoundingMode.HALF_UP).toPlainString().replace('.', ',');
+        return monto.setScale(2, RoundingMode.HALF_UP).toPlainString();
     }
 
     private static String formatear(BigDecimal monto, boolean conDecimales) {
@@ -75,12 +76,12 @@ public final class Formatos {
         StringBuilder texto = new StringBuilder();
         for (int i = 0; i < entero.length(); i++) {
             if (i > 0 && (entero.length() - i) % 3 == 0) {
-                texto.append(ESPACIO);
+                texto.append(',');
             }
             texto.append(entero.charAt(i));
         }
         if (conDecimales) {
-            texto.append(',').append(digitos.substring(punto + 1));
+            texto.append('.').append(digitos.substring(punto + 1));
         }
         return (redondeado.signum() < 0 ? "-" : "") + "S/" + ESPACIO + texto;
     }

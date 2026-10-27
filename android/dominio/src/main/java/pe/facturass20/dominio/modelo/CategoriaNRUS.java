@@ -13,7 +13,7 @@ public record CategoriaNRUS(int codigo, BigDecimal limiteMensual, BigDecimal cuo
         cuota = Montos.normalizar(Objects.requireNonNull(cuota, "cuota"));
     }
 
-    /** El límite es inclusivo: S/ 5 000,00 todavía es categoría 1. */
+    /** El límite es inclusivo: S/ 5,000.00 todavía es categoría 1. */
     public boolean admite(BigDecimal monto) {
         return monto.compareTo(limiteMensual) <= 0;
     }

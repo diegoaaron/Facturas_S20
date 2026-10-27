@@ -64,6 +64,6 @@
                 android:layout_marginStart="8dp"
                 android:textAppearance="@style/Texto.FacturasS20.Dato"
                 android:textStyle="bold"
-                tools:text="S/ 1 450,00"/>
+                tools:text="S/ 1,450.00"/>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

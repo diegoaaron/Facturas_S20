@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textAppearance="@style/Texto.FacturasS20.Secundario"
-            tools:text="Se descontará S/ 386,40 del total del mes."/>
+            tools:text="Se descontará S/ 386.40 del total del mes."/>
 
     <RadioGroup
             android:id="@+id/motivos"

@@ -40,7 +40,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:textAppearance="@style/Texto.FacturasS20.Secundario"
-                    tools:text="Compras S/ 4 480,20"/>
+                    tools:text="Compras S/ 4,480.20"/>
         </LinearLayout>
 
         <LinearLayout

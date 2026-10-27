@@ -173,6 +173,6 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/Texto.FacturasS20.Titulo"
                 android:textColor="@color/color_primario"
-                tools:text="S/ 4 120,50"/>
+                tools:text="S/ 4,120.50"/>
     </LinearLayout>
 </LinearLayout>

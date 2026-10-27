@@ -70,7 +70,7 @@
                     android:textAppearance="@style/Texto.FacturasS20.Monto"
                     android:textColor="@color/color_acento_oscuro"
                     android:textSize="36sp"
-                    tools:text="+ S/ 1 450,00"/>
+                    tools:text="+ S/ 1,450.00"/>
 
             <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
@@ -96,7 +96,7 @@
                             android:layout_height="wrap_content"
                             android:textAppearance="@style/Texto.FacturasS20.Monto"
                             android:textColor="@color/color_texto"
-                            tools:text="S/ 4 120,50"/>
+                            tools:text="S/ 4,120.50"/>
 
                     <pe.facturass20.ui.comun.BarraLimiteView
                             android:id="@+id/barra_limite"

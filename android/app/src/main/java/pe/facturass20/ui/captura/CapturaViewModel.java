@@ -3,6 +3,7 @@ package pe.facturass20.ui.captura;
 import android.app.Application;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.os.SystemClock;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -34,8 +35,14 @@ public class CapturaViewModel extends BaseViewModel {
 
     /** Ver {@link PreparadorFoto#desdeCamara}; los datos ya se copiaron del {@code ImageProxy}. */
     public void desdeCamara(byte[] jpeg, int ancho, int alto, Rect visible, int giro, MarcoEncuadre marco) {
-        enFondo(() -> PreparadorFoto.desdeCamara(jpeg, ancho, alto, visible, giro, marco, contenedor().reloj().ahora()),
-                foto -> revisar(foto, false));
+        enFondo(() -> {
+            long inicio = SystemClock.elapsedRealtime();
+            FotoCapturada foto = PreparadorFoto.desdeCamara(jpeg, ancho, alto, visible, giro, marco,
+                    contenedor().reloj().ahora());
+            Log.i("FacturasS20", "Foto preparada (con la búsqueda del QR) en "
+                    + (SystemClock.elapsedRealtime() - inicio) + " ms");
+            return foto;
+        }, foto -> revisar(foto, false));
     }
 
     public void desdeGaleria(Uri uri) {
