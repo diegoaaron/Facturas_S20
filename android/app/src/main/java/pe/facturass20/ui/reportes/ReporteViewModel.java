@@ -3,7 +3,6 @@ package pe.facturass20.ui.reportes;
 import android.app.Application;
 import android.content.ContentResolver;
 import android.net.Uri;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -14,28 +13,21 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import pe.facturass20.ContenedorDependencias;
 import pe.facturass20.R;
 import pe.facturass20.dominio.modelo.Contribuyente;
 import pe.facturass20.dominio.modelo.Determinacion;
 import pe.facturass20.dominio.modelo.FacturaCompra;
-import pe.facturass20.dominio.modelo.ImagenFactura;
 import pe.facturass20.dominio.modelo.PeriodoMensual;
-import pe.facturass20.dominio.modelo.ReglaNegocioException;
-import pe.facturass20.inferencia.Huella;
 import pe.facturass20.ui.comun.BaseViewModel;
 import pe.facturass20.ui.comun.Evento;
 
 /**
- * P16 Reporte (RF-15, RF-16): la vista previa con los datos del mes y el PDF (documentación técnica §8.5),
- * que se genera al compartirlo o guardarlo.
+ * P16 Reporte (RF-15, RF-16): la vista previa con los datos del mes y el PDF (documentación técnica §8.5)
+ * para compartirlo o guardarlo; los datos y el PDF los arma {@link GeneradorReporte}.
  */
 public final class ReporteViewModel extends BaseViewModel {
 
@@ -67,9 +59,6 @@ public final class ReporteViewModel extends BaseViewModel {
     /** El PDF ya escrito en {@code filesDir/reportes/}, para compartirlo o guardarlo donde elija el usuario. */
     public record PdfListo(Accion accion, File archivo, String nombre) { }
 
-    /** Carpeta privada de los PDF; el {@code FileProvider} solo da acceso a esta (§10). */
-    static final String CARPETA = "reportes";
-
     private final MutableLiveData<Vista> vista = new MutableLiveData<>();
     private final MutableLiveData<Evento<PdfListo>> pdfListo = new MutableLiveData<>();
 
@@ -90,21 +79,8 @@ public final class ReporteViewModel extends BaseViewModel {
     public void cargar(String argumentoPeriodo) {
         YearMonth mes = periodoDe(argumentoPeriodo);
         ContenedorDependencias c = contenedor();
-        enFondo(() -> {
-            Contribuyente contribuyente = c.contribuyentes().obtener()
-                    .orElseThrow(() -> new ReglaNegocioException(texto(R.string.error_sin_configurar)));
-            Determinacion determinacion = c.determinarCategoria().ejecutar(mes);
-            PeriodoMensual periodo = c.periodos().buscar(mes).orElseGet(() -> PeriodoMensual.nuevo(mes));
-            List<FacturaCompra> facturas = new ArrayList<>(periodo.facturasVigentes());
-            facturas.sort(Comparator.comparing(FacturaCompra::fechaEmision));
-            int conImagen = 0;
-            for (FacturaCompra factura : facturas) {
-                if (factura.id() != null && c.facturas().buscarImagen(factura.id()).isPresent()) {
-                    conImagen++;
-                }
-            }
-            return new Vista(contribuyente, periodo, determinacion, facturas, conImagen);
-        }, vista::setValue);
+        String sinConfigurar = texto(R.string.error_sin_configurar);
+        enFondo(() -> GeneradorReporte.datos(c, mes, sinConfigurar), vista::setValue);
     }
 
     /** Se dispara una vez cuando el PDF está listo para la acción pedida. */
@@ -113,8 +89,8 @@ public final class ReporteViewModel extends BaseViewModel {
     }
 
     /**
-     * Escribe el PDF del mes (§8.5) en la carpeta privada, lo anota en {@code reporte_mensual} con su SHA-256
-     * y avisa con {@link #pdfListo()}. Cada vez se genera de nuevo, con los datos del momento.
+     * Prepara el PDF del mes (§8.5) y avisa con {@link #pdfListo()}. De un mes cerrado se usa el generado al
+     * cerrarlo; de un mes abierto, o si aquel falta, se genera con los datos del momento.
      */
     public void generarPdf(Accion accion) {
         Vista datos = vista.getValue();
@@ -124,14 +100,10 @@ public final class ReporteViewModel extends BaseViewModel {
         ContenedorDependencias c = contenedor();
         Application aplicacion = getApplication();
         enFondo(() -> {
-            File carpeta = new File(aplicacion.getFilesDir(), CARPETA);
-            if (!carpeta.isDirectory() && !carpeta.mkdirs()) {
-                throw new IOException("No se pudo crear la carpeta de reportes");
+            File pdf = GeneradorReporte.delCierre(c, datos.periodo());
+            if (pdf == null) {
+                pdf = GeneradorReporte.generar(aplicacion, c, datos);
             }
-            File pdf = new File(carpeta, datos.nombreArchivo());
-            LocalDateTime ahora = c.reloj().ahora();
-            new ReportePdf(aplicacion).escribir(datos, ahora, factura -> foto(c, factura), pdf);
-            c.reportes().registrar(datos.periodo().periodo(), pdf.getAbsolutePath(), Huella.sha256(pdf, null), ahora);
             return new PdfListo(accion, pdf, datos.nombreArchivo());
         }, listo -> pdfListo.setValue(new Evento<>(listo)));
     }
@@ -152,22 +124,5 @@ public final class ReporteViewModel extends BaseViewModel {
             }
             return true;
         }, guardado -> mostrarMensaje(texto(R.string.reporte_guardado)));
-    }
-
-    /** La foto descifrada de la factura, o null si no tiene o no se puede leer (el PDF sale sin ella). */
-    private static byte[] foto(ContenedorDependencias c, FacturaCompra factura) {
-        if (factura.id() == null) {
-            return null;
-        }
-        Optional<ImagenFactura> imagen = c.facturas().buscarImagen(factura.id());
-        if (!imagen.isPresent()) {
-            return null;
-        }
-        try {
-            return c.almacenImagenes().leer(imagen.get().ruta());
-        } catch (RuntimeException e) {
-            Log.w("FacturasS20", "Foto no incluida en el reporte: " + e.getClass().getSimpleName());
-            return null;
-        }
     }
 }

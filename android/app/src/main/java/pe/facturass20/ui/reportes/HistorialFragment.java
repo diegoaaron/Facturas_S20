@@ -55,16 +55,23 @@ public class HistorialFragment extends Fragment {
 
         modelo.vista().observe(getViewLifecycleOwner(), this::mostrar);
         modelo.cerrado().observe(getViewLifecycleOwner(), evento -> {
-            YearMonth mes = evento.tomar();
-            if (mes != null) {
-                new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle(getString(R.string.historial_cerrado_titulo, Formatos.periodo(mes)))
-                        .setMessage(R.string.cierre_sugerir_exportar)
-                        .setPositiveButton(R.string.historial_exportar_ahora, (d, w) ->
-                                NavHostFragment.findNavController(this).navigate(R.id.historial_a_exportarDatos))
-                        .setNegativeButton(R.string.historial_despues, null)
-                        .show();
+            HistorialViewModel.Cierre cierre = evento.tomar();
+            if (cierre == null) {
+                return;
             }
+            YearMonth mes = cierre.mes();
+            MaterialAlertDialogBuilder dialogo = new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(getString(R.string.historial_cerrado_titulo, Formatos.periodo(mes)))
+                    .setMessage(cierre.conPdf()
+                            ? getString(R.string.cierre_pdf_listo) + " " + getString(R.string.cierre_sugerir_exportar)
+                            : getString(R.string.cierre_sugerir_exportar))
+                    .setPositiveButton(R.string.historial_exportar_ahora, (d, w) ->
+                            NavHostFragment.findNavController(this).navigate(R.id.historial_a_exportarDatos))
+                    .setNegativeButton(R.string.historial_despues, null);
+            if (cierre.conPdf()) {
+                dialogo.setNeutralButton(R.string.cierre_ver_reporte, (d, w) -> verReporte(mes));
+            }
+            dialogo.show();
         });
         modelo.ocupado().observe(getViewLifecycleOwner(), ocupado ->
                 binding.progreso.setVisibility(ocupado && modelo.vista().getValue() == null ? View.VISIBLE : View.GONE));
@@ -130,11 +137,14 @@ public class HistorialFragment extends Fragment {
         fila.textoMes.setText(Formatos.periodo(periodo.periodo()));
         fila.textoCompras.setText(getString(R.string.historial_compras, Formatos.moneda(periodo.totalAdquisiciones())));
         fila.textoCategoria.setText(categoria(mes.determinacion(), false));
-        fila.getRoot().setOnClickListener(v -> {
-            Bundle argumentos = new Bundle();
-            argumentos.putString("periodo", periodo.periodo().toString());
-            NavHostFragment.findNavController(this).navigate(R.id.historial_a_reporte, argumentos);
-        });
+        fila.getRoot().setOnClickListener(v -> verReporte(periodo.periodo()));
+    }
+
+    /** P16 del mes; si está cerrado, comparte el PDF generado al cerrarlo. */
+    private void verReporte(YearMonth mes) {
+        Bundle argumentos = new Bundle();
+        argumentos.putString("periodo", mes.toString());
+        NavHostFragment.findNavController(this).navigate(R.id.historial_a_reporte, argumentos);
     }
 
     private String categoria(@Nullable Determinacion determinacion, boolean larga) {

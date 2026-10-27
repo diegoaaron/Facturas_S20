@@ -9,8 +9,8 @@ import pe.facturass20.dominio.modelo.ReglaNegocioException;
 import pe.facturass20.dominio.puertos.PeriodoRepositorio;
 
 /**
- * Cierra un mes (P17, RF-17): exige las ventas registradas y congela su determinación. Generar el
- * reporte PDF y sugerir la exportación se agregan en la iteración I5.
+ * Cierra un mes (P17, RF-17): exige las ventas registradas y congela su determinación. El reporte PDF
+ * con esa determinación y la sugerencia de exportar los agrega P17 después de cerrar (son de Android).
  */
 public final class CerrarPeriodo {
 

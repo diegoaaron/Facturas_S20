@@ -10,6 +10,9 @@ import pe.facturass20.datos.entidades.ReporteMensualEntity;
 /** Los PDF generados de cada mes (tabla {@code reporte_mensual}, RF-15): dónde quedó y su SHA-256. */
 public final class ReporteRepositorioRoom {
 
+    /** Un PDF anotado: dónde quedó y su SHA-256. */
+    public record Generado(String ruta, String sha256, LocalDateTime fecha) { }
+
     private final BaseDatosFacturas db;
     private final PeriodoRepositorioRoom periodos;
 
@@ -36,5 +39,12 @@ public final class ReporteRepositorioRoom {
         fila.fechaGeneracion = fecha;
         db.reporteDao().insertar(fila);
         return true;
+    }
+
+    /** El último PDF anotado del mes, si hay. */
+    public Optional<Generado> ultimo(YearMonth periodo) {
+        return periodos.idPeriodo(periodo)
+                .map(id -> db.reporteDao().ultimoDelPeriodo(id))
+                .map(fila -> new Generado(fila.rutaPdf, fila.sha256, fila.fechaGeneracion));
     }
 }
