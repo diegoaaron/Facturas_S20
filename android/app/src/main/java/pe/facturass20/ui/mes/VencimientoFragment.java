@@ -25,6 +25,7 @@ import pe.facturass20.databinding.FragmentVencimientoBinding;
 import pe.facturass20.ui.comun.Filas;
 import pe.facturass20.ui.comun.Formatos;
 import pe.facturass20.ui.comun.Mensajes;
+import pe.facturass20.ui.comun.PermisoNotificaciones;
 import pe.facturass20.ui.inicio.ResumenInicio;
 
 /**
@@ -38,6 +39,7 @@ public class VencimientoFragment extends Fragment {
 
     private FragmentVencimientoBinding binding;
     private CategoriaViewModel modelo;
+    private final PermisoNotificaciones permiso = new PermisoNotificaciones(this);
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -63,7 +65,12 @@ public class VencimientoFragment extends Fragment {
 
     private void recordatorio(int titulo, PreferenciasAvisos.Aviso aviso) {
         Filas.interruptor(binding.recordatorios, getString(titulo), null, modelo.avisoActivado(aviso),
-                activado -> modelo.activarAviso(aviso, activado));
+                activado -> {
+                    modelo.activarAviso(aviso, activado);
+                    if (activado) {
+                        permiso.pedirAlActivar();
+                    }
+                });
     }
 
     private void mostrar(ResumenInicio resumen, int digito) {

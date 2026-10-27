@@ -76,6 +76,7 @@ public final class VentasViewModel extends BaseViewModel {
         }
         BigDecimal monto = entrada.monto();
         enFondo(() -> contenedor().registrarVentas().ejecutar(actual.periodo(), monto), determinacion -> {
+            contenedor().revisarAvisosPronto();
             guardadas.setValue(new Evento<>(true));
         });
     }

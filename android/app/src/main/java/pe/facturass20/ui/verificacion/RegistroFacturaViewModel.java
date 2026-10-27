@@ -105,6 +105,7 @@ public abstract class RegistroFacturaViewModel extends BaseViewModel {
         try {
             FacturaCompra guardada = c.registrarFactura().ejecutar(factura, imagen, extraccion, periodoConfirmado)
                     .factura();
+            c.revisarAvisosPronto();
             return Intento.guardada(guardada.id());
         } catch (FacturaDuplicadaException e) {
             borrar(c, ruta);

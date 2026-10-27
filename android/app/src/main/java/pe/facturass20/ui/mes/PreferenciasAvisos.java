@@ -3,10 +3,12 @@ package pe.facturass20.ui.mes;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import pe.facturass20.dominio.casosuso.RevisarAvisos;
+
 /**
  * Qué avisos quiere recibir el usuario (P14) y qué recordatorios del vencimiento (P15), en
- * {@code SharedPreferences} privadas. Todos vienen activados. Las notificaciones las programará
- * WorkManager en la iteración I5; por ahora solo se guarda la elección.
+ * {@code SharedPreferences} privadas. Todos vienen activados. Las notificaciones las manda
+ * {@code RecordatorioWorker}.
  */
 public final class PreferenciasAvisos {
 
@@ -26,6 +28,7 @@ public final class PreferenciasAvisos {
     }
 
     private static final String ARCHIVO = "avisos";
+    private static final String PERMISO_PEDIDO = "permiso_pedido";
 
     private final SharedPreferences preferencias;
 
@@ -39,5 +42,20 @@ public final class PreferenciasAvisos {
 
     public void activar(Aviso aviso, boolean activado) {
         preferencias.edit().putBoolean(aviso.clave, activado).apply();
+    }
+
+    /** Si P04 ya pidió el permiso de notificaciones (se pide una sola vez). */
+    public boolean permisoPedido() {
+        return preferencias.getBoolean(PERMISO_PEDIDO, false);
+    }
+
+    public void marcarPermisoPedido() {
+        preferencias.edit().putBoolean(PERMISO_PEDIDO, true).apply();
+    }
+
+    /** Las elecciones, tal como las usa {@link RevisarAvisos}. */
+    public RevisarAvisos.Preferencias leer() {
+        return new RevisarAvisos.Preferencias(activado(Aviso.LIMITE_80), activado(Aviso.LIMITE_100),
+                activado(Aviso.TOPE_ANUAL), activado(Aviso.VENCE_EN_5_DIAS), activado(Aviso.VENCE_EN_1_DIA));
     }
 }

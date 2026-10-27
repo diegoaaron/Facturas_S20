@@ -4,6 +4,7 @@ import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 
+import pe.facturass20.trabajos.RecordatorioWorker;
 import pe.facturass20.ui.exportacion.ExportarDatosViewModel;
 
 /**
@@ -26,6 +27,7 @@ public class App extends Application {
         crearCanales();
         // Los ZIP que quedaron de compartir no van cifrados (§9.1).
         contenedor.ejecutor().execute(() -> ExportarDatosViewModel.borrarTemporales(this));
+        RecordatorioWorker.programar(this);
     }
 
     public ContenedorDependencias contenedor() {

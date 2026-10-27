@@ -24,6 +24,7 @@ import pe.facturass20.ui.comun.BarraLimiteView;
 import pe.facturass20.ui.comun.Filas;
 import pe.facturass20.ui.comun.Formatos;
 import pe.facturass20.ui.comun.Mensajes;
+import pe.facturass20.ui.comun.PermisoNotificaciones;
 import pe.facturass20.ui.inicio.ResumenInicio;
 
 /**
@@ -35,6 +36,7 @@ public class CategoriaFragment extends Fragment {
 
     private FragmentCategoriaBinding binding;
     private CategoriaViewModel modelo;
+    private final PermisoNotificaciones permiso = new PermisoNotificaciones(this);
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -71,7 +73,12 @@ public class CategoriaFragment extends Fragment {
 
     private void aviso(int titulo, PreferenciasAvisos.Aviso aviso) {
         Filas.interruptor(binding.avisos, getString(titulo), null, modelo.avisoActivado(aviso),
-                activado -> modelo.activarAviso(aviso, activado));
+                activado -> {
+                    modelo.activarAviso(aviso, activado);
+                    if (activado) {
+                        permiso.pedirAlActivar();
+                    }
+                });
     }
 
     private void mostrar(CategoriaViewModel.Vista vista) {

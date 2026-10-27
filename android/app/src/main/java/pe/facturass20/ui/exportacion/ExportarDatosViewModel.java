@@ -163,7 +163,7 @@ public final class ExportarDatosViewModel extends BaseViewModel {
 
     private void avisarListo(SolicitudExportacion solicitud, ResumenExportacion resumen) {
         String periodo = solicitud.esAnual() ? String.valueOf(solicitud.anio())
-                : Formatos.periodo(YearMonth.of(solicitud.anio(), solicitud.mes()));
+                : Formatos.mes(YearMonth.of(solicitud.anio(), solicitud.mes())) + " de " + solicitud.anio();
         mostrarMensaje(getApplication().getResources().getQuantityString(R.plurals.exportar_listo,
                 resumen.facturas(), resumen.facturas(), periodo));
     }

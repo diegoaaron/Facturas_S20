@@ -854,7 +854,7 @@ Son iteraciones de dos semanas, alineadas con las entregas del curso.
 | Paso 0 | 8 | Configuración del equipo y proyecto Android base | App "Hello World!" en el teléfono | ✅ completo (ver 13.3) |
 | I3 | 9–10 | Front-end navegable (P01–P20) sobre la base de datos cifrada, y dominio con motor de reglas probado | Incremento 1 | ✅ completo el 2026-10-25 (pasos 1 a 5, ver 13.4) |
 | I4 | 11–12 | Inferencia local con el modelo convertido, medición en el teléfono (la prueba de usabilidad se retiró el 2026-10-27) | APF3 | en curso (ver 13.4) |
-| I5 | 13–14 | Reporte PDF, exportación de datos e historial | Incremento 3 | en curso (PDF y exportación a ZIP hechos el 2026-10-27; faltan los recordatorios) |
+| I5 | 13–14 | Reporte PDF, exportación de datos e historial | Incremento 3 | ✅ completo el 2026-10-27 (PDF, exportación a ZIP y avisos; falta abrir el ZIP en Excel y LibreOffice, paso 12) |
 | I6 | 15–18 | Pruebas, validación en mes simulado y sustentación | Informe final | pendiente |
 
 ### 13.3 Paso 0 · Configuración del equipo ✅ (hecho)
@@ -976,7 +976,15 @@ Decidido el 2026-09-28: para el APF3 se muestra ~80 % de front-end (la app) y ~2
 
 **I5 · semanas 13–14 — Reportes, exportación de datos e historial**
 9. ~~Reporte PDF (8.5) y compartir~~ (hecho el 2026-10-27, ver §8.5); cierre de mes e historial (P17) con la sugerencia de exportar (hechos en I3). ~~Pendiente: que `CerrarPeriodo` genere el PDF al cerrar el mes~~ — hecho el 2026-10-27: P17 cierra el mes y genera su PDF en la misma tarea (`GeneradorReporte`); si el PDF falla, el mes queda cerrado y P16 lo genera al compartirlo. No se probó con un cierre real en el teléfono (cerrar es irreversible).
-10. WorkManager: recordatorios y avisos.
+10. ~~WorkManager: recordatorios y avisos~~ (hecho el 2026-10-27):
+   - **Dominio:** `RevisarAvisos` decide qué notificaciones tocan hoy y las anota en la tabla `aviso` (puerto `AvisoRepositorio`, `AvisoRepositorioRoom`) para no repetirlas:
+     - Vencimiento de la declaración del mes anterior, 5 días y 1 día antes. Si el de 5 días no salió (teléfono apagado), solo se manda el más cercano. No avisa de meses anteriores a la fecha de alta.
+     - 80 % y 100 % del límite (el 100 % incluye quedar fuera del régimen), una vez por mes, en los meses abiertos actual y anterior. Después del 100 % ya no se manda el 80 %.
+     - Acercarse al tope anual, una vez por año. Se agregó `TipoAviso.TOPE_ANUAL`.
+     - Respeta los interruptores de P14 y P15 (`PreferenciasAvisos.leer()`).
+   - **`trabajos.RecordatorioWorker`:** corre una vez al día a las 9:00 (trabajo periódico único, programado al iniciar la app) y después de guardar una factura o las ventas (`ContenedorDependencias.revisarAvisosPronto()`). Sin permiso de notificaciones no revisa nada, así los avisos no quedan anotados y llegan cuando se conceda, si siguen a tiempo. En la pantalla bloqueada solo se ve «Tiene un aviso de Facturas S20», sin montos ni fechas. No usa red.
+   - **Permiso (Android 13+):** `ui.comun.PermisoNotificaciones`. P04 lo pide una sola vez; P14 y P15 lo piden al activar un aviso y, si se niega, explican que los avisos no llegarán.
+   - **Pruebas:** `RevisarAvisosTest` (dominio, 7), `RecordatorioWorkerTest` (hora de la revisión) y `trabajos.NotificacionesAvisosTest` (instrumentada: muestra una notificación de cada tipo con datos de ejemplo; no toca la base).
 11. ~~Exportación de datos (sección 9): `ExportarDatos`, `ExportadorDatos`, `EscritorCsv`, P20 con SAF y compartir por `FileProvider`~~ (hecho el 2026-10-27, ver §9.6).
 12. Pruebas de exportación y verificación del criterio 9.5 en Excel y LibreOffice.
 

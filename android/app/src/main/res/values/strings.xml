@@ -179,6 +179,22 @@
     <!-- Notificaciones -->
     <string name="canal_avisos_nombre">Avisos del NRUS</string>
     <string name="canal_avisos_descripcion">Límite de la categoría y fecha de vencimiento de la declaración</string>
+    <!-- Notificaciones de RecordatorioWorker (RF-14) -->
+    <string name="notif_publica">Tiene un aviso de Facturas S20</string>
+    <string name="notif_vence_titulo">Declaración del NRUS de %1$s</string>
+    <string name="notif_vence_hoy">Vence hoy.</string>
+    <string name="notif_vence_manana">Vence mañana, %1$s.</string>
+    <string name="notif_vence_en_dias">Vence en %1$d días, el %2$s.</string>
+    <string name="notif_vence_cuota">Cuota: %1$s.</string>
+    <string name="notif_80_titulo">Se acerca al límite de su categoría</string>
+    <string name="notif_80_texto">Sus montos de %2$s superaron el 80 %% del límite de la categoría %1$d.</string>
+    <string name="notif_100_titulo">Pasó a la categoría %1$d</string>
+    <string name="notif_100_texto">Sus montos de %1$s superaron el límite de su categoría. La cuota del mes es %2$s.</string>
+    <string name="notif_fuera_titulo">Superó el límite del Nuevo RUS</string>
+    <string name="notif_fuera_texto">Con los montos de %1$s ya no le corresponde el Nuevo RUS. Consulte con su contador.</string>
+    <string name="notif_tope_anual_titulo">Se acerca al tope anual del Nuevo RUS</string>
+    <string name="notif_tope_anual_texto">Sus compras o ventas de %1$d se acercan al tope anual de %2$s.</string>
+    <string name="permiso_notificaciones_negado">Sin permiso de notificaciones no le llegarán los avisos. Puede darlo en los ajustes de Android.</string>
     <string name="canal_descarga_nombre">Descarga del lector de facturas</string>
     <string name="canal_descarga_descripcion">Avance de la descarga única del modelo de IA</string>
 

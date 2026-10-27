@@ -13,6 +13,7 @@ import pe.facturass20.datos.cifrado.AlmacenImagenes;
 import pe.facturass20.datos.cifrado.GestorClaves;
 import pe.facturass20.datos.cifrado.GestorPin;
 import pe.facturass20.datos.parametros.CargadorParametrosNrus;
+import pe.facturass20.datos.repositorios.AvisoRepositorioRoom;
 import pe.facturass20.datos.repositorios.ContribuyenteRepositorioRoom;
 import pe.facturass20.datos.repositorios.DetallesExportacionRoom;
 import pe.facturass20.datos.repositorios.FacturaRepositorioRoom;
@@ -25,6 +26,7 @@ import pe.facturass20.dominio.casosuso.DeterminarCategoria;
 import pe.facturass20.dominio.casosuso.ExportarDatos;
 import pe.facturass20.dominio.casosuso.RegistrarFactura;
 import pe.facturass20.dominio.casosuso.RegistrarVentas;
+import pe.facturass20.dominio.casosuso.RevisarAvisos;
 import pe.facturass20.dominio.casosuso.VerificarFactura;
 import pe.facturass20.dominio.puertos.ContribuyenteRepositorio;
 import pe.facturass20.dominio.puertos.ExportadorArchivos;
@@ -39,6 +41,7 @@ import pe.facturass20.inferencia.ExtractorGemma;
 import pe.facturass20.inferencia.GestorModeloLocal;
 import pe.facturass20.inferencia.ManifiestoModelo;
 import pe.facturass20.inferencia.litert.LiteRtLmPuente;
+import pe.facturass20.trabajos.RecordatorioWorker;
 import pe.facturass20.ui.acceso.PreferenciasAcceso;
 import pe.facturass20.ui.acceso.Sesion;
 import pe.facturass20.ui.captura.CapturaEnCurso;
@@ -274,6 +277,16 @@ public final class ContenedorDependencias {
         return new CerrarPeriodo(periodos(), determinarCategoria());
     }
 
+    /** Qué notificaciones tocan hoy (RecordatorioWorker). */
+    public RevisarAvisos revisarAvisos() {
+        return new RevisarAvisos(periodos(), contribuyentes(), determinarCategoria(), adaptadores().avisos, reloj);
+    }
+
+    /** Después de un cambio en los montos: revisa en segundo plano si toca avisar del límite. */
+    public void revisarAvisosPronto() {
+        RecordatorioWorker.revisarAhora(contexto);
+    }
+
     public ExportarDatos exportarDatos(ExportadorArchivos exportador) {
         return new ExportarDatos(periodos(), exportador);
     }
@@ -301,6 +314,7 @@ public final class ContenedorDependencias {
         final ParametrosRepositorioRoom parametros;
         final ReporteRepositorioRoom reportes;
         final DetallesExportacionRoom detallesExportacion;
+        final AvisoRepositorioRoom avisos;
         final AlmacenImagenes imagenes;
         final GestorPin pin;
         final CargadorParametrosNrus cargador;
@@ -315,6 +329,7 @@ public final class ContenedorDependencias {
             parametros = new ParametrosRepositorioRoom(base);
             reportes = new ReporteRepositorioRoom(base, periodos);
             detallesExportacion = new DetallesExportacionRoom(base, periodos);
+            avisos = new AvisoRepositorioRoom(base, periodos);
             imagenes = new AlmacenImagenes(contexto);
             pin = new GestorPin(base.contribuyenteDao());
             cargador = new CargadorParametrosNrus(contexto, base);

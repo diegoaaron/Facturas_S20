@@ -22,6 +22,7 @@ import pe.facturass20.dominio.modelo.FacturaCompra;
 import pe.facturass20.dominio.modelo.NivelAlerta;
 import pe.facturass20.ui.comun.Formatos;
 import pe.facturass20.ui.comun.Mensajes;
+import pe.facturass20.ui.comun.PermisoNotificaciones;
 
 /**
  * P04 Inicio: compras del mes con la barra del límite, ventas, categoría y cuota, vencimiento y las
@@ -31,6 +32,7 @@ public class InicioFragment extends Fragment {
 
     private FragmentInicioBinding binding;
     private InicioViewModel modelo;
+    private final PermisoNotificaciones permiso = new PermisoNotificaciones(this);
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -53,6 +55,8 @@ public class InicioFragment extends Fragment {
         modelo.ocupado().observe(getViewLifecycleOwner(), ocupado ->
                 binding.progreso.setVisibility(ocupado && modelo.resumen().getValue() == null ? View.VISIBLE : View.GONE));
         Mensajes.observar(this, modelo, binding.getRoot());
+        // Los avisos del NRUS vienen activados: sin el permiso no llegarían.
+        permiso.pedirUnaVez();
     }
 
     @Override
