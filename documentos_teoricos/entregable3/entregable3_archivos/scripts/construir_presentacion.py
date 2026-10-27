@@ -1,8 +1,9 @@
 """Construye documentos_teoricos/entregable3/entregable3_presentacion.pptx (exposición del APF3).
 
 Cubre solo lo que pidió el docente para esta exposición: Project Charter básico, diagrama de Gantt, diagramas de
-procesos con la cobertura del alcance funcional y no funcional, diagramas lógico y físico de la base de datos y
-capturas de la app. Usa la línea gráfica y las utilidades de la PPT del entregable 2. Uso:
+procesos con el alcance que cubren, diagramas lógico y físico de la base de datos y capturas de la app. El
+2026-10-27 el equipo quitó los subprocesos de soporte y la matriz de cobertura, y ajustó la PPT a mano en
+PowerPoint: regenerarla pisa esos ajustes. Usa la línea gráfica y las utilidades de la PPT del entregable 2. Uso:
     python diagramas_e3.py            # si cambian el Gantt o el esquema de la base
     python construir_presentacion.py
 """
@@ -166,42 +167,6 @@ def proceso_registro():
                                                             "RNF-13 transacción"], AZUL)
 
 
-def procesos_soporte():
-    s = diapositiva("Diagramas de procesos", "Subprocesos de cierre mensual y de publicación del modelo",
-                    "El cierre mensual cubre la parte del NRUS: ventas, categoría, cuota, avisos, vencimiento, reporte "
-                    "y cierre del mes. La publicación del modelo cubre cómo llega el modelo ajustado al teléfono: se "
-                    "evalúa contra el base, se convierte y la app lo descarga una sola vez y verifica su huella.")
-    imagen(s, os.path.join(E2, "bpmn_04_cierre.png"), 0.45, 1.35, 9.1, 2.75, sin_titulo=True)
-    imagen(s, os.path.join(E2, "bpmn_05_modelo.png"), 0.45, 4.2, 9.1, 2.75, sin_titulo=True)
-    etiquetas(s, 9.75, 1.35, 3.1, "Cierre mensual", ["RF-09 a RF-17, RF-21, RF-22", "RNF-03 total exacto",
-                                                      "RNF-08 reporte PDF", "RNF-17, 18 reglas del NRUS"], VERDE)
-    etiquetas(s, 9.75, 4.2, 3.1, "Publicación del modelo", ["RF-20 instalar y actualizar", "RNF-06, 07 tamaño y equipo",
-                                                             "RNF-16 descarga verificada", "RNF-19 cambiar el modelo"],
-              AZUL)
-
-
-def cobertura():
-    s = diapositiva("Diagramas de procesos", "Cobertura del alcance funcional y no funcional",
-                    "Esta matriz resume qué proceso cubre cada requerimiento. Los 22 funcionales y los 19 no "
-                    "funcionales quedan cubiertos. El acceso con PIN o huella y la anulación son transversales: no "
-                    "tienen diagrama propio y se ven en las pantallas P01, P02 y P12.")
-    filas = [
-        ["Proceso", "Requerimientos funcionales", "Requerimientos no funcionales"],
-        ["Proceso propuesto (TO-BE)", "RF-01 a RF-17, RF-21", "RNF-03, RNF-09, RNF-12, RNF-14"],
-        ["Registrar factura con IA", "RF-01 a RF-08", "RNF-01, 02, 04, 05, 09, 10, 12, 13, 14"],
-        ["Cierre mensual y declaración", "RF-09 a RF-17, RF-21, RF-22", "RNF-03, 08, 13, 17, 18"],
-        ["Publicar y actualizar el modelo", "RF-20", "RNF-01, 02, 06, 07, 16, 19"],
-        ["Transversal: acceso y anulación (P01, P02, P12)", "RF-18, RF-19", "RNF-11, RNF-15"],
-        ["Total cubierto", "22 de 22 (100 %)", "19 de 19 (100 %)"],
-    ]
-    tabla(s, 0.55, 1.5, 12.2, filas, [4, 4, 4.2], size=13, alto_fila=0.55, resaltar={6})
-    caja_texto(s, 0.55, 5.6, 12.2, 1.2,
-               [[("Funcional: ", True), ("lo que hace la app (registrar, calcular, avisar, reportar, exportar).", False)],
-                [("No funcional: ", True), ("cómo lo hace: exactitud, tiempo, memoria, sin conexión, cifrado y "
-                                            "reglas mantenibles.", False)]],
-               size=13, color=GRIS)
-
-
 # ---------------------------------------------------------------- base de datos
 def bd_logico():
     s = diapositiva("Base de datos", "Modelo lógico de la base de datos",
@@ -282,8 +247,6 @@ def main():
     gantt()
     proceso_tobe()
     proceso_registro()
-    procesos_soporte()
-    cobertura()
     bd_logico()
     bd_fisico_registro()
     bd_fisico_nrus()
